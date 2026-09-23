@@ -26,4 +26,26 @@ when the user asks. Mark done items with `[x]` and the date; do not delete them 
 - [ ] Decide whether to link the team skills repository `~/git/ai-skills/skills/*` into
       `companies/youdo/skills/` via symlinks. (proposed 2026-09-23)
 
+### Token cost optimization (proposed 2026-09-23)
+
+- [ ] AGENTS.md rule: a sequence of three or more commands run twice becomes a script in
+      `scripts/`; check `scripts/` before improvising. Scripts print a compact summary,
+      not raw output (`--summary`, `--quiet`).
+- [ ] `general/scripts/kb_find.py <keywords>`: search the knowledge base and return only
+      title, system, checked date and matching lines per note, instead of reading INDEX.md
+      and whole maps. AGENTS.md rule: read long maps in parts (first 40 lines, then the
+      needed section), not whole.
+- [ ] Notes over ~8 KB start with a `## Summary` of 10-15 lines; `kb_lint.py` warns when a
+      long note has none. Add summaries to the existing large maps (dev-deployment overview,
+      gitlab-ci deploy-dev, jenkins deploy-dev-b2b, test-k8s, android system map).
+- [ ] AGENTS.md rule: reading more than three files or a long log is delegated to a
+      subagent that returns a few lines of conclusions.
+- [ ] Mark the recommended model tier in each prompt under `general/prompts/`; use a cheaper
+      model for translation, migration, frontmatter fixes and template-based recipes.
+- [ ] Habit: one session per task; the knowledge base carries context between sessions.
+- [ ] Output discipline in AGENTS.md: never print whole files when one line is needed
+      (`head`, `grep -c`, `wc -l`, script `--quiet`).
+- [ ] Measure weekly (`/cost` in Claude Code, Codex usage stats); note expensive tasks and
+      why in the log.
+
 ## Done
