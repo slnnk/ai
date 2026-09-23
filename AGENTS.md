@@ -41,11 +41,14 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
 
 ## After significant work
 
+- Create new notes with `python3 ~/ai/general/scripts/new_note.py log|system|recipe ...`;
+  it sets the path, name and frontmatter. Then fill the sections.
 - Log entry: `knowledge/log/YYYY-MM-DD-<system>-<slug>.md`. Cover: task, context (project,
   environment, hosts, ticket), actions and key commands, findings and conclusions, changed
   files, remaining risks and TODO.
 - System map: update the existing file in `knowledge/systems/`; never create a duplicate.
-  For a new system create a minimal map from the template in `general/knowledge/README.md`.
+- Run `python3 ~/ai/general/scripts/kb_lint.py` and fix what it reports; `ai-sync.sh` also
+  prints findings at the start of the next day.
 - Repositories: keep `knowledge/repos.md` current: local path, origin URL without
   credentials, purpose, related system, date checked.
 - Regenerate indexes: `python3 ~/ai/general/scripts/build_index.py`.
@@ -80,6 +83,11 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
 - For secrets found in infrastructure record only the location, variable name and access
   route (bastion, VPN, vault path, role). Never the value.
 - Do not copy personal data without need.
+
+## Backlog
+
+`~/ai/TODO.md` is the user's backlog for the knowledge base itself. Read it when asked to
+review it; add entries only when the user asks.
 
 ## Agent memory
 

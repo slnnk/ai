@@ -140,6 +140,22 @@ purpose, related system, date checked. Link related clones in the system map
 (app <-> autotests <-> infrastructure <-> shared library <-> docs). Extend the registry
 gradually while working; do not crawl the whole filesystem.
 
+## Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `general/scripts/new_note.py log\|system\|recipe ...` | create a note with correct path, name and frontmatter |
+| `general/scripts/kb_lint.py [--staged]` | check frontmatter, log names, links, secrets, company identifiers in `general/`, language |
+| `general/scripts/build_index.py` | rebuild `INDEX.md` in every layer |
+| `general/scripts/ai-sync.sh` | once-a-day lint, index, commit and push (see below) |
+
+Company identifiers that must never appear in `general/` are listed one per line in
+`companies/<name>/lint-identifiers.txt`; private IP ranges and `*.corp` hosts are checked
+by default. Use RFC 5737 addresses (192.0.2.x, 198.51.100.x, 203.0.113.x) in recipes.
+
+Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
+`extract-recipe.md`).
+
 ## Indexes
 
 `python3 ~/ai/general/scripts/build_index.py` rewrites `knowledge/INDEX.md` in every

@@ -14,7 +14,7 @@ values. On the host `zabbix-agent2` is active and listens on TCP 10050, and `tel
 from the server connects. The agent log shows:
 
 ```
-failed to accept an incoming connection: connection from "10.20.0.1" rejected, allowed hosts: "198.51.100.10,198.51.100.11"
+failed to accept an incoming connection: connection from "192.0.2.1" rejected, allowed hosts: "198.51.100.10,198.51.100.11"
 ```
 
 ## Cause
@@ -30,7 +30,7 @@ sites without NAT, and leave `ServerActive=` pointing at the real server (active
 and unaffected by NAT):
 
 ```ini
-Server=198.51.100.10,198.51.100.11,10.20.0.1
+Server=198.51.100.10,198.51.100.11,192.0.2.1
 ServerActive=198.51.100.11
 ```
 

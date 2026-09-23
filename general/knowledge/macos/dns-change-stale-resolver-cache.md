@@ -29,7 +29,7 @@ DHCP, profiles or MDM scripts.
 Set the resolver persistently on the network service and flush the system cache:
 
 ```bash
-sudo networksetup -setdnsservers Ethernet 10.0.0.53      # your resolver(s), space separated
+sudo networksetup -setdnsservers Ethernet 192.0.2.53      # your resolver(s), space separated
 sudo dscacheutil -flushcache
 sudo killall -HUP mDNSResponder
 ```

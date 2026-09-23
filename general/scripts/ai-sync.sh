@@ -56,6 +56,18 @@ git add -A || fail "git add"
 if git diff --cached --name-only | grep -qE '(^|/)\.env$'; then
   git reset -q; fail "a .env file is staged; check .gitignore"
 fi
+# lint staged notes: a credential blocks the commit, other findings are reported and fixed later
+LINT=/tmp/ai-sync-lint.$$
+python3 general/scripts/kb_lint.py --staged > "$LINT" 2>&1
+if grep -q '^E secret' "$LINT"; then
+  grep '^E secret' "$LINT" >&2; rm -f "$LINT"; git reset -q
+  fail "a staged note looks like it contains a credential; remove it and rerun"
+fi
+if grep -q '^[EW] ' "$LINT"; then
+  log "lint findings to fix (commit proceeds):"; grep '^[EW] ' "$LINT" | sed 's/^/  /'
+fi
+rm -f "$LINT"
+
 added=$(git diff --cached --name-status | grep -c '^A' || true)
 modified=$(git diff --cached --name-status | grep -c '^M' || true)
 deleted=$(git diff --cached --name-status | grep -c '^D' || true)

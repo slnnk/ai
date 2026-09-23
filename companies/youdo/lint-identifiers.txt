@@ -1,0 +1,6 @@
+# Company identifiers that must never appear in general/ (case-insensitive substrings)
+youdo
+slnnk
+msk3-
+DEVOPS-
+sebbia
