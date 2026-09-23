@@ -58,7 +58,7 @@ grep -R --line-number bullseye-security /etc/apt/sources.list /etc/apt/sources.l
 
 Status: cause confirmed; host/container configuration was not changed.
 
-Portable lesson: `~/ai/general/knowledge/linux/apt-release-file-expired-after-debian-lts-end.md`.
+Portable lesson: `~/ai/general/knowledge/linux/debian-eol-apt-repositories.md`.
 
 ## 2026-08-20: Google Chrome key and disabling GitLab
 

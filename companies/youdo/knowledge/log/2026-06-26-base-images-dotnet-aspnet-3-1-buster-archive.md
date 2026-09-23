@@ -40,4 +40,4 @@ Other .NET 3.1 or Debian buster based Dockerfiles may need the same archive-sour
 
 ## Portable lesson
 
-[`~/ai/general/knowledge/docker/debian-eol-apt-sources-archive.md`](../../../../general/knowledge/docker/debian-eol-apt-sources-archive.md)
+[`~/ai/general/knowledge/linux/debian-eol-apt-repositories.md`](../../../../general/knowledge/linux/debian-eol-apt-repositories.md)
