@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# ai-sync.sh — once-a-day commit and push of the ~/ai knowledge base.
+#
+# Agents call this at the start of every task. It is cheap and idempotent:
+#   - if ~/ai/.last-sync already holds today's date, it exits immediately;
+#   - otherwise it rebuilds the indexes, commits any changes with an automatic
+#     message, pulls with rebase, pushes to all remotes and records today's date.
+#
+# Usage:
+#   ai-sync.sh            run if not yet run today
+#   ai-sync.sh --force    run even if already synced today
+#   ai-sync.sh --dry-run  show what would be committed, change nothing
+#   ai-sync.sh --status   print the last sync date and exit
+#
+# Exit codes: 0 synced or nothing to do; 1 sync failed (state file not updated,
+# so the next call retries); 2 usage error.
+#
+# The state file is per machine and is not tracked in git.
+
+set -u
+AI_ROOT="${AI_ROOT:-$HOME/ai}"
+STATE="$AI_ROOT/.last-sync"
+TODAY="$(date +%F)"
+FORCE=0; DRY=0
+
+for arg in "$@"; do
+  case "$arg" in
+    --force) FORCE=1 ;;
+    --dry-run) DRY=1 ;;
+    --status) echo "last sync: $(cat "$STATE" 2>/dev/null || echo never)"; exit 0 ;;
+    -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "ai-sync: unknown option $arg" >&2; exit 2 ;;
+  esac
+done
+
+cd "$AI_ROOT" || { echo "ai-sync: $AI_ROOT not found" >&2; exit 1; }
+
+if [ "$FORCE" -eq 0 ] && [ "$DRY" -eq 0 ] && [ "$(cat "$STATE" 2>/dev/null)" = "$TODAY" ]; then
+  exit 0
+fi
+
+log() { echo "ai-sync: $*"; }
+fail() { log "FAILED: $*"; exit 1; }
+
+# 1. indexes
+python3 general/scripts/build_index.py >/dev/null || fail "build_index.py"
+
+# 2. stage and inspect
+git add -A || fail "git add"
+if git diff --cached --name-only | grep -qE '(^|/)\.env$'; then
+  git reset -q; fail "a .env file is staged; check .gitignore"
+fi
+added=$(git diff --cached --name-status | grep -c '^A' || true)
+modified=$(git diff --cached --name-status | grep -c '^M' || true)
+deleted=$(git diff --cached --name-status | grep -c '^D' || true)
+renamed=$(git diff --cached --name-status | grep -c '^R' || true)
+
+if [ "$DRY" -eq 1 ]; then
+  log "dry run: $added added, $modified modified, $deleted deleted, $renamed renamed"
+  git diff --cached --name-status | sed 's/^/  /'
+  git reset -q
+  exit 0
+fi
+
+# 3. commit
+if ! git diff --cached --quiet; then
+  msg="Sync $TODAY: $added added, $modified modified"
+  [ "$deleted" -gt 0 ] && msg="$msg, $deleted deleted"
+  [ "$renamed" -gt 0 ] && msg="$msg, $renamed renamed"
+  git commit -q -m "$msg" || fail "git commit"
+  log "$msg"
+else
+  log "nothing to commit"
+fi
+
+# 4. pull --rebase, then push to every remote URL of origin
+export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=8"
+if git remote get-url origin >/dev/null 2>&1; then
+  if ! git pull --rebase -q origin main 2>/tmp/ai-sync-pull.$$; then
+    git rebase --abort 2>/dev/null
+    cat /tmp/ai-sync-pull.$$ >&2; rm -f /tmp/ai-sync-pull.$$
+    fail "pull --rebase; resolve manually in $AI_ROOT"
+  fi
+  rm -f /tmp/ai-sync-pull.$$
+  if ! git push -q origin main 2>/tmp/ai-sync-push.$$; then
+    cat /tmp/ai-sync-push.$$ >&2; rm -f /tmp/ai-sync-push.$$
+    fail "push (commit is saved locally; will retry next run)"
+  fi
+  rm -f /tmp/ai-sync-push.$$
+  log "pushed to all remotes"
+fi
+
+echo "$TODAY" > "$STATE"
+exit 0

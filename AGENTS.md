@@ -20,6 +20,8 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
 
 ## Before a task
 
+- Run `~/ai/general/scripts/ai-sync.sh`. It commits and pushes the knowledge base once a day
+  (state in `~/ai/.last-sync`) and exits instantly when already done today.
 - Read `~/ai/current/CONTEXT.md`.
 - Open `knowledge/INDEX.md` of the relevant layer, then the system map in `knowledge/systems/`.
 - `grep -ril <keyword> ~/ai/general/knowledge ~/ai/personal/knowledge ~/ai/current/knowledge`
@@ -47,6 +49,7 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
 - Repositories: keep `knowledge/repos.md` current: local path, origin URL without
   credentials, purpose, related system, date checked.
 - Regenerate indexes: `python3 ~/ai/general/scripts/build_index.py`.
+- Do not commit or push `~/ai` yourself; the daily `ai-sync.sh` run does it.
 - Every note starts with frontmatter:
 
       ---

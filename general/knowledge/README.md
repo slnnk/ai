@@ -144,3 +144,13 @@ gradually while working; do not crawl the whole filesystem.
 
 `python3 ~/ai/general/scripts/build_index.py` rewrites `knowledge/INDEX.md` in every
 layer (`general`, `personal`, `current`). Run it after adding or renaming notes.
+
+## Daily sync
+
+`~/ai/general/scripts/ai-sync.sh` is called by agents at the start of every task. On the
+first call of a day it rebuilds indexes, commits everything with an automatic message
+(`Sync YYYY-MM-DD: N added, M modified`), pulls with rebase and pushes to all remotes, then
+writes the date to `~/ai/.last-sync`. Later calls the same day exit at once. `--force` runs
+regardless of the date, `--dry-run` shows what would be committed, `--status` prints the
+last sync date. A failed push leaves the commit local and the state file untouched, so the
+next call retries. Agents never run `git commit` in `~/ai` themselves.

@@ -1,3 +1,5 @@
 # secrets only; repositories are private
 .env
 **/.env
+# per-machine state of the daily sync
+.last-sync
