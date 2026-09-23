@@ -71,65 +71,8 @@ fi
 # 3. commit with a message built from agent notes and changed-note metadata
 if ! git diff --cached --quiet; then
   MSG=/tmp/ai-sync-msg.$$
-  git diff --cached --name-status | python3 - "$TODAY" "$NOTES" > "$MSG" <<'PY' || fail "compose commit message"
-import re, sys, pathlib, subprocess
-today, notes_path = sys.argv[1], sys.argv[2]
-status_word = {"A": "added", "M": "updated", "D": "removed", "R": "renamed"}
-
-def meta(path):
-    """Return (system, title) from a note's frontmatter and first H1, or (None, None)."""
-    p = pathlib.Path(path)
-    if p.suffix != ".md" or not p.exists() or p.name in ("INDEX.md",):
-        return None, None
-    system = title = None
-    try:
-        for line in p.read_text(errors="replace").splitlines()[:40]:
-            m = re.match(r"^system:\s*(\S+)", line)
-            if m and not system: system = m.group(1)
-            if line.startswith("# ") and not title: title = line[2:].strip()
-            if system and title: break
-    except OSError:
-        pass
-    return system, title
-
-def area(path):
-    parts = pathlib.Path(path).parts
-    if parts[0] == "companies" and len(parts) > 2: return parts[1]
-    if parts[0] in ("general", "personal") and len(parts) > 2 and parts[1] == "knowledge": return f"{parts[0]}/{parts[2]}"
-    return parts[0]
-
-files, areas = [], []
-for line in sys.stdin:
-    cols = line.rstrip("\n").split("\t")
-    st, path = cols[0][0], cols[-1]
-    if path.endswith("INDEX.md") or path == ".gitignore":
-        continue
-    system, title = meta(path) if st != "D" else (None, None)
-    label = area(path)
-    if system and label.startswith("companies/") is False and "/" not in label and system != label:
-        label = f"{label}/{system}"
-    if label not in areas: areas.append(label)
-    files.append((st, path, title))
-
-notes = []
-np = pathlib.Path(notes_path)
-if np.exists():
-    notes = [l.strip() for l in np.read_text(errors="replace").splitlines() if l.strip()]
-
-subject_areas = ", ".join(areas[:4]) + (" ..." if len(areas) > 4 else "")
-print(f"Sync {today}: {subject_areas or 'index and housekeeping'}")
-print()
-if notes:
-    print("Work recorded by agents:")
-    for n in notes:
-        print(f"- {n.lstrip('-* ')}")
-    print()
-if files:
-    print("Files:")
-    for st, path, title in files:
-        w = status_word.get(st, st)
-        print(f"- {w} {path}" + (f": {title}" if title else ""))
-PY
+  git diff --cached --name-status | python3 general/scripts/ai_sync_message.py "$TODAY" "$NOTES" > "$MSG" \
+    || fail "compose commit message"
   git commit -q -F "$MSG" || fail "git commit"
   log "$(head -1 "$MSG")"
   rm -f "$MSG"
