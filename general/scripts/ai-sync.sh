@@ -3,8 +3,13 @@
 #
 # Agents call this at the start of every task. It is cheap and idempotent:
 #   - if ~/ai/.last-sync already holds today's date, it exits immediately;
-#   - otherwise it rebuilds the indexes, commits any changes with an automatic
-#     message, pulls with rebase, pushes to all remotes and records today's date.
+#   - otherwise it rebuilds the indexes, commits any changes, pulls with rebase,
+#     pushes to all remotes and records today's date.
+#
+# Commit message: subject lists the touched areas (company, general/<tech>, ...);
+# body contains the lines agents appended to ~/ai/.sync-notes ("what and why")
+# followed by every changed note with its title. .sync-notes is emptied after the
+# commit. Agents append with:  echo "- <system>: <what changed and why>" >> ~/ai/.sync-notes
 #
 # Usage:
 #   ai-sync.sh            run if not yet run today
@@ -20,6 +25,7 @@
 set -u
 AI_ROOT="${AI_ROOT:-$HOME/ai}"
 STATE="$AI_ROOT/.last-sync"
+NOTES="$AI_ROOT/.sync-notes"   # one line per piece of work, appended by agents, cleared after commit
 TODAY="$(date +%F)"
 FORCE=0; DRY=0
 
@@ -62,13 +68,72 @@ if [ "$DRY" -eq 1 ]; then
   exit 0
 fi
 
-# 3. commit
+# 3. commit with a message built from agent notes and changed-note metadata
 if ! git diff --cached --quiet; then
-  msg="Sync $TODAY: $added added, $modified modified"
-  [ "$deleted" -gt 0 ] && msg="$msg, $deleted deleted"
-  [ "$renamed" -gt 0 ] && msg="$msg, $renamed renamed"
-  git commit -q -m "$msg" || fail "git commit"
-  log "$msg"
+  MSG=/tmp/ai-sync-msg.$$
+  git diff --cached --name-status | python3 - "$TODAY" "$NOTES" > "$MSG" <<'PY' || fail "compose commit message"
+import re, sys, pathlib, subprocess
+today, notes_path = sys.argv[1], sys.argv[2]
+status_word = {"A": "added", "M": "updated", "D": "removed", "R": "renamed"}
+
+def meta(path):
+    """Return (system, title) from a note's frontmatter and first H1, or (None, None)."""
+    p = pathlib.Path(path)
+    if p.suffix != ".md" or not p.exists() or p.name in ("INDEX.md",):
+        return None, None
+    system = title = None
+    try:
+        for line in p.read_text(errors="replace").splitlines()[:40]:
+            m = re.match(r"^system:\s*(\S+)", line)
+            if m and not system: system = m.group(1)
+            if line.startswith("# ") and not title: title = line[2:].strip()
+            if system and title: break
+    except OSError:
+        pass
+    return system, title
+
+def area(path):
+    parts = pathlib.Path(path).parts
+    if parts[0] == "companies" and len(parts) > 2: return parts[1]
+    if parts[0] in ("general", "personal") and len(parts) > 2 and parts[1] == "knowledge": return f"{parts[0]}/{parts[2]}"
+    return parts[0]
+
+files, areas = [], []
+for line in sys.stdin:
+    cols = line.rstrip("\n").split("\t")
+    st, path = cols[0][0], cols[-1]
+    if path.endswith("INDEX.md") or path == ".gitignore":
+        continue
+    system, title = meta(path) if st != "D" else (None, None)
+    label = area(path)
+    if system and label.startswith("companies/") is False and "/" not in label and system != label:
+        label = f"{label}/{system}"
+    if label not in areas: areas.append(label)
+    files.append((st, path, title))
+
+notes = []
+np = pathlib.Path(notes_path)
+if np.exists():
+    notes = [l.strip() for l in np.read_text(errors="replace").splitlines() if l.strip()]
+
+subject_areas = ", ".join(areas[:4]) + (" ..." if len(areas) > 4 else "")
+print(f"Sync {today}: {subject_areas or 'index and housekeeping'}")
+print()
+if notes:
+    print("Work recorded by agents:")
+    for n in notes:
+        print(f"- {n.lstrip('-* ')}")
+    print()
+if files:
+    print("Files:")
+    for st, path, title in files:
+        w = status_word.get(st, st)
+        print(f"- {w} {path}" + (f": {title}" if title else ""))
+PY
+  git commit -q -F "$MSG" || fail "git commit"
+  log "$(head -1 "$MSG")"
+  rm -f "$MSG"
+  [ -f "$NOTES" ] && : > "$NOTES"
 else
   log "nothing to commit"
 fi

@@ -49,6 +49,8 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
 - Repositories: keep `knowledge/repos.md` current: local path, origin URL without
   credentials, purpose, related system, date checked.
 - Regenerate indexes: `python3 ~/ai/general/scripts/build_index.py`.
+- Append one line to `~/ai/.sync-notes` describing the work for the daily commit message:
+  `echo "- <system>: <what changed and why>" >> ~/ai/.sync-notes`.
 - Do not commit or push `~/ai` yourself; the daily `ai-sync.sh` run does it.
 - Every note starts with frontmatter:
 

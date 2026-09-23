@@ -3,3 +3,4 @@
 **/.env
 # per-machine state of the daily sync
 .last-sync
+.sync-notes

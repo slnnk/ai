@@ -148,9 +148,14 @@ layer (`general`, `personal`, `current`). Run it after adding or renaming notes.
 ## Daily sync
 
 `~/ai/general/scripts/ai-sync.sh` is called by agents at the start of every task. On the
-first call of a day it rebuilds indexes, commits everything with an automatic message
-(`Sync YYYY-MM-DD: N added, M modified`), pulls with rebase and pushes to all remotes, then
-writes the date to `~/ai/.last-sync`. Later calls the same day exit at once. `--force` runs
+first call of a day it rebuilds indexes, commits everything, pulls with rebase and pushes to
+all remotes, then writes the date to `~/ai/.last-sync`. Later calls the same day exit at once.
+
+The commit subject lists the touched areas (`Sync 2026-09-24: youdo, general/linux`). The body
+starts with the lines agents appended to `~/ai/.sync-notes` after each piece of work
+(`- nomad-test: root disk full on agent-test-01, dnsmasq log-queries; recipe added`), then
+lists every changed note with its title. `.sync-notes` is emptied after the commit; both
+state files are per machine and ignored by git. `--force` runs
 regardless of the date, `--dry-run` shows what would be committed, `--status` prints the
 last sync date. A failed push leaves the commit local and the state file untouched, so the
 next call retries. Agents never run `git commit` in `~/ai` themselves.
