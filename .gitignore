@@ -1,8 +1,3 @@
-# employer data lives in its own repository (nested), never in this one
-companies/
-current
-# secrets
+# secrets only; repositories are private
 .env
 **/.env
-# generated indexes are rebuilt by general/scripts/build_index.py
-# (kept in git on purpose so the index is readable on a fresh clone)

@@ -1,0 +1,48 @@
+knowledge/gitlab-ci/android-youdo4-dynamic-runner.md	companies/youdo/knowledge/systems/gitlab-ci/android-youdo4-dynamic-runner.md	gitlab-ci	hypothesis	living design map, nothing applied yet; recipe at general/knowledge/gitlab-ci/kubernetes-executor-scale-to-zero-node-group.md
+knowledge/gitlab-ci/dynamic-kubernetes-runners.md	companies/youdo/knowledge/systems/gitlab-ci/dynamic-kubernetes-runners.md	gitlab-ci	hypothesis	living design map; in-directory link rewritten; recipe at general/knowledge/gitlab-ci/kubernetes-executor-scale-to-zero-node-group.md
+knowledge/gitlab-ci/resource-groups.md	companies/youdo/knowledge/systems/gitlab-ci/resource-groups.md	gitlab-ci	verified	translated from Russian; recipe at general/knowledge/gitlab-ci/resource-group-serialize-production-deploy.md
+knowledge/gitlab-ci/youdo-business-dotnet-tests-duration-2026-09-03.md	companies/youdo/knowledge/log/2026-09-03-youdo-business-dotnet-tests-duration.md	youdo-business	verified	recipe at general/knowledge/gitlab-ci/slow-job-runner-contention-diagnosis.md
+knowledge/gitlab-ci/youdo-business-job-3109318.md	companies/youdo/knowledge/log/2026-09-03-youdo-business-job-3109318.md	youdo-business	verified	date from content (Last verified 2026-09-03)
+knowledge/gitlab-ci/youdo-business-pipeline-138220.md	companies/youdo/knowledge/log/2026-09-10-youdo-business-pipeline-138220.md	youdo-business	verified	date from content
+knowledge/ops/2026-09-11-youdo-business-test14-hangfire-lock.md	companies/youdo/knowledge/log/2026-09-11-youdo-business-test14-hangfire-lock.md	youdo-business	verified	lock-holder inference marked as hypothesis in text; recipe at general/knowledge/dotnet/hangfire-postgresql-distributed-lock-timeout-on-restart.md
+knowledge/ops/2026-09-22-youdo-business-tickets-test13-hangfire-db-permission.md	companies/youdo/knowledge/log/2026-09-22-youdo-business-tickets-test13-hangfire-db-permission.md	youdo-business	verified	recipe at general/knowledge/dotnet/hangfire-postgresql-create-schema-permission-denied.md
+knowledge/ops/2026-09-16-geocoder-suggest-http-500.md	companies/youdo/knowledge/log/2026-09-16-geocoder-suggest-http-500.md	geocoder	hypothesis	
+knowledge/ops/2026-09-18-youdo-mcp-test-nomad-healthcheck.md	companies/youdo/knowledge/log/2026-09-18-youdo-mcp-test-nomad-healthcheck.md	youdo-mcp	hypothesis	recipe at general/knowledge/dotnet/aspnet-container-default-port-8080-healthcheck.md
+knowledge/ops/2026-09-21-youdo-mcp-openiddict-vault-pfx.md	companies/youdo/knowledge/log/2026-09-21-youdo-mcp-openiddict-vault-pfx.md	youdo-mcp	verified	contains public certificate fingerprints only, no key material
+knowledge/ops/2026-09-22-rabbitmq-config-migration.md	companies/youdo/knowledge/log/2026-09-22-rabbitmq-config-migration.md	rabbitmq	verified	translated from Russian; recipe at general/knowledge/rabbitmq/rename-node-in-docker-compose.md
+knowledge/docvalidation/passport-mapping-2026-08-24.md	companies/youdo/knowledge/log/2026-08-24-docvalidation-passport-mapping.md	docvalidation	verified	translated from Russian
+knowledge/sorm/production-readiness-2026-09-22.md	companies/youdo/knowledge/systems/sorm.md	sorm	verified	living production-readiness map -> system map
+knowledge/youdo-evaluation-service.md	companies/youdo/knowledge/systems/evaluation-service.md	evaluation-service	verified	system map with embedded work log
+ops/2026-08-21-youdo-business-pipeline-137081.md	companies/youdo/knowledge/log/2026-08-21-youdo-business-pipeline-137081.md	youdo-business	verified	recipe at general/knowledge/gitlab-ci/pipeline-blocked-by-manual-job-allow-failure-false.md
+ops/2026-09-01-youdo-business-job-3103389-month-boundary-tests.md	companies/youdo/knowledge/log/2026-09-01-youdo-business-job-3103389-month-boundary-tests.md	youdo-business	verified	recipe at general/knowledge/dotnet/integration-tests-fail-at-month-boundary-timezone-mismatch.md
+notes/base-images-aspnet-10-review.md	companies/youdo/knowledge/log/2026-06-26-base-images-aspnet-10-review.md	base-images	verified	cross-linked to youdo-mcp healthcheck log; recipe at general/knowledge/dotnet/aspnet-container-default-port-8080-healthcheck.md
+notes/base-images-dotnet-sdk-10-review.md	companies/youdo/knowledge/log/2026-06-26-base-images-dotnet-sdk-10-review.md	base-images	verified	
+notes/base-images/docker-libreoffice-ppa-gpg-timeout.md	companies/youdo/knowledge/log/2026-06-26-base-images-docker-libreoffice-ppa-gpg-timeout.md	base-images	hypothesis	recipe at general/knowledge/docker/add-apt-repository-gpg-key-timeout.md
+notes/base-images/dotnet-6-diagnostic-tools.md	companies/youdo/knowledge/log/2026-06-26-base-images-dotnet-6-diagnostic-tools.md	base-images	verified	recipe at general/knowledge/dotnet/dotnet-tool-install-nu1202-pin-diagnostic-tools.md
+notes/base-images/dotnet-aspnet-3.1-buster-archive.md	companies/youdo/knowledge/log/2026-06-26-base-images-dotnet-aspnet-3-1-buster-archive.md	base-images	verified	recipe at general/knowledge/docker/debian-eol-apt-sources-archive.md (complements existing linux/apt-release-file-expired-after-debian-lts-end.md)
+notes/base-images/harica-root-ca-check-2026-06-26.md	companies/youdo/knowledge/log/2026-06-26-base-images-harica-root-ca-check.md	base-images	verified	recipe at general/knowledge/docker/verify-root-ca-present-in-image.md
+notes/youdo-aspnet-10-image-uid-gid.md	companies/youdo/knowledge/log/2026-06-26-base-images-aspnet-10-image-uid-gid.md	base-images	verified	recipe at general/knowledge/docker/groupadd-gid-already-exists-in-base-image.md
+projects/base-images/dotnet-aspnet-5-harica-ca-2026-06-23.md	companies/youdo/knowledge/log/2026-06-23-base-images-dotnet-aspnet-5-harica-ca.md	base-images	verified	recipe at general/knowledge/docker/verify-root-ca-present-in-image.md (shared with harica-root-ca-check)
+notes/fns-build-nu1605-2026-06-25.md	companies/youdo/knowledge/log/2026-06-25-fns-build-nu1605.md	fns	verified	recipe at general/knowledge/dotnet/nuget-nu1605-downgrade-after-missing-package-version.md
+notes/escrow-tinkoff/2026-07-20-e2c-addcustomer-502.md	companies/youdo/knowledge/log/2026-07-20-escrow-tinkoff-e2c-addcustomer-502.md	escrow-tinkoff	hypothesis	translated from Russian
+notes/youdo/web-mvcapplication-tracing-health-only.md	companies/youdo/knowledge/log/2026-06-09-tracing-web-mvcapplication-health-only.md	tracing	verified	recipe at general/knowledge/jaeger/udp-sender-pointed-at-grpc-port-no-spans.md
+youdo/tracing-config-notes.md	companies/youdo/knowledge/systems/tracing.md	tracing	verified	"how Tracing:Hosts works" + debug checklist -> system map; recipe at general/knowledge/jaeger/udp-sender-pointed-at-grpc-port-no-spans.md
+projects/team-copilot/deploy-gitlab-ci.md	companies/youdo/knowledge/log/2026-06-11-team-copilot-deploy-gitlab-ci.md	team-copilot	verified	recipes at general/knowledge/k8s/pvc-pending-no-default-storageclass.md and general/knowledge/k8s/vault-secrets-operator-403-permission-denied.md
+RECIPE	general/knowledge/gitlab-ci/resource-group-serialize-production-deploy.md
+RECIPE	general/knowledge/gitlab-ci/pipeline-blocked-by-manual-job-allow-failure-false.md
+RECIPE	general/knowledge/gitlab-ci/slow-job-runner-contention-diagnosis.md
+RECIPE	general/knowledge/gitlab-ci/kubernetes-executor-scale-to-zero-node-group.md
+RECIPE	general/knowledge/dotnet/hangfire-postgresql-distributed-lock-timeout-on-restart.md
+RECIPE	general/knowledge/dotnet/hangfire-postgresql-create-schema-permission-denied.md
+RECIPE	general/knowledge/dotnet/aspnet-container-default-port-8080-healthcheck.md
+RECIPE	general/knowledge/dotnet/integration-tests-fail-at-month-boundary-timezone-mismatch.md
+RECIPE	general/knowledge/dotnet/dotnet-tool-install-nu1202-pin-diagnostic-tools.md
+RECIPE	general/knowledge/dotnet/nuget-nu1605-downgrade-after-missing-package-version.md
+RECIPE	general/knowledge/docker/add-apt-repository-gpg-key-timeout.md
+RECIPE	general/knowledge/docker/debian-eol-apt-sources-archive.md
+RECIPE	general/knowledge/docker/verify-root-ca-present-in-image.md
+RECIPE	general/knowledge/docker/groupadd-gid-already-exists-in-base-image.md
+RECIPE	general/knowledge/rabbitmq/rename-node-in-docker-compose.md
+RECIPE	general/knowledge/jaeger/udp-sender-pointed-at-grpc-port-no-spans.md
+RECIPE	general/knowledge/k8s/pvc-pending-no-default-storageclass.md
+RECIPE	general/knowledge/k8s/vault-secrets-operator-403-permission-denied.md

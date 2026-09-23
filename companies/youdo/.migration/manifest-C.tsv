@@ -1,0 +1,30 @@
+knowledge/youdo-android-testing/ci-cd.md	~/ai/companies/youdo/knowledge/systems/android-farm/ci-cd.md	android-farm	verified	living map; body copied verbatim, checked=2026-08-19 (Google Play key-rotation section)
+knowledge/youdo-android-testing/ci-suites.md	~/ai/companies/youdo/knowledge/systems/android-farm/ci-suites.md	android-farm	verified	living map; body copied verbatim
+knowledge/youdo-android-testing/system-map.md	~/ai/companies/youdo/knowledge/systems/android-farm/system-map.md	android-farm	verified	living map; ~/.codex paths rewritten to ~/ai/current; added "Related log entries" section listing the batch-C log entries; systemd-resolved lesson extracted to recipe general/knowledge/linux/systemd-resolved-route-only-domain-servfail.md
+knowledge/youdo-ios/2026-09-14-fastlane-spaceauth-service-key.md	~/ai/companies/youdo/knowledge/log/2026-09-14-ios-ci-fastlane-spaceauth-service-key.md	ios-ci	verified	translated from Russian; recipe written at ~/ai/general/knowledge/fastlane/spaceauth-service-key-is-empty.md
+knowledge/youdo-ios/job-3102258-github-http2-failure.md	~/ai/companies/youdo/knowledge/log/2026-08-31-ios-ci-job-3102258-github-http2-failure.md	ios-ci	verified	translated from Russian; date 2026-08-31 taken from content; recipe written at ~/ai/general/knowledge/git/http2-stream-cancel-curl-92-clone-failures.md
+notes/youdoapp/2026-06-25-ios-4990-swiftlint-unit-tests.md	~/ai/companies/youdo/knowledge/log/2026-06-25-ios-ci-ios-4990-swiftlint-unit-tests.md	ios-ci	verified	YouDoApp repo work; headings mapped to log template
+notes/youdoapp/2026-07-21-ios-5008-merge-develop.md	~/ai/companies/youdo/knowledge/log/2026-07-21-ios-ci-ios-5008-merge-develop.md	ios-ci	verified	merge-only operation
+notes/youdo-ios-build-dev-ipa-2026-08-04.md	~/ai/companies/youdo/knowledge/log/2026-08-04-ios-ci-build-dev-ipa.md	ios-ci	verified	translated from Russian; mentions CI variable NEXUS_CREDS by name only
+ops/2026-07-20-ios-runner-dns-rubygems.md	~/ai/companies/youdo/knowledge/log/2026-07-20-ios-ci-runner-dns-rubygems.md	ios-ci	verified	redacted Firebase service-account private_key_id (key identifier, not the key); service-account email kept; recipes written at ~/ai/general/knowledge/git/http2-stream-cancel-curl-92-clone-failures.md and ~/ai/general/knowledge/macos/dns-change-stale-resolver-cache.md
+ops/2026-08-04-android-farm-avd-template-transfer.md	~/ai/companies/youdo/knowledge/log/2026-08-04-android-farm-avd-template-transfer.md	android-farm	verified	translated from Russian (31 KB, running log 2026-08-04..2026-08-13); ADB key contents were never in the source; recipes written at ~/ai/general/knowledge/android/emulator-avd-transfer-and-sparse-userdata.md and ~/ai/general/knowledge/nginx/large-put-upload-buffered-on-small-root-disk.md
+ops/2026-08-12-android-autotests-report-3063278.md	~/ai/companies/youdo/knowledge/log/2026-08-12-android-farm-autotests-report-3063278.md	android-farm	verified	plain "Context:/Findings:" labels turned into template headings
+ops/2026-08-12-android-farm-appium-147-148.md	~/ai/companies/youdo/knowledge/log/2026-08-12-android-farm-appium-147-148.md	android-farm	verified	recipe written at ~/ai/general/knowledge/android/tecno-hios-usf-freezes-uiautomator2.md
+ops/2026-08-12-vysor-redmi-note-13-pro-input.md	~/ai/companies/youdo/knowledge/log/2026-08-12-android-farm-vysor-redmi-note-13-pro-input.md	android-farm	verified	translated from Russian; MIUI menu path kept in Russian with English gloss
+ops/2026-08-13-android-selenium-hub-zabbix.md	~/ai/companies/youdo/knowledge/log/2026-08-13-android-farm-selenium-hub-zabbix.md	android-farm	verified	translated from Russian; system android-farm (not monitoring) per batch theme; recipe written at ~/ai/general/knowledge/zabbix/passive-agent-behind-nat-server-allowlist.md
+ops/2026-08-20-android-dig-job-3066275.md	~/ai/companies/youdo/knowledge/log/2026-08-20-android-farm-android-dig-job-3066275.md	android-farm	verified	~/.codex/skills -> ~/ai/current/skills
+ops/2026-08-20-android-dig-job-3077287.md	~/ai/companies/youdo/knowledge/log/2026-08-20-android-farm-android-dig-job-3077287.md	android-farm	verified	
+ops/2026-08-20-android-dig-job-3078215.md	~/ai/companies/youdo/knowledge/log/2026-08-20-android-farm-android-dig-job-3078215.md	android-farm	verified	
+ops/2026-08-20-global-skill-android-dig.md	~/ai/companies/youdo/knowledge/log/2026-08-20-android-farm-global-skill-android-dig.md	android-farm	verified	skill creation log; ~/.codex/skills and ~/.codex/.env rewritten; future-diagnosis path pattern rewritten to log/YYYY-MM-DD-android-farm-android-dig-job-<job-id>.md
+ops/2026-09-07-android-dig-job-3120554.md	~/ai/companies/youdo/knowledge/log/2026-09-07-android-farm-android-dig-job-3120554.md	android-farm	verified	
+ops/2026-09-08-android-dig-job-3121092.md	~/ai/companies/youdo/knowledge/log/2026-09-08-android-farm-android-dig-job-3121092.md	android-farm	verified	
+ops/2026-09-08-android-dig-loki-endpoint.md	~/ai/companies/youdo/knowledge/log/2026-09-08-android-farm-android-dig-loki-endpoint.md	android-farm	verified	tiny config-only note
+automation-services/adb_devices_ca_certificates.md	~/ai/companies/youdo/knowledge/log/2026-07-22-automation-services-adb-devices-ca-certificates.md	automation-services	verified	date 2026-07-22 taken from content
+RECIPE	~/ai/general/knowledge/fastlane/spaceauth-service-key-is-empty.md
+RECIPE	~/ai/general/knowledge/git/http2-stream-cancel-curl-92-clone-failures.md
+RECIPE	~/ai/general/knowledge/macos/dns-change-stale-resolver-cache.md
+RECIPE	~/ai/general/knowledge/android/emulator-avd-transfer-and-sparse-userdata.md
+RECIPE	~/ai/general/knowledge/android/tecno-hios-usf-freezes-uiautomator2.md
+RECIPE	~/ai/general/knowledge/linux/systemd-resolved-route-only-domain-servfail.md
+RECIPE	~/ai/general/knowledge/nginx/large-put-upload-buffered-on-small-root-disk.md
+RECIPE	~/ai/general/knowledge/zabbix/passive-agent-behind-nat-server-allowlist.md

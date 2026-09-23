@@ -1,0 +1,4 @@
+interface:
+  display_name: "Android Infrastructure Diagnostics"
+  short_description: "Diagnose Android test infrastructure failures"
+  default_prompt: "Use $android-dig to diagnose infrastructure failures in this GitLab Android autotest job."
