@@ -102,6 +102,28 @@ worth keeping is also written to `~/ai`.
   into the agent's skills folder (`~/.codex/skills/`, `~/.claude/skills/`).
 - Switching employer: create `companies/<new>/`, repoint `current`, redo skill symlinks.
 
+## Git
+
+- Never run state-changing git commands (`git add`, `git commit`, `git push`, `git tag`,
+  `git merge`, `git rebase`, `git reset`, `git stash`, ...) in any repository unless the
+  user explicitly asks for it in the current task. Read-only commands (`status`, `diff`,
+  `log`, `show`, `fetch`) are fine.
+- Exception: the daily `~/ai/general/scripts/ai-sync.sh` run, which commits and pushes `~/ai`.
+
+## Changes outside local files
+
+- Ask the user for permission before every command that changes state anywhere other than
+  local files. Examples: `terraform apply`/`destroy`, `ansible-playbook` without `--check`,
+  `kubectl apply`/`delete`/`scale`, `nomad job run`/`stop`, `helm install`/`upgrade`,
+  `docker` commands on shared hosts, editing files or restarting services on remote servers
+  over ssh, and API calls that create, update or delete (POST/PUT/PATCH/DELETE to GitLab,
+  YouTrack, Zabbix, cloud providers, ...).
+- Say what the command changes and where, then wait for an explicit yes. A yes covers only
+  that action; ask again for the next one.
+- No permission is needed for editing local files (including files in a repository
+  checkout), or for read-only commands: `terraform plan`, `--check`/`--diff`, `kubectl get`,
+  GET requests, reading logs.
+
 ## Precedence
 
 Project-level instructions win on conflicts inside that project. Keeping `~/ai` current

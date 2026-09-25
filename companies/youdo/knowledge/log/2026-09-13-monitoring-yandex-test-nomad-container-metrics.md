@@ -80,7 +80,7 @@ The range contains gaps caused by stopped/unavailable clients and scrape targets
 ### Zabbix
 
 - API: `http://zabbix-test.youdo.corp/api_jsonrpc.php`, Zabbix `6.4.21`.
-- The access token is stored only as `ZABBIZ_DEV_TOKEN` in `~/ai/current/.env` (the variable name contains `ZABBIZ`, not `ZABBIX`).
+- The access token is stored only as `ZABBIX_DEV_TOKEN` in `~/ai/current/.env` (renamed from `ZABBIZ_DEV_TOKEN` on 2026-09-23).
 - Searching Zabbix host interfaces by the IPs of current/recently removed Nomad clients `10.16.26.7`, `.33`, `.44`, `.48`, `.54`, `.55`, `.59`, `.62`, `.64` returned nothing.
 - Searching item names/keys for `container` returned nothing. On the check date Zabbix is not a source of historical container CPU/RAM for this Nomad group.
 

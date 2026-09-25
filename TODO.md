@@ -14,8 +14,8 @@ when the user asks. Mark done items with `[x]` and the date; do not delete them 
 - [ ] Observe agent behaviour for two weeks: do daily sync commits have a non-empty
       "Work recorded by agents" section when "Files" is non-empty? If not, tighten the
       wording in AGENTS.md or move the rule into a skill. (proposed 2026-09-23)
-- [ ] `companies/youdo/.env`: key `ZABBIZ_DEV_TOKEN` looks like a typo of `ZABBIX_DEV_TOKEN`;
-      there is also an empty line. Rename if no script depends on it. (proposed 2026-09-23)
+- [x] `companies/youdo/.env`: renamed `ZABBIZ_DEV_TOKEN` to `ZABBIX_DEV_TOKEN` (done 2026-09-23).
+- [ ] `companies/youdo/.env`: there is also an empty line; remove it. (proposed 2026-09-23)
 - [ ] Review the Claude per-project memory directories under `~/.claude/projects/*/memory`
       (automation-services, sorm, youdo-mcp, home) and move anything durable into `~/ai`.
       (proposed 2026-09-23)

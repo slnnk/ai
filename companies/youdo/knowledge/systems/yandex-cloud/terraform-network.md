@@ -1,7 +1,7 @@
 ---
 system: yandex-cloud
 status: verified
-checked: 2026-09-17
+checked: 2026-09-23
 tags: [terraform, yandex-tf, network, base-image, ansible-provider, nlb]
 ---
 # Yandex Terraform: network
@@ -15,6 +15,8 @@ Last verified: 2026-09-17.
 - Remote state: Consul at `consul.service.selectel.consul:8500`, datacenter `selectel`, path `terraform/yandex-network`.
 - The root manages shared networking plus gateway, balancer, Postfix, IPsec, and NAT MSSQL compute resources. The Yandex provider authenticates with ignored `network/key.json`; CI copies the key from GitLab Secure Files.
 - CI jobs: `validate:network` runs `tflint`, `plan:network` initializes and creates a plan, and manual `apply:network` runs on `master` for changes under `network/**`.
+- TODO (repo-wide): `.gitlab-ci.yml` has no `workflow:rules`, so the first push of a new branch runs every `plan:*` (including `prod`) alongside the MR pipeline. See the DevOps-866 [log](../../log/2026-09-23-yandex-cloud-yandex-tf-network-ansible-job.md).
+- Since `DevOps-866` (2026-09-23, MR `!229`, applied in job `3170875`): Terraform no longer runs playbooks and there is no CI Ansible job; only `ansible_host` inventory resources remain, and playbooks are run manually from `automation-services/inventories/yandex`. The `time` provider was removed. Reason: Terraform-run Ansible had no Vault creds, so `/etc/ipsec.secrets` was rendered empty. Details: [log](../../log/2026-09-23-yandex-cloud-yandex-tf-network-ansible-job.md). Sections below about `ansible_playbook` resources describe the state before this change.
 
 ## Shared Ubuntu 22.04 base-image overwrite mitigation (2026-09-17)
 
