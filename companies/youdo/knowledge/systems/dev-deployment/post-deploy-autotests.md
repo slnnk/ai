@@ -1,7 +1,7 @@
 ---
 system: dev-deployment
 status: verified
-checked: 2026-09-07
+checked: 2026-09-29
 tags: [devops-832, autotests, smoke, regression, gitlab-ci, tochka, billing, tkb, target-env-suffix]
 ---
 # B2B dev-deployment: post-deploy autotests
@@ -9,6 +9,139 @@ tags: [devops-832, autotests, smoke, regression, gitlab-ci, tochka, billing, tkb
 Last verified: 2026-09-07
 
 Authoritative system map: `~/ai/current/knowledge/systems/dev-deployment/overview.md`.
+
+## Merge readiness (checked in GitLab 2026-09-28, updated 2026-09-29)
+
+2026-09-29: templates branch merged to `master` (`76347cd`, includes `.autotests-dev.yml`
+with `TARGET_ENV_SUFFIX` without dash); the branch is kept. Master templates now emit the
+no-dash value, so any service using `.autotests-dev.yml` must use a test image with
+`DEV_HOST_SUFFIX` code; old `latest` images would build `...webappdevops-832...`.
+
+2026-09-29 00:30-00:36: MR pipelines of Billing (139727, Jenkins 164), TKB (139728, Jenkins
+165) and Tochka (139729, Jenkins 166) ran `1 deploy dev` at the same time. All three use task
+id DevOps-832, so they target the same namespace `dev-devops-832`. Jenkins 166 failed with
+Helm `UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress`; the
+namespace label `jenkinsJobId` ended at 166, and smoke jobs of 164/165 stopped at
+`Namespace ownership mismatch` (the stale-pipeline protection worked as designed). Suffix and
+images were correct (`Target environment suffix: devops-832`). Releases were left
+`deployed` (none pending). Workaround: deploy services of one task one after another.
+
+Sequential rerun 2026-09-29 00:43-01:06, all suffix-based URLs correct (no `...webappdevops...`):
+- Tochka: deploy 3190033 (Jenkins 167), smoke 3189750 and regression 3189751: 514 cases,
+  376 passed, 123 failed, 15 skipped. 121 failures are `404` on
+  `POST /v1/beneficiaries/createPerson` (and the IE variant): the service `master` merged
+  into the MR includes Site-24856 (`e4274f3`, 2026-09-22) which removed the v1 create
+  methods; only `/v2/beneficiaries/createPerson` and `/v2/.../createIndividualEntrepreneur`
+  remain. Tests (`CreatePersonStepImpl`, `CreateEntrepreneurStepImpl`, used by
+  `PersonHelper`) still call v1. Application/QA drift, not infrastructure; legacy Nomad
+  runs against the new service version will fail the same way.
+- Billing: deploy 3190075 (Jenkins 168), smoke 3190117: 545 cases, 3 failed (two known
+  `GetYouDoBalanceHistoryTest`, new `RefillYouDoBalanceTest [tkbBankDefault]` NPE on empty
+  balance; data/QA).
+- TKB: deploy 3190162 (Jenkins 169), smoke 3190163: 174 cases, same 2
+  `IdentifyToBeneficiaryTest` failures. TKB repeat deploy recreated `postgres-0`
+  (01:01) and `mock-api` restarted once with exit 137 `Error` (not OOMKilled) at 01:02
+  (hypothesis: liveness failure while its DB pod restarted).
+- On repeat deploy the primary's `postgres-0` pod is recreated (StatefulSet with PVC).
+
+Merge 2026-09-29: test projects merged 01:11 (tochka-tests !85, tkb-tests !16,
+billing-tests !64); Tochka service !237 merged 01:18:34 with `master` CI clean (no templates
+`ref`, no `AUTOTESTS_IMAGE_TAG`). GitLab auto-started the environment `on_stop` job
+`3 delete dev` 3189673 four seconds after the merge (confirms stop on MR merge, in addition
+to `auto_stop_in: 7 days`). It failed by design: `Namespace dev-devops-832 belongs to Jenkins
+build 169, but this job expects build 167` (the shared namespace was last deployed by TKB).
+Tochka environment 457 stays `stopping` until the job succeeds; after the namespace is
+gone, a retry of 3189673 finds no namespace and succeeds. Only the pipeline that owns the
+namespace (TKB, 169) can delete it.
+
+Final state 2026-09-29 01:40: TKB !63 merged 01:31, Billing !97 merged 01:38; all three
+service `master` CI files include `v3/.autotests-dev.yml` without pins; master pipelines
+139746/139748/139750 green; test-project master pipelines ran `build`, `publish-maven`,
+`update latests`; namespace `dev-devops-832` is gone and environments 457/472/460 are
+`stopped` (Tochka delete retried as 3190623). Tochka, TKB and Billing are rolled out.
+
+
+Open MRs from `DevOps-832-dev-autotests`: `youdo-business-tochka-proxy` !237,
+`youdo-business-tkb-proxy` !63, `youdo-business-billing-service` !97,
+`youdo-business-billing-service-tests` !64 (last pipeline canceled). No MR yet for
+`gitlab-ci-templates` (branch `DevOps-832-dev-autotests`, 3 commits: `b55929d`, `fd00a30`,
+`34b63d6`; adds `v3/.autotests-dev.yml`, changes `v3/.deploy-dev.yml` and `v3/.main.yml`;
+merges into current `master` without conflicts), `youdo-business-tochka-proxy-tests`
+(`02dcaea`) and `youdo-business-tkb-tests` (`6615a91`). Main `youdo.business` and
+`youdo-business-tests` have no branch.
+
+Every service MR pins the templates include to `ref: DevOps-832-dev-autotests` and sets
+`AUTOTESTS_IMAGE_TAG: devops-832-dev-autotests`; both must be removed once templates and
+test projects are in `master`. Merge order: templates, test projects, service MRs.
+
+TKB after the memory fix: pipeline 138096 (`aa4d083`), deploy 3120801 on 2026-09-07, smoke
+3120883 and regression 3120884 both 172/174 with the same two `IdentifyToBeneficiaryTest`
+failures; peak memory was not recorded. `3 delete dev` 3120803 ran 2026-09-14 23:24, seven
+days after the deploy, which matches `auto_stop_in: 7 days`: the first observed real
+auto-stop expiry. It uninstalled the release and deleted `dev-devops-832`.
+
+## youdo.business suite: audit and plan (2026-09-28)
+
+Branches `DevOps-832-dev-autotests` exist locally in `youdo.business`, `youdo-business-tests`,
+`youdo-business-ui-tests` (equal to `master`, not pushed); local templates checkout is on
+`DevOps-832-dev-autotests`.
+
+Findings:
+- `youdo-business-tests` builds all URLs in
+  `src/main/java/api/steps/specifications/request/ApiEndpoints.java:13-24` from
+  `TARGET_HOST` and `TARGET_PROXY=.yandex-test.youdo.local` (constant from Nexus artifact
+  `b2b:youdo-business-test-lib`). Used:
+  ADMIN `b2bautomation`, BUSINESS, BUSINESS_API, EMPLOYEE, MOCK
+  (`youdo-business-mock-api`), BUSINESS_DOC (shared `doc-generator`, no stand label),
+  DOC_VALIDATION (`doc-validation`, dev name is `docvalidation`), BUSINESS_WORKER
+  (`https://b2bautomation.<H>.youdo.sg/hangfire/recurring/trigger`), TEST_CLIENT (shared
+  `b2b-test-client`). C2C and MODERATION are defined but unused by tests.
+- Tochka/TKB/Billing step classes come from their test projects as Maven
+  `1.0.0-SNAPSHOT`; `publish-maven` runs only on `master`. The main suite therefore sees the
+  `TARGET_ENV_SUFFIX` mode of those projects only after their MRs are merged.
+- `b2b:youdo-business-test-lib` is module `lib` of `youdo/Test/youdo-business-tests-plugin`
+  (project 537, `settings.gradle.kts`: `include("plugin", "lib")`); found by matching the
+  Nexus upload time of `1.0-20260731.144748-8` with `publish-maven` job 3045413 of pipeline
+  136105 (`e73e3bf`). `lib/.../BaseApiService.java:20-21` defines `TARGET_HOST` and
+  `TARGET_PROXY`; `lib/.../specifications/ApiEndpoints.java:7-9` builds
+  `B2B_AUTOMATION_URL`, `BUSINESS_MOCK_API_URL` (both need the suffix mode) and
+  `METRICS_URL` (shared). Local checkout `~/git/youdo-business-tests-plugin` was 152 commits
+  behind on 2026-09-29.
+- Gradle plugin `b2b:youdo-business-test-plugin` (module `plugin` of the same repo) task `precondition` (dependency of `test`)
+  hardcodes `http://b2bautomation.<TARGET_HOST>.yandex-test.youdo.local`.
+- `b2b-test-client` (`youdo/Test/youdo-business-tests-client`) seeds data directly in
+  `<targetHost>_youdo-business` on a shared PostgreSQL; the dev DB lives inside the namespace.
+  Used by 5 test classes (company risks, repay, Tochka hold/documents, webhooks).
+- UI suite: Kotlin + Playwright, local headless Chromium in the test image (no grid);
+  `BaseTest.kt:254-255` `https://employee|business.<H>.youdo.sg`, auth cookie domain
+  `.<H>.youdo.sg` (`:88-90`), header `X-Real-Ip` for AntiFraud; setup API calls through
+  `youdo-business-tests` classes (SNAPSHOT). Template `v3/.autotests-ui.yml` has no dev
+  variant; the deploy job autostarts only a job named `smoke tests`.
+- Dev memory in `youdo.business/devops/dev.yml` is far below Nomad `memory_max`
+  (business-web 256Mi vs 2048, worker 512Mi vs 2048, business-api/employee-web/mock-api/
+  internal-api 256Mi vs 512).
+- All suites: `ignoreFailures=true`; UI ~34 smoke / ~119 regress, API ~39 smoke / ~327
+  regress; JUnit parallelism 15.
+
+Dev hostnames (`<sfx>` = `-` + `TARGET_ENV_SUFFIX`, the dash is added in test code): `https://business<sfx>.dev.youdo.sg`,
+`https://business-api<sfx>.dev.youdo.sg`, `https://employee<sfx>.dev.youdo.sg`,
+`https://b2bautomation<sfx>.dev.youdo.sg`, `http://youdo-business-mock-api<sfx>.dev.youdo.corp`,
+`http://doc-generator<sfx>.dev.youdo.corp`, `http://docvalidation<sfx>.dev.youdo.corp`.
+
+Compatibility check of the prepared MRs (2026-09-29):
+- Test projects (Tochka `02dcaea`, TKB `6615a91`, Billing `8e36a0f`): only the URL class and an
+  entrypoint echo change; the Nomad fallback strings are byte-identical to `master`, so
+  legacy jobs (no `TARGET_ENV_SUFFIX`) and SNAPSHOT consumers keep the old URLs.
+- Templates branch `34b63d6`: 12 `deploy-dev` consumers lint valid. The new autostart in
+  `1 deploy dev` runs only with `AUTOTESTS=true` and plays only a job named `smoke tests`;
+  legacy `smoke-tests testN` jobs are not matched.
+- Service MRs change only `.gitlab-ci.yml` and `devops/dev.yml` (dev-only memory, worker
+  Service/ingress). `AUTOTESTS_IMAGE_TAG` is shared with the legacy `.autotests` jobs
+  (`AUTOTESTS_IMAGE` in `v3/.main-vars.yml:30`, default `latest`), so the pin must be removed
+  before merge together with the templates `ref`. Without both pins all three lint valid and
+  expose `smoke tests` / `regression tests`. No conflicts with `master` (Tochka is 6 behind).
+- Decisions 2026-09-29: UI suite is in DevOps-832 scope; tests depending on `b2b-test-client`
+  are allowed to fail for now.
 
 ## Verified TKB integration status
 
@@ -145,21 +278,26 @@ Smoke should be started automatically only after a successful manually-started d
 Use one task-specific suffix instead of passing every endpoint or adding a machine-readable endpoint catalog. Hostnames generated by the current dev-deployment contract insert `-<deployId>` into the leftmost DNS label. The GitLab deploy job already receives `DEV_NAMESPACE=dev-<deployId>`, so the autotest job can derive:
 
 ```bash
-TARGET_ENV_SUFFIX="-${DEV_NAMESPACE#dev-}"
+TARGET_ENV_SUFFIX="${DEV_NAMESPACE#dev-}"
 ```
 
-For `DEV_NAMESPACE=dev-devops-689`, this produces `TARGET_ENV_SUFFIX=-devops-689`. Tochka tests then construct their known component URLs:
+Changed 2026-09-29 (review comment on billing-tests !64): the value carries no leading dash;
+the test code adds `-` itself (`DEV_HOST_SUFFIX`); no format validation in the tests (user
+decision). Runs recorded
+above before this date used the old form `-devops-832`.
+
+For `DEV_NAMESPACE=dev-devops-689`, this produces `TARGET_ENV_SUFFIX=devops-689`. Tochka tests then construct their known component URLs:
 
 ```text
-http://youdo-business-tochka-proxy-mock-webapp${TARGET_ENV_SUFFIX}.dev.youdo.corp
-http://youdo-business-tochka-proxy-mock-worker${TARGET_ENV_SUFFIX}.dev.youdo.corp
-https://b2bautomation${TARGET_ENV_SUFFIX}.dev.youdo.sg
+http://youdo-business-tochka-proxy-mock-webapp-${TARGET_ENV_SUFFIX}.dev.youdo.corp
+http://youdo-business-tochka-proxy-mock-worker-${TARGET_ENV_SUFFIX}.dev.youdo.corp
+https://b2bautomation-${TARGET_ENV_SUFFIX}.dev.youdo.sg
 ```
 
 Keep two explicit compatibility modes during migration:
 
 - `TARGET_HOST=test3`: existing Nomad URL construction;
-- `TARGET_ENV_SUFFIX=-devops-689`: Kubernetes dev-deployment URL construction.
+- `TARGET_ENV_SUFFIX=devops-689`: Kubernetes dev-deployment URL construction.
 
 When `TARGET_ENV_SUFFIX` is present, tests must use the Kubernetes form. When it is absent, they may fall back to the current Nomad form. If neither input is present, tests fail fast. Do not infer the mode from the content of a single overloaded variable.
 

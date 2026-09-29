@@ -45,7 +45,8 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
   it sets the path, name and frontmatter. Then fill the sections.
 - Log entry: `knowledge/log/YYYY-MM-DD-<system>-<slug>.md`. Cover: task, context (project,
   environment, hosts, ticket), actions and key commands, findings and conclusions, changed
-  files, remaining risks and TODO.
+  files, remaining risks. Actionable TODO goes to `~/ai/TODO.md` (see Backlog), with a link
+  back to the note.
 - System map: update the existing file in `knowledge/systems/`; never create a duplicate.
 - Run `python3 ~/ai/general/scripts/kb_lint.py` and fix what it reports; `ai-sync.sh` also
   prints findings at the start of the next day.
@@ -86,8 +87,10 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
 
 ## Backlog
 
-`~/ai/TODO.md` is the user's backlog for the knowledge base itself. Read it when asked to
-review it; add entries only when the user asks.
+`~/ai/TODO.md` is the single live list of open work for all layers (company, personal,
+knowledge base), grouped by system. Read the section of a system before working on it. Add
+open items from your work there and close items you finished; do not keep separate TODO
+lists in notes. "Open items" in a note are a dated snapshot, not the current state.
 
 ## Agent memory
 

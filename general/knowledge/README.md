@@ -56,7 +56,7 @@ One recipe per file, `<topic>-<slug>.md`, no date in the name; the date lives in
     Files, configs, roles, playbooks, services, MRs.
 
     ## Open items
-    Risks, TODO, next steps.
+    Risks and next steps as of this date. Actionable items also go to `~/ai/TODO.md`.
 
     ## Portable lesson
     Link to `general/knowledge/...` if one was written, otherwise "none".
