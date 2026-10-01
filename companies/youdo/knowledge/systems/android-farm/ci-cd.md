@@ -6,6 +6,18 @@ tags: [android, gitlab-ci, gradle, fastlane, google-play, huawei, rustore, nexus
 ---
 # YouDo Android: infrastructure and CI/CD map
 
+## Summary
+
+- Map of YouDo Android delivery: product build, store publication, and autotests on a device farm.
+- Product pipeline: GitLab `team-youdo-android/android-youdo4` (project 79, `.gitlab-ci.yml`) builds on runner tag `gitlab-runner-android-dind01-runner` in image `registry.youdo.sg/sysadmins/devops-tools/gradle:18`.
+- Flows: `feature` (MR to `develop`, `assembleBeta`), `regress` (`staging`, beta/release APK and AAB), `hotfix` (branch `hot-fix`). Manual jobs `regress_publish_google`/`_huawei`/`_rustore` publish through `fastlane-docker` (`0.0.9`, Google Play 30% staged rollout).
+- Build-to-autotest: manual `publish_for_tests` jobs put the APK and version marker in Nexus `raw-private/android`; `youdo-android-testing` (project 69) runs on `gradle:12` via Selenium Grid `192.168.30.30:4444` and Appium hosts `.147`/`.148` in Kazan.
+- Runner host: `gitlab-runner-android-dind01.youdo.corp` (`172.28.0.175`, prod_selectel), privileged Docker executor, managed by `automation-services` (`gitlab-runners.yml`, role `roles/gitlab-runner`).
+- State: the hotfix CI fix (DevOps-833, branch `DevOps-833-fix-hotfix`: RuStore APK artifact, `fastlane-docker:0.0.9`) passed CI Lint but is not committed, merged or run in a real pipeline.
+- Risks: manual store jobs have no `environment` or protected-environment controls; mutable image tags; `latest` of `fastlane-docker` moves on any Git tag; plaintext access material in runner host vars; an untracked Firebase JSON in the `fastlane-docker` worktree; credentials exposed in Nexus and report artifacts.
+- Read "End-to-end delivery routes" for the flows, "Main Android application pipeline" for jobs, "Dedicated Android build runner" for the host, and "Gradle build image" and "fastlane-docker publication image" for images.
+- Read "Google Play service-account key rotation" for the `GOOGLE_PLAY_JSON_KEY_DATA` procedure, "Autotest pipeline and farm" for tests, "Confirmed gaps and risks" for open issues, and "Change record: DevOps-833 hotfix CI fix" for the fix details.
+
 - Last checked: 2026-08-13 (Europe/Moscow)
 - Priority: delivery infrastructure, CI runners and images, artifact flow, publication, test execution, and operational ownership.
 - Sources: local Git repositories plus read-only GitLab project/registry metadata.

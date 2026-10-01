@@ -6,7 +6,19 @@ tags: [devops-832, autotests, smoke, regression, gitlab-ci, tochka, billing, tkb
 ---
 # B2B dev-deployment: post-deploy autotests
 
-Last verified: 2026-09-07
+## Summary
+
+- What: DevOps-832 feature that runs a service's existing API autotests against the task-specific Kubernetes namespace (`dev-<task-id>`, e.g. `dev-devops-832`) right after the manual GitLab job `1 deploy dev` (Jenkins-backed) succeeds. Sber is out of scope (service no longer current).
+- Flow: service MR pipeline includes `v3/.deploy-dev.yml`, `v3/.autotests.yml`, `v3/.autotests-dev.yml` from `gitlab-ci-templates` -> Jenkins deploys primary + catalog dependencies and archives `generated/deploy-dev.env` / `generated/ingress-urls.txt` -> GitLab imports `DEV_NAMESPACE`, `JENKINS_BUILD_NUMBER`, `JENKINS_BUILD_URL` -> job `smoke tests` auto-plays (needs `AUTOTESTS=true`), `regression tests` stays manual; then `3 delete dev` (also on MR merge, plus `auto_stop_in: 7 days`).
+- Endpoint contract: `TARGET_ENV_SUFFIX="${DEV_NAMESPACE#dev-}"` (no leading dash since 2026-09-29; tests add it via `DEV_HOST_SUFFIX`); legacy Nomad mode uses `TARGET_HOST` (`test..test17`); tests fail fast if neither is set. The temporary `AUTOTESTS_IMAGE_TAG` pin (shared with legacy `.autotests` jobs, default `latest`) was removed before merge on 2026-09-29.
+- Repos: `gitlab-ci-templates`, `jenkins-pipelines`, `helm-charts`, service repos `youdo-business-tochka-proxy` / `-tkb-proxy` / `-billing-service`, their `*-tests` projects, `youdo.business`, `youdo-business-tests`.
+- State (2026-09-29): Tochka, TKB and Billing are rolled out; templates, test projects and service MRs merged to `master`, temporary `ref` / `AUTOTESTS_IMAGE_TAG` pins removed, namespace and environments cleaned up. Main `youdo.business` suite (API + UI) is only audited/planned; the UI suite is in scope, tests needing `b2b-test-client` may fail for now.
+- Known problems: all suites use `ignoreFailures=true` and jobs are `allow_failure: true` (not a release gate); smoke tag selection does not work (`includeTags("regress")` unconditionally); Tochka has 121 `404` failures on v1 `createPerson` (QA drift after Site-24856); Billing (3 failed of 545 in smoke 3190117, 2026-09-29) and TKB (2 failed of 174) have a few masked functional failures; two services of one task deployed in parallel collide (Helm `another operation ... in progress`, ownership mismatch), so deploy sequentially.
+- Risks: a hard-coded fallback for `TEST_ACCESS_TOKEN` in Tochka tests (rotate, do not copy the value); Tochka retry logic probes an unrelated address; memory limits were the cause of Billing OOM/502 (fixed with 512Mi/1Gi); TKB `mock-api` restart (exit 137) on repeat deploy is a hypothesis (liveness during DB restart).
+- Sections: "Merge readiness" = newest runs, merge order, final state and TKB memory follow-up; "youdo.business suite: audit and plan" = endpoint map, hostnames, compatibility check; "Verified TKB / Tochka pilot / Billing integration status" = per-service evidence (Billing includes OOM, Jenkins `node('AutoTest')` pin, open infra work); "Goal" and "Current delivery path" = design; "Tochka endpoint audit" and "Cross-service audit" = per-service table; "Additional correctness and security findings" = QA-owned issues; "Recommended design" and "Implementation sequence" = design, endpoint contract, worker exposure; "Acceptance criteria"; "Related repositories" and "Related log entries" = links.
+- Older sections ("Verified ..." per-service, "Recommended design", "Implementation sequence") are historical and carry inline `(superseded ...)` markers where newer facts apply; tables and the Summary reflect the state of 2026-09-29.
+
+Last verified: 2026-09-29 (see frontmatter `checked`; was 2026-09-07 before the merge/rollout updates)
 
 Authoritative system map: `~/ai/current/knowledge/systems/dev-deployment/overview.md`.
 
@@ -61,7 +73,7 @@ service `master` CI files include `v3/.autotests-dev.yml` without pins; master p
 `stopped` (Tochka delete retried as 3190623). Tochka, TKB and Billing are rolled out.
 
 
-Open MRs from `DevOps-832-dev-autotests`: `youdo-business-tochka-proxy` !237,
+(superseded 2026-09-29: see "Final state 2026-09-29 01:40" above; all MRs and the templates branch are merged.) Open MRs from `DevOps-832-dev-autotests`: `youdo-business-tochka-proxy` !237,
 `youdo-business-tkb-proxy` !63, `youdo-business-billing-service` !97,
 `youdo-business-billing-service-tests` !64 (last pipeline canceled). No MR yet for
 `gitlab-ci-templates` (branch `DevOps-832-dev-autotests`, 3 commits: `b55929d`, `fd00a30`,
@@ -70,7 +82,7 @@ merges into current `master` without conflicts), `youdo-business-tochka-proxy-te
 (`02dcaea`) and `youdo-business-tkb-tests` (`6615a91`). Main `youdo.business` and
 `youdo-business-tests` have no branch.
 
-Every service MR pins the templates include to `ref: DevOps-832-dev-autotests` and sets
+(superseded 2026-09-29: pins removed, see "Merge 2026-09-29" and "Final state" above.) Every service MR pins the templates include to `ref: DevOps-832-dev-autotests` and sets
 `AUTOTESTS_IMAGE_TAG: devops-832-dev-autotests`; both must be removed once templates and
 test projects are in `master`. Merge order: templates, test projects, service MRs.
 
@@ -149,15 +161,15 @@ On 2026-09-07 pipeline `138093` at service commit `6b24286` runtime-proved the i
 
 The service exposes component `worker-mock` through a ClusterIP Service plus internal host `youdo-business-tkb-proxy-worker-mock-devops-832.dev.youdo.corp`. No public worker route exists. HTTP checks returned 200 from TKB mock-webapp `/_/healthcheck`, worker-mock `/_/healthcheck`, and public automation-web `/health`. All namespace workloads are Ready with zero restarts and there are no Kubernetes Warning events.
 
-The test branch now accepts `TARGET_ENV_SUFFIX` while preserving the existing Nomad `TARGET_HOST` fallback. Kubernetes mode maps the old logical test targets to `youdo-business-tkb-proxy-mock-webapp<suffix>.dev.youdo.corp`, `youdo-business-tkb-proxy-worker-mock<suffix>.dev.youdo.corp`, and `https://b2bautomation<suffix>.dev.youdo.sg`. The entrypoint reports the suffix without changing test selection, failure propagation, credential fallback, retries, or report behavior.
+The test branch now accepts `TARGET_ENV_SUFFIX` while preserving the existing Nomad `TARGET_HOST` fallback. Kubernetes mode maps the old logical test targets (`<suffix>` here includes the dash; superseded 2026-09-29: `TARGET_ENV_SUFFIX` has no dash, tests add it via `DEV_HOST_SUFFIX`) to `youdo-business-tkb-proxy-mock-webapp<suffix>.dev.youdo.corp`, `youdo-business-tkb-proxy-worker-mock<suffix>.dev.youdo.corp`, and `https://b2bautomation<suffix>.dev.youdo.sg`. The entrypoint reports the suffix without changing test selection, failure propagation, credential fallback, retries, or report behavior.
 
 Both suites ran 183 Gradle tests and reported `BUILD SUCCESSFUL` only because `ignoreFailures=true`. Each had the same two failures: the two `IdentifyToBeneficiaryTest` cases expecting an incoming payment to remain `New` exhausted the ten polling iterations and threw `Входящий платеж не в статусе New`. GitLab imported 174 cases per job: 172 passed and 2 failed. All repeated worker-trigger and incoming-payment-list steps passed, so the endpoint mapping itself is proven. TKB logs during the tests contain Billing `ACCOUNT_NOT_FOUND` errors while refilling balances for generated beneficiaries; this supports a test-data/cross-service consistency issue, not an ingress or worker reachability failure. The exact application/QA correction remains pending.
 
-TKB memory is not yet runtime-accepted for load stability. `mock-api` sampled at 256388Ki against its 256Mi limit (about 97.8%) after both suites; `worker-mock` sampled at 180880Ki (about 69%). Neither restarted or retained OOM state. Published service commit `aa4d083` raises both components to 512Mi request / 1Gi limit, matching the proven Tochka/Billing workload profile. MR pipeline `138096` built and unit-tested the commit successfully; manual deploy job `3120801` has not been started. Rerun deploy, automatic smoke, and manual regression while observing peak usage. Repeat-deploy isolation and cleanup/stale-pipeline verification are also pending.
+(superseded 2026-09-07/2026-09-29: see "Merge readiness" for deploy 3120801, smoke 3120883, regression 3120884, repeat deploy Jenkins 169 and cleanup.) TKB memory is not yet runtime-accepted for load stability. `mock-api` sampled at 256388Ki against its 256Mi limit (about 97.8%) after both suites; `worker-mock` sampled at 180880Ki (about 69%). Neither restarted or retained OOM state. Published service commit `aa4d083` raises both components to 512Mi request / 1Gi limit, matching the proven Tochka/Billing workload profile. MR pipeline `138096` built and unit-tested the commit successfully; manual deploy job `3120801` has not been started (superseded 2026-09-07: it ran, peak memory still not recorded). Rerun deploy, automatic smoke, and manual regression while observing peak usage. Repeat-deploy isolation and cleanup/stale-pipeline verification are also pending (superseded 2026-09-29: done via Jenkins 169, `3 delete dev` ownership check, environments stopped; see "Merge readiness").
 
 ## Verified Tochka pilot status
 
-The Kubernetes post-deploy autotest path is operational on the three pushed `DevOps-832-dev-autotests` branches. Pipeline `137961` / successful deploy retry `3112466` used Jenkins build 153 and automatically started `smoke tests` job `3112464`. Namespace ownership and `TARGET_ENV_SUFFIX=-devops-832` were verified before the existing test image ran. GitLab received 603 JUnit cases: 587 passed, 16 skipped, no failed/error cases. `regression tests` job `3112465` exists as a manual job. Allure/JUnit publication succeeded.
+The Kubernetes post-deploy autotest path is operational on the three pushed `DevOps-832-dev-autotests` branches. Pipeline `137961` / successful deploy retry `3112466` used Jenkins build 153 and automatically started `smoke tests` job `3112464`. Namespace ownership and `TARGET_ENV_SUFFIX=-devops-832` (superseded 2026-09-29: value has no leading dash now, see "Endpoint contract") were verified before the existing test image ran. GitLab received 603 JUnit cases: 587 passed, 16 skipped, no failed/error cases. `regression tests` job `3112465` exists as a manual job. Allure/JUnit publication succeeded.
 
 Tochka's four workloads are now persisted and deployed with 512Mi memory requests and 1Gi limits; all remained Running with zero restarts through the successful smoke run.
 
@@ -165,7 +177,7 @@ Tochka's four workloads are now persisted and deployed with 512Mi memory request
 
 Billing pipeline `137991` at service commit `1b6ed25` succeeded on 2026-09-04. Deploy job `3114239` invoked Jenkins build `155`; the build loaded Jenkins revision `20b9d78`, created fresh namespace `dev-devops-832`, deployed the complete 13-service catalog with Billing primary, and published the expected Billing ingress. It automatically played `smoke tests` job `3114321`; `regression tests` job `3114322` remains manual.
 
-The smoke job used billing-tests feature commit `8e36a0f` through image `registry.youdo.sg/youdo/test/youdo-business-billing-service-tests/autotests:devops-832-dev-autotests`, validated namespace ownership, derived `TARGET_ENV_SUFFIX=-devops-832`, retained `TARGET_HOST=none`, and reached `http://youdo-business-billing-service-webapp-devops-832.dev.youdo.corp`. Allure and JUnit artifacts were published successfully.
+The smoke job used billing-tests feature commit `8e36a0f` through image `registry.youdo.sg/youdo/test/youdo-business-billing-service-tests/autotests:devops-832-dev-autotests`, validated namespace ownership, derived `TARGET_ENV_SUFFIX=-devops-832` (superseded 2026-09-29: no leading dash now), retained `TARGET_HOST=none`, and reached `http://youdo-business-billing-service-webapp-devops-832.dev.youdo.corp`. Allure and JUnit artifacts were published successfully.
 
 The green job is not a clean functional pass. Gradle logged 553 executed tests and 3 failures, while GitLab imported 545 cases: 542 passed and 3 failed. The three reported failures were one `RefillYouDoBalanceTest` parameterization returning a null item and two `GetYouDoBalanceHistoryTest` parameterizations returning zero where the test expected a non-zero value. Existing `ignoreFailures=true` converted the Gradle test task to `BUILD SUCCESSFUL`; the job is also `allow_failure: true`. This is the already documented QA-owned failure-propagation limitation, not a Kubernetes routing failure. The 553-versus-545 count discrepancy should be checked when QA/report semantics are addressed.
 
@@ -202,7 +214,7 @@ Open infrastructure work:
 - Resolved and runtime-proven: Jenkins build 152 / GitLab job `3112382` exposed a post-rollout race. `jenkins-pipelines/master` commit `20b9d78` retries the check, excludes deletion-marked and Job pods, and preserves failure for persistent non-Running active pods. Billing Jenkins build `158` observed the old ReplicaSet pod in `Terminating`, ignored it correctly, and completed successfully.
 - `youdo-business-doc-generator/api` correction is merged to `master` through MR 34 / merge commit `bdee550d`: 512Mi request / 1Gi limit. `youdo.business/automation-web` correction is merged through MR 3738 / merge commit `b7d1df43`: 512Mi request / 1Gi limit. The existing `dev-devops-832` namespace predates both merges and therefore does not validate them.
 - Manual `regression tests` job `3112465` succeeded in pipeline `137961` from 01:28:58 to 01:34:42 MSK (344 seconds), before both memory merges. Per operator decision, do not repeat Tochka solely for memory verification: the next service onboarded to post-deploy autotests will create/refresh the full dependency catalog from `master`, and that run must verify the new doc-generator and automation-web resources, restarts/OOM, peak memory, and Jenkins old-ReplicaSet handling.
-- Rollout/merge policy: first configure post-deploy autotests for every selected service and test project on feature branches. Keep the coordinated application/test/template changes unmerged during preparation. After all projects are ready, merge the complete set in dependency order, switch temporary template refs to `master`, and run final end-to-end verification.
+- Rollout/merge policy (superseded 2026-09-29: executed, everything merged and pins removed, see "Final state 2026-09-29 01:40"): first configure post-deploy autotests for every selected service and test project on feature branches. Keep the coordinated application/test/template changes unmerged during preparation. After all projects are ready, merge the complete set in dependency order, switch temporary template refs to `master`, and run final end-to-end verification.
 
 ## Automation UI identification
 
@@ -240,9 +252,9 @@ Services currently enabling `v3/.autotests.yml` and `AUTOTESTS=true` on `origin/
 
 | Service | Test image repository | Endpoint shape | Kubernetes gap |
 |---|---|---|---|
-| `youdo-business-tochka-proxy` | `youdo-business-tochka-proxy-tests` | mock webapp + mock worker + automation-web | pilot gap resolved and runtime-proven on feature branches |
-| `youdo-business-tkb-proxy` | `youdo-business-tkb-tests` | mock API + worker + automation-web | initial deploy and endpoint connectivity runtime-proven in pipeline `138093`; two masked functional failures and near-limit mock-api memory remain; repeat/cleanup pending |
-| `youdo-business-billing-service` | `youdo-business-billing-service-tests` | webapp only | Completed for DevOps-832. Pipeline `137992`, deploy retry `3114414`, Jenkins `158` proved the `AutoTest` pin, repeat rollout, 512Mi/1Gi resources, zero restarts, smoke and regression connectivity. Each suite has 2 remaining functional assertions, masked by `ignoreFailures`. |
+| `youdo-business-tochka-proxy` | `youdo-business-tochka-proxy-tests` | mock webapp + mock worker + automation-web | pilot gap resolved and runtime-proven; service !237 merged to `master` 2026-09-29 01:18 without pins; regression 2026-09-29 (job 3189751): 123 failed of 514, of which 121 are v1 `createPerson` `404` (Site-24856 drift) |
+| `youdo-business-tkb-proxy` | `youdo-business-tkb-tests` | mock API + worker + automation-web | initial deploy and endpoint connectivity runtime-proven in pipeline `138093`; two masked `IdentifyToBeneficiaryTest` failures remain; memory raised to 512Mi/1Gi (`aa4d083`, deploy 3120801 2026-09-07), repeat deploy (Jenkins 169) and cleanup done, !63 merged 2026-09-29 01:31 (supersedes "repeat/cleanup pending" from 2026-09-07); mock-api exit-137 restart on repeat deploy is a hypothesis |
+| `youdo-business-billing-service` | `youdo-business-billing-service-tests` | webapp only | Completed for DevOps-832. Pipeline `137992`, deploy retry `3114414`, Jenkins `158` proved the `AutoTest` pin, repeat rollout, 512Mi/1Gi resources, zero restarts, smoke and regression connectivity. 2026-09-04: 2 remaining functional assertions per suite; newest 2026-09-29 smoke 3190117: 3 failed of 545 (two `GetYouDoBalanceHistoryTest` plus new `RefillYouDoBalanceTest [tkbBankDefault]` NPE), all masked by `ignoreFailures`; !97 merged 2026-09-29 01:38. |
 | `youdo.business` | `youdo-business-tests` | many product and dependency endpoints | requires a per-endpoint map, not one host suffix |
 
 `youdo-business-sber-proxy` and `youdo-business-sber-proxy-tests` are explicitly outside the rollout scope because the service is no longer current; do not add Sber to the Jenkins dev catalog for DevOps-832.
@@ -322,7 +334,7 @@ If policy forbids even internal ingress for worker trigger endpoints, the altern
    - Add the `TARGET_ENV_SUFFIX` Kubernetes mode while retaining `TARGET_HOST` as the temporary Nomad fallback.
    - Construct the mock webapp, mock worker, and automation-web URLs from their stable base names plus the suffix while leaving all other test behaviour unchanged.
    - Leave tag selection, failure propagation, token handling, retry logic, and test content to the QA backlog; they do not block DevOps-832.
-   - Publish the test feature branch as `devops-832-dev-autotests` and use that branch-specific image for the pilot; do not alter the legacy jobs' `latest` contract.
+   - Publish the test feature branch as `devops-832-dev-autotests` and use that branch-specific image for the pilot (superseded 2026-09-29: test projects merged, pin removed); do not alter the legacy jobs' `latest` contract.
 
 3. **Expose only required Kubernetes components**
    - Enable the Tochka `mock-worker` Service and add an internal task-specific ingress.
@@ -342,8 +354,8 @@ If policy forbids even internal ingress for worker trigger endpoints, the altern
    - Keep `allow_failure: true`; deciding when the suite is trustworthy enough to become an MR gate is a separate QA-owned task.
 
 6. **Rollout to other services**
-   - Billing first (single existing webapp ingress): infrastructure rollout completed and runtime-proven in pipeline `137992`; 512Mi/1Gi eliminated the OOM/502 failure pattern. Two masked balance-history assertions remain for QA.
-   - TKB second: initial deploy, automatic smoke, manual regression, worker exposure, and endpoint mapping are runtime-proven. The local branch now raises both mock-api and worker-mock memory; publish and runtime-check it, diagnose the two repeated incoming-payment failures, then verify repeat-deploy and cleanup.
+   - Billing first (single existing webapp ingress): infrastructure rollout completed and runtime-proven in pipeline `137992`; 512Mi/1Gi eliminated the OOM/502 failure pattern. Two masked balance-history assertions remain for QA (superseded 2026-09-29: 3 failures in smoke 3190117, see "Merge readiness").
+   - TKB second: initial deploy, automatic smoke, manual regression, worker exposure, and endpoint mapping are runtime-proven. The local branch now raises both mock-api and worker-mock memory; publish and runtime-check it, diagnose the two repeated incoming-payment failures, then verify repeat-deploy and cleanup (superseded 2026-09-29: memory fix deployed, repeat deploy and cleanup verified, merged; the two failures remain).
    - Main `youdo-business` suite after decomposing its many explicit endpoints.
 
 Sber is not a later rollout phase: the operator marked the service and its tests non-current on 2026-09-04.

@@ -6,6 +6,20 @@ tags: [terraform, yandex-tf, test-infra, nomad-test, base-image, instance-group]
 ---
 # Yandex Terraform: test-infra
 
+## Summary
+
+- System: Terraform root `/home/slnnk/git/yandex-tf/test-infra` (repo `sysadmins/yandex/yandex-tf`), folder `test-folder`, private test subnet mostly in `ru-central1-b`. It holds two Nomad/Consul instance groups (7 agents, 3 masters) and standalone VMs such as `zabbix-test`.
+- State in Consul path `terraform/yandex-test-infra`; local use needs `test-infra/key.json` and `CONSUL_HTTP_TOKEN` (locations only).
+- CI (Terraform `1.7.5`, provider `0.127.0`): `validate:test-infra`, `plan:test-infra`, manual `apply:test-infra` on `master` (fresh `terraform apply -auto-approve` twice, ignores the reviewed `tfplan`), manual `ansible:test-infra` running `automation-services/cluster_docker.yml`.
+- AWX and Sentry VMs were retired (files and `ansible_host` blocks removed); job `3154035` destroyed all seven objects.
+- An employee overwrote the shared image: old `fd8tpn447q9l6en2gqvi`, new `fd8ot9ko30559cfp1p0o`, causing 15 disk plus 15 VM replacements in the plan. Mitigated with name lookup `yc-base-image-ubuntu-22-04` and `ignore_changes` on 13 disks and both groups (the group image ignore keeps the deleted image ID; see job `3154035` failure).
+- Job `3154035` failed partially: 14 of 17 standalone updates applied; both Nomad groups failed because the retained deleted image was revalidated; `zabbix-test` failed on `core_fraction` 20 to 100 without `allow_stopping_for_update`.
+- Remediation prepared on local branch `DevOps-859-delete-old-vms`: group `user-data` ignore, `allow_stopping_for_update = true`. No live plan run yet; run one before apply.
+- Risks: group templates still reference the deleted image, so scale-up or auto-healing may fail; SSH-key drift from commit `b202bb5` is deferred; template changes restart all Nomad nodes; stale `shared_network_name` in tfvars.
+- Read "Failed master apply after base-image migration" for current state; "Shared base-image overwrite" for cause; "Avoiding instance-group restarts" for OS Login design; "AWX and Sentry retirement assessment" for the workflow.
+- Older sections ("AWX and Sentry retirement assessment", "AWX and Sentry repository removal", "Unexpected mass replacements in MR !224") are marked inline as superseded by job `3154035` and the confirmed image-overwrite cause.
+- Unresolved: none.
+
 Last verified: 2026-09-17.
 
 ## Scope and access
@@ -24,7 +38,7 @@ Last verified: 2026-09-17.
 - On `master`, `apply:test-infra` is manual. It runs an unpersisted fresh `terraform apply -auto-approve` twice; the second run is an inventory workaround. Therefore the apply job does not consume the reviewed `tfplan`, and its fresh plan must be checked carefully at execution time.
 - `ansible:test-infra` is a separate manual job depending on the apply job and runs `automation-services/cluster_docker.yml` using Terraform-backed inventory.
 
-## AWX and Sentry retirement assessment (2026-09-15)
+## AWX and Sentry retirement assessment (2026-09-15) (superseded 2026-09-17: retirement applied in job `3154035`, see "Failed master apply after base-image migration"; steps kept as the workflow)
 
 Task: determine the safe removal procedure for the test AWX and Sentry VMs. No resources or repository files were changed during the assessment.
 
@@ -46,7 +60,7 @@ Recommended retirement workflow:
 
 Rollback: restore configuration through Git and recreate from Terraform. VM-local data is recoverable only from a verified snapshot/backup; recreated boot disks are initialized from the configured Ubuntu image.
 
-## AWX and Sentry repository removal (2026-09-15)
+## AWX and Sentry repository removal (2026-09-15) (superseded 2026-09-17: plan counts 17 change / 7 destroy were applied in part by job `3154035`, see "Failed master apply after base-image migration")
 
 - Deleted `test-infra/compute-awx-test.tf` and `test-infra/compute-sentry-test.tf`; the Sentry 186 GB data disk is intentionally not retained.
 - Removed `ansible_host.sentry-test` and `ansible_host.awx_test01` from `test-infra/ansible-hosts.tf`.
@@ -56,7 +70,7 @@ Rollback: restore configuration through Git and recreate from Terraform. VM-loca
 - Restart impact verified 2026-09-15: the 15 standalone `yandex_compute_instance` updates have no replacement paths and update only VM metadata. Yandex Cloud documents that standalone VM metadata updates do not require stopping or restarting the VM. The two instance-group template metadata changes do require VM restart: all 7 Nomad agents and all 3 Nomad/Consul masters are subject to sequential restart. Both groups have `max_unavailable = 1` and `max_expansion = 0`; the master group additionally has `max_deleting = 1` and `startup_duration = 30`.
 - Repository diff at verification: only the two deleted compute files and the two removed inventory blocks; `git diff --check` passed and no AWX/Sentry references remained under `test-infra`.
 
-## Unexpected mass replacements in MR !224 plan (2026-09-17)
+## Unexpected mass replacements in MR !224 plan (2026-09-17) (superseded 2026-09-17: cause was an overwritten shared image, not a state write; see "Shared base-image overwrite". The `terraform_version = 1.9.4` state-write hypothesis and the advice against `ignore_changes = [image_id]` were reversed)
 
 - GitLab job `3150822` (`plan:test-infra`, pipeline `138877`, commit `bca68d9`) reported `30 to add, 15 to change, 37 to destroy`. Do not apply this plan.
 - The intended retirement accounts for exactly 7 standalone destroys: two Ansible hosts, two VMs, AWX boot disk, Sentry boot disk, and Sentry data disk.
@@ -73,9 +87,9 @@ Rollback: restore configuration through Git and recreate from Terraform. VM-loca
 - Confirmed cause: an employee overwrote the shared Yandex Cloud image used to initialize all `test-infra` boot disks. The old image ID recorded in state/configuration was `fd8tpn447q9l6en2gqvi`; the rebuilt image with the stable name `yc-base-image-ubuntu-22-04` currently resolves to `fd8ot9ko30559cfp1p0o`.
 - Updated all 15 active Ubuntu image data sources under `test-infra`: lookup now uses `name = "yc-base-image-ubuntu-22-04"` and `folder_id`, rather than a hard-coded image ID. The disabled `compute-elk-test.tf.disabled` file was intentionally left unchanged because Terraform does not load it.
 - Added `ignore_changes = [image_id, snapshot_id]` to the 13 managed standalone boot disks. Existing `snapshot_id` protection was preserved.
-- Added a narrow lifecycle ignore for `instance_template[0].boot_disk[0].initialize_params[0].image_id` to both Nomad instance groups. This prevents replacement/rollout of existing group VMs solely because the stable image name points to a newly built image ID; newly created instances still use the currently resolved image.
+- Added a narrow lifecycle ignore for `instance_template[0].boot_disk[0].initialize_params[0].image_id` to both Nomad instance groups. This prevents replacement/rollout of existing group VMs solely because the stable image name points to a newly built image ID (superseded 2026-09-17: in job `3154035` it retained the deleted image ID and group updates failed; see "Failed master apply after base-image migration"); newly created instances still use the currently resolved image.
 - `terraform validate` succeeds with Yandex provider `0.127.0`, confirming the nested lifecycle paths are valid.
-- Read-only verification used `terraform plan -refresh=false -lock=false -detailed-exitcode -no-color`. Result: `0 to add, 17 to change, 7 to destroy`; the previous 15 boot-disk plus 15 VM replacements are gone. The seven remaining destroys are only the already approved AWX/Sentry retirement resources, while the 17 in-place metadata updates remain unrelated SSH-key representation drift.
+- Read-only verification used `terraform plan -refresh=false -lock=false -detailed-exitcode -no-color`. Result (pre-apply; the 7 destroys and 14 of 17 updates were applied in job `3154035`): `0 to add, 17 to change, 7 to destroy`; the previous 15 boot-disk plus 15 VM replacements are gone. The seven remaining destroys are only the already approved AWX/Sentry retirement resources, while the 17 in-place metadata updates remain unrelated SSH-key representation drift.
 - Operational caveat: ignoring `image_id` deliberately preserves existing disks/VMs when the named base image is rebuilt. It also means changing the desired base image for existing machines will require an explicit controlled recreation or temporary removal of the ignore rule; this must be reviewed rather than applied implicitly.
 
 ## Avoiding instance-group restarts for SSH-key rotation
@@ -86,7 +100,7 @@ Assessment date: 2026-09-15.
 - Standalone VM metadata can be updated live, but Yandex Instance Groups rules explicitly classify `instance_template.metadata` changes as requiring VM restart. There is no Terraform/Yandex switch that makes the same group-template metadata change live.
 - Recommended long-term design: migrate SSH authorization to Yandex Cloud OS Login (prefer SSH certificates), install/verify the OS Login agent on existing Ubuntu 22.04 hosts, enable OS Login once, and manage access through IAM/Identity Hub. The initial group-template migration may require one controlled rolling restart, but later key/user changes no longer touch instance metadata and do not restart groups.
 - Alternative when OS Login is not available: manage `/home/<user>/.ssh/authorized_keys` in-guest through Ansible or another configuration agent. Keep group `user-data` stable and use it only for bootstrap.
-- Immediate workaround for a retirement-only apply: add a narrowly scoped Terraform lifecycle ignore for the group template's `user-data`, or restore the exact previously rendered `user-data` representation. Ignore rules conceal future intended metadata changes and must be documented/removed after SSH access is moved elsewhere.
+- Immediate workaround for a retirement-only apply (superseded 2026-09-17: the `user-data` ignore was prepared on branch `DevOps-859-delete-old-vms`, see "Prepared remediation"): add a narrowly scoped Terraform lifecycle ignore for the group template's `user-data`, or restore the exact previously rendered `user-data` representation. Ignore rules conceal future intended metadata changes and must be documented/removed after SSH access is moved elsewhere.
 - A targeted apply of only retirement resources can also avoid the current group update, but it is an exceptional operational workaround and leaves the SSH metadata drift pending for the next full apply.
 
 ## Failed master apply after base-image migration (2026-09-17)

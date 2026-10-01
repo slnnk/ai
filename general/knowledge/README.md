@@ -84,6 +84,9 @@ A living document for one system, updated in place. Sections; drop those that do
 
     # <System>
 
+    ## Summary
+    Required once the note grows over ~8 KB (kb_lint warns): 10-15 lines on what the
+    system is, how it works, current state, main risks, and which section to read for what.
     ## Purpose
     ## Components
     Repositories with purpose: product code, autotests, shared test libraries, CI/CD,
@@ -145,9 +148,11 @@ gradually while working; do not crawl the whole filesystem.
 | Script | Purpose |
 | --- | --- |
 | `general/scripts/new_note.py log\|system\|recipe ...` | create a note with correct path, name and frontmatter |
-| `general/scripts/kb_lint.py [--staged]` | check frontmatter, log names, links, secrets, company identifiers in `general/`, language |
-| `general/scripts/build_index.py` | rebuild `INDEX.md` in every layer |
-| `general/scripts/ai-sync.sh` | once-a-day lint, index, commit and push (see below) |
+| `general/scripts/kb_find.py <keywords>` | compact search: path, system, status, checked, title and matching lines per note |
+| `general/scripts/token_usage.py [--days N] [--kb] [--brief]` | token totals of Claude Code and Codex sessions per project/model, top sessions; `--kb` counts how agents read the knowledge base (kb_find, search, INDEX, full vs partial reads); run weekly by `ai-sync.sh` into `personal/usage/` |
+| `general/scripts/kb_lint.py [--staged]` | check frontmatter, log names, links, secrets, company identifiers in `general/`, language, missing `## Summary` in long maps and recipes, `AGENTS.md` over 5.5 KB |
+| `general/scripts/build_index.py` | rebuild `INDEX.md` in every layer; `--stale 30` lists notes due for review: maps older than 30 days, recipes older than `--recipe-days` (180), all `hypothesis`; `--count` prints the number |
+| `general/scripts/ai-sync.sh` | once-a-day lint, index, commit and push; weekly token usage report (see below) |
 
 Company identifiers that must never appear in `general/` are listed one per line in
 `companies/<name>/lint-identifiers.txt`; private IP ranges and `*.corp` hosts are checked
@@ -175,3 +180,26 @@ state files are per machine and ignored by git. `--force` runs
 regardless of the date, `--dry-run` shows what would be committed, `--status` prints the
 last sync date. A failed push leaves the commit local and the state file untouched, so the
 next call retries. Agents never run `git commit` in `~/ai` themselves.
+
+`~/ai` is one private repository; `origin` fetches from GitHub and pushes to both GitHub and
+GitFlic (a separate `gitflic` remote also exists).
+The company layer and the `current` symlink are tracked in it; `.gitignore` holds only `.env`
+and the sync state files. Do not ignore `companies/` or split it into a nested repository.
+
+Monthly staleness review: on the first sync of a month with notes due, `ai-sync.sh` adds
+`Monthly staleness review YYYY-MM` to `TODO.md` "Knowledge base" and prints a reminder. The
+agent offers the review to the user; checks are read-only.
+
+Dated reminders: an open `TODO.md` item written as `- [ ] due YYYY-MM-DD: ...` is printed by
+`ai-sync.sh` as `reminder:` on every daily sync from that date until the item is closed.
+
+## Connecting an agent
+
+Agent-specific directories (`~/.codex`, `~/.claude`, `~/.gemini`) hold only symlinks into
+`~/ai` plus the agent's own runtime state.
+
+- Instructions: symlink to `~/ai/AGENTS.md` from `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`,
+  `~/.gemini/GEMINI.md`.
+- Skills: one symlink per directory from `~/ai/general/skills/` and `~/ai/current/skills/`
+  into the agent's skills folder (`~/.codex/skills/`, `~/.claude/skills/`).
+- Switching employer: create `companies/<new>/`, repoint `current`, redo skill symlinks.

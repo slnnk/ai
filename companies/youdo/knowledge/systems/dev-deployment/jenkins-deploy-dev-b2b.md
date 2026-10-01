@@ -6,6 +6,18 @@ tags: [jenkins, jenkins-pipelines, deploy-dev-b2b, active-choices, helm, ephemer
 ---
 # B2B ephemeral development deploy pipeline (Jenkins)
 
+## Summary
+
+- What: Jenkins pipeline deploying a B2B service (plus catalog dependencies) into an ephemeral Kubernetes namespace for a task or MR. Component note; authoritative status is `~/ai/current/knowledge/systems/dev-deployment/overview.md`.
+- Files: `/home/slnnk/git/jenkins-pipelines` (`pipelines/deploy-dev-b2b.Jenkinsfile`, catalog `config/deploy-dev-b2b.groovy`), `helm-charts` (`ephemeral-namespace`, `microservice`), GitLab entry `gitlab-ci-templates/v3/.deploy-dev.yml`.
+- Flow: GitLab manual `deploy dev` posts `SERVICE`, `VERSIONS` (optional hidden `GITLAB_PROJECT_ID`) to Jenkins `buildWithParameters` -> Active Choices query GitLab API (`GITLAB_ACTIVE_CHOICES_TOKEN`, Jenkins global env) -> namespace chart -> `microservice` chart per service, images `nexus.youdo.com/<gitlab-project-path>:<tag>`; credential `kubeconfig-dev`.
+- Behavior: the ordered 13-entry `services` catalog is the only source of active services (commit `10ef2517`); any entry can be primary. Fresh namespace installs all missing releases; repeat deploy upgrades only the primary and keeps existing non-primary releases; non-primary default to `master`. Namespaces are named from the task id (`dev-devops-689`), TTL `7d`.
+- Outputs: `generated/<service>-routing.yml` and `generated/ingress-urls.txt` (also in build description; `*.dev.youdo.sg` as `https://`, others `http://`); lifecycle jobs `2 extend dev`, `3 delete dev`.
+- Verified: full catalog (builds 140/142), ingress report (build 147), docvalidation-main lifecycle (builds 137/138, jobs 3095877/3095884/3095885/3095886, full cleanup). Not verified: `fns` as main; Jenkins form UI smoke test.
+- Risks: Active Choices scripts need In-process Script Approval after changes; form rendering queries open MRs for every enabled project; build 142 migration Job names of 64-68 chars broke billing, Tochka proxy and auth installs (label limit 63); `helm upgrade --atomic` failure leaves hook resources (see portable lessons).
+- Stale: sections are chronological; superseded passages are marked inline (`allowed_services`/`scope`, `dev-<BUILD_NUMBER>`).
+- Resolved 2026-09-30: namespace `dev-119` no longer exists in the dev cluster (`kubectl get namespace` NotFound; the only `dev-*` namespace left is `dev-hide-employee-api-swagger`); YouTrack article DevOps-A-50 was last updated 2026-08-31 by the user, i.e. after the two-service rollout (not after the 2026-09-29 merge, see TODO dev-deployment closeout). `helm-charts` `origin/master` `4ab8743`: `PGDATA` fix merged; migration Job name shortened to `<projectName>-m<type>` without a `trunc 63` guard (regression-test item in TODO.md).
+
 > Historical/component note. The authoritative cross-system status and rollout plan is `~/ai/current/knowledge/systems/dev-deployment/overview.md`. Where this file conflicts with it, use the central document.
 
 Last verified: 2026-08-31.
@@ -21,7 +33,7 @@ Last verified: 2026-08-31.
 
 ## Execution path
 
-Jenkins job -> Active Choices parameters -> GitLab API -> ephemeral Kubernetes namespace `dev-<BUILD_NUMBER>` -> Helm chart checkout -> service deployment.
+Jenkins job -> Active Choices parameters -> GitLab API -> ephemeral Kubernetes namespace `dev-<BUILD_NUMBER>` (superseded 2026-08-27: see "Two-service rollout", namespace `dev-devops-689` is named from the task id) -> Helm chart checkout -> service deployment.
 
 - GitLab API base URL is stored in the Groovy config.
 - `GITLAB_ACTIVE_CHOICES_TOKEN` comes from Jenkins global environment; the secret value is not stored here.
@@ -53,6 +65,8 @@ Jenkins job -> Active Choices parameters -> GitLab API -> ephemeral Kubernetes n
 
 ## Parameter behavior changed on 2026-08-18
 
+(The `deployment.allowed_services` logic below is superseded 2026-08-30: see "Full-catalog activation"; the form now covers the whole `services` catalog.)
+
 Task: simplify service/version selection in the B2B deployment form.
 
 - Removed the `INCLUDE_DEPENDENCIES` checkbox and its expansion logic.
@@ -67,7 +81,7 @@ Task: simplify service/version selection in the B2B deployment form.
 
 - `git diff --check` passed.
 - Static checks confirmed one `PT_SINGLE_SELECT` parameter and no remaining `INCLUDE_DEPENDENCIES` or `PT_CHECKBOX` references in the pipeline/runner documentation.
-- No local Groovy executable or Jenkins test harness was available, so the form still needs a Jenkins-side smoke test after deployment.
+- No local Groovy executable or Jenkins test harness was available, so the form still needs a Jenkins-side smoke test after deployment (superseded 2026-08-27 for the Groovy part: tests run on the local Groovy 3 runtime, see "Two-service rollout" and "Full-catalog activation"; the form UI smoke test is still unverified).
 
 ## Operational checks and next steps
 
@@ -75,11 +89,13 @@ Task: simplify service/version selection in the B2B deployment form.
 2. Confirm `SERVICE` starts blank and permits only one selection.
 3. Confirm no service version selectors are present before selection.
 4. Select a service and confirm selectors appear for all enabled entries, with the selected service first.
-5. Run a smoke deployment and inspect the console log, build description, archived routing overlays, namespace resources, Helm releases, and pod rollout status.
+5. (Done: smoke deployments builds 119, 137, 138, 147 verified.) Run a smoke deployment and inspect the console log, build description, archived routing overlays, namespace resources, Helm releases, and pod rollout status.
 
-Risk: the form queries open merge requests for every enabled GitLab project after selection, so parameter rendering scales with `deployment.allowed_services`.
+Risk: the form queries open merge requests for every enabled GitLab project after selection, so parameter rendering scales with the enabled set (since 2026-08-30 the full 13-entry catalog, not `deployment.allowed_services`).
 
 ## Two-service rollout prepared on 2026-08-27
+
+(Scope superseded 2026-08-30: see "Full-catalog activation"; `scope`/`allowed_services` were removed in `10ef2517`.)
 
 - User confirmed that `docvalidation` and `fns` must form the complete current deployment set: either can be main, and the other is a dependent service on `master` by default.
 - `fns` was already present in the full Jenkins catalog with GitLab project ID `244`; its `devops/dev.yml` was reported merged before this change.
@@ -87,7 +103,7 @@ Risk: the form queries open merge requests for every enabled GitLab project afte
 - Multi-service ordering in both Active Choices and runtime is now constrained to `allowed_services`, not all 13 catalog entries. Main is first, so the expected sets are `[docvalidation, fns]` or `[fns, docvalidation]`.
 - Added `tests/deploy_dev_b2b_test.groovy`. TDD RED failed on the missing deployment-set function; GREEN passed after the implementation. The test parses the real Jenkinsfile with the local Groovy 3 runtime and checks both main-service orders plus the real config.
 - Updated repository `README.md` to document that `allowed_services` controls both the main-service choices and the enabled multi-service set.
-- No commit, push, Jenkins job reload, or runtime deployment has been performed. After publication, reload the Jenkins job, approve modified Active Choices scripts if requested, verify exactly two `SERVICE` choices and two `VERSIONS` selectors, then run fresh/repeat/lifecycle smoke tests with each service as main. Update the YouTrack article after the runtime result; its current text still describes `scope=single` and the docvalidation-only pilot.
+- No commit, push, Jenkins job reload, or runtime deployment had been performed at the time of writing (superseded 2026-08-27: published as commit `56691cc6`, runtime verified by build 137, see below). After publication, reload the Jenkins job, approve modified Active Choices scripts if requested, verify exactly two `SERVICE` choices and two `VERSIONS` selectors, then run fresh/repeat/lifecycle smoke tests with each service as main. Update the YouTrack article after the runtime result; its text then described `scope=single` and the docvalidation-only pilot (update not recorded: unresolved).
 
 ### First two-service runtime smoke: GitLab job 3095877 / Jenkins build 137
 
@@ -98,7 +114,7 @@ Risk: the form queries open merge requests for every enabled GitLab project afte
 - Both services installed their PostgreSQL StatefulSets and completed pre/post migration Jobs. Docvalidation API/service/scheduler and fns API/service/scheduler were Ready with zero restarts; RabbitMQ and Redis were Ready; the namespace had no Warning events. Both `http://docvalidation-devops-689.dev.youdo.corp/hc` and `http://fns-devops-689.dev.youdo.corp/hc` returned HTTP 200 `Healthy`.
 - Jenkins archived both routing overlays. Fns live ConfigMap `fns-devops-689-env` set `DocValidationClient__BaseAddress=http://docvalidation-devops-689.dev.youdo.corp/api/v1`, confirming ephemeral dependency routing rather than the stable fallback. Docvalidation retained its stable Cerberus and YouDo API endpoints.
 - Read-only cluster checks used `/home/slnnk/.kube/config-yandex-dev`. The file is mode `664`, so Helm warns that it is group/world readable; reduce access to `600`. Local kubectl is `1.29.3` against server `1.34.1`, outside the supported +/-1 minor-version skew; Jenkins itself used the matching `kubectl:1.34.0` lifecycle image, so these warnings did not affect job 3095877.
-- GitLab environment `dev/devops-689-k8s` is currently `available`. Next multi-service checks: repeat deploy and confirm the main docvalidation release advances while existing fns Helm revision/pod UIDs remain unchanged; then extend/delete lifecycle verification. A separate run with `fns` as main is still pending.
+- GitLab environment `dev/devops-689-k8s` was `available` at that time (superseded 2026-08-27: `stopped` after job 3095886). Next multi-service checks (repeat, extend, delete done; only fns-main remains): repeat deploy and confirm the main docvalidation release advances while existing fns Helm revision/pod UIDs remain unchanged; then extend/delete lifecycle verification. A separate run with `fns` as main is still pending.
 
 ### Two-service repeat deploy: GitLab job 3095884 / Jenkins build 138
 
@@ -109,7 +125,7 @@ Risk: the form queries open merge requests for every enabled GitLab project afte
 - Fns remained revision 1 with its original deploy timestamp `2026-08-27 21:31:42 +03:00`, image tag `master-595`, and unchanged pod identities from the first deploy: API `fns-devops-689-api-6c5c86fccb-f5h9s`, scheduler `fns-devops-689-scheduler-5c4d4b5b54-69g4d`, service `fns-devops-689-service-6856ccc468-2lcfh`, and PostgreSQL `fns-devops-689-postgres-0`; all retained their original creation timestamps and had zero restarts.
 - RabbitMQ and Redis identities also remained unchanged. Both PostgreSQL PVCs stayed Bound with their original `2026-08-27T18:31:43Z` creation timestamps; docvalidation reused PVC UID `d816c332-df8c-4140-a258-7408d178f342`, and fns retained PVC UID `2af02c6d-9e41-4966-80f7-0548442795ea`.
 - All deployments/StatefulSets were Ready, no Warning events existed, and both service `/hc` endpoints returned HTTP 200 `Healthy`. Fns live routing still pointed to `http://docvalidation-devops-689.dev.youdo.corp/api/v1`.
-- The main multi-service repeat-deploy invariant is verified. Remaining runtime checks are extend/delete lifecycle on the current build 138 metadata and a separate deployment with `fns` as main.
+- The main multi-service repeat-deploy invariant is verified. Remaining runtime checks were extend/delete (superseded 2026-08-27: done by jobs 3095885/3095886) and a separate deployment with `fns` as main (still unverified).
 
 ### Two-service lifecycle extend: GitLab job 3095885
 
@@ -118,7 +134,7 @@ Risk: the form queries open merge requests for every enabled GitLab project afte
 - Kubernetes lifecycle metadata changed from TTL `7d` to `5d`; `k8s-ttl-controller.twin.sh/refreshed-at` became `2026-08-27T18:50:05Z`.
 - GitLab Environment `442` (`dev/devops-689-k8s`) remained `available` and its `auto_stop_at` moved to `2026-09-01T21:50:06.050+03:00`, exactly five days after the extend job.
 - All docvalidation/fns deployments and PostgreSQL StatefulSets remained Ready, no Warning events existed, and both service `/hc` endpoints returned HTTP 200 `Healthy` after extension.
-- Extend behavior for the two-service build is verified. Remaining lifecycle check is `3 delete dev` from the same pipeline/build metadata, followed by confirmation that namespace, all three Helm releases/secrets, PVC/PV, and GitLab environment state are cleaned up. A separate deployment with `fns` as main is still pending.
+- Extend behavior for the two-service build is verified. Remaining lifecycle check `3 delete dev` (superseded 2026-08-27: done by job 3095886, cleanup confirmed). A separate deployment with `fns` as main is still pending.
 
 ### Two-service lifecycle delete: GitLab job 3095886
 
@@ -127,23 +143,23 @@ Risk: the form queries open merge requests for every enabled GitLab project afte
 - Post-checks confirmed namespace `dev-devops-689` is NotFound; Helm releases `dev-devops-689`, `docvalidation-devops-689`, and `fns-devops-689` are absent; no matching Helm release secrets remain in any namespace.
 - Both previously Bound volumes (`pvc-d816c332-df8c-4140-a258-7408d178f342` for docvalidation and `pvc-2af02c6d-9e41-4966-80f7-0548442795ea` for fns) are absent, and no PV retains a claimRef to `dev-devops-689`.
 - GitLab Environment `442` (`dev/devops-689-k8s`) moved to `stopped` at `2026-08-27T21:53:25.382+03:00` with `auto_stop_at=null`.
-- The complete docvalidation-main two-service lifecycle is verified: fresh deploy, repeat deploy preserving fns, extend, and delete. The remaining rollout check is a separate deployment with `fns` as main, followed by its lifecycle cleanup. The YouTrack Dev deployment article should be updated after that final direction check or now with the verified docvalidation-main results plus an explicit pending fns-main item.
+- The complete docvalidation-main two-service lifecycle is verified: fresh deploy, repeat deploy preserving fns, extend, and delete. The remaining rollout check is a separate deployment with `fns` as main, followed by its lifecycle cleanup (still unverified). The YouTrack Dev deployment article should be updated after that final direction check or now with the verified docvalidation-main results plus an explicit pending fns-main item (update not recorded).
 
 ## Docvalidation single-service pilot and kubeconfig update (2026-08-25)
 
-- Jenkins `master` commit `936de243594ce28b93cb14835897b903805f4b89` restricts the pilot to `docvalidation` with deployment scope `single`.
+- Jenkins `master` commit `936de243594ce28b93cb14835897b903805f4b89` restricts the pilot to `docvalidation` with deployment scope `single` (superseded 2026-08-27/30: `scope=all` for two services, then full catalog).
 - Build 117 confirmed the guards: `SERVICE=docvalidation`, `VERSIONS=docvalidation|223|mr|133|`, and `services to deploy: docvalidation`. It selected GitLab pipeline 134202.
 - Build 117 failed before namespace creation because the then-current `kubeconfig-dev` targeted unreachable Kubernetes API `https://10.16.26.68` and Helm received an I/O timeout.
 - Jenkins system/global secret-file credential `kubeconfig-dev` was updated through the credentials `config.xml` API from the user-provided `/tmp/k8sdev`. The credential value is not stored in notes.
 - The new credential targets `https://10.16.26.3`. Direct validation showed Kubernetes server 1.34.1 and permission to create/delete namespaces. A Jenkins-side size and SHA-256 comparison confirmed that the stored credential exactly matches the provided file.
-- Next check: rerun the same Jenkins selection and verify the ephemeral namespace stage reaches the new API endpoint, then continue with Helm/Vault/RabbitMQ and docvalidation rollout diagnostics.
+- Next check: rerun the same Jenkins selection and verify the ephemeral namespace stage reaches the new API endpoint, then continue with Helm/Vault/RabbitMQ and docvalidation rollout diagnostics (superseded 2026-08-25: done by builds 118 and 119).
 
 ### Jenkins build 118 result
 
 - Build 118 reached the new Kubernetes API successfully and again deployed only `docvalidation`. Namespace `dev-118` was created with the expected Jenkins/dev/TTL metadata; registry and RabbitMQ Vault secrets synchronized; RabbitMQ and Redis became Ready.
 - Jenkins selected docvalidation MR 133 / GitLab pipeline 134202, repository commit `044f867d8813d6ed7e5e310e481e48d311d7d59f`, and image tag `devops-689-k8s-134202`. The archived routing overlay correctly kept Cerberus and youdo-business on their stable dev endpoints.
 - The docvalidation Helm install failed after its ten-minute timeout. PostgreSQL 16 could not initialize because the dynamically provisioned filesystem contains `lost+found` at the PVC mount root `/var/lib/postgresql/data`.
-- Root cause is in `/home/slnnk/git/helm-charts/microservice/templates/postgres-deployment.yaml`, introduced by Helm `master` commit `84288a7`: the StatefulSet mounts the PVC directly at PostgreSQL's default `PGDATA`. On 2026-08-25 the local clean `master` worktree was updated to set `PGDATA=/var/lib/postgresql/data/pgdata`; this change is not yet committed or pushed. Default and docvalidation-specific `helm lint`, `helm template`, rendered YAML parsing, and `git diff --check` passed.
+- Root cause is in `/home/slnnk/git/helm-charts/microservice/templates/postgres-deployment.yaml`, introduced by Helm `master` commit `84288a7`: the StatefulSet mounts the PVC directly at PostgreSQL's default `PGDATA`. On 2026-08-25 the local clean `master` worktree was updated to set `PGDATA=/var/lib/postgresql/data/pgdata`; this change was not yet committed or pushed at that time (later publication not recorded in this note: unresolved). Default and docvalidation-specific `helm lint`, `helm template`, rendered YAML parsing, and `git diff --check` passed.
 - `helm upgrade --atomic` removed the `docvalidation-118` release but pre-install hook resources survived: the PostgreSQL StatefulSet/pod/service, pre-migration Job/pod, and bound 5 Gi PVC remained. The separate namespace release `ns-dev-118` also remained with running RabbitMQ and Redis. After verifying `createdBy=jenkins`, `environment=dev`, and `jenkinsJobId=118`, Helm release `ns-dev-118` was uninstalled; namespace `dev-118` and its resources/PVC were confirmed absent.
 
 ### Jenkins build 119 result
@@ -153,7 +169,7 @@ Risk: the form queries open merge requests for every enabled GitLab project afte
 - API, scheduler, service, PostgreSQL, RabbitMQ, and Redis are Ready with zero restarts at verification time. `http://docvalidation-119.dev.youdo.corp/hc` returned HTTP 200 `Healthy` through Traefik at `10.16.26.101`.
 - The routing artifact uses stable dev endpoints for Cerberus and youdo-business, as expected for single-service deployment.
 - Observed transient warning: the pre-migration pod initially received Nexus `NotFound`/`ImagePullBackOff` for the migrations image, then successfully pulled the exact same tag about 90 seconds later and completed. RabbitMQ/Redis also had one initial service-account ConfigMap cache mount timeout and recovered. These did not affect the final result but should be watched in later runs.
-- Namespace `dev-119` remains active for lifecycle testing (`extend dev` and `delete dev`).
+- Namespace `dev-119` remained active for lifecycle testing (`extend dev` and `delete dev`) (superseded 2026-08-27: lifecycle was verified on `dev-devops-689`, jobs 3095885/3095886; `dev-119` final state not recorded).
 
 ## Portable lessons
 

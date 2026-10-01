@@ -6,10 +6,24 @@ tags: [gitlab-runner, kubernetes, android, autoscaling, terraform, vault, yandex
 ---
 # android-youdo4 dynamic Kubernetes runner
 
-Last checked: 2026-09-09
+## Summary
 
-Status: architecture agreed in principle; no repository or infrastructure
-changes have been made.
+- Plan to move all `team-youdo-android/android-youdo4` CI jobs from the fixed Docker VM runner (`gitlab-runner-android`, `172.28.0.175`, Runner `17.9.3`, live `concurrent=6` on 2026-09-16, earlier recorded 3) to an autoscaled Kubernetes-executor runner. Status is hypothesis; nothing is applied.
+- Final target (2026-09-16): Yandex Managed Kubernetes `kube-test` (`/home/slnnk/git/yandex-tf/test-k8s`). The Selectel `mks-infra` design is superseded; its sections are kept as history and marked inline.
+- Architecture: one always-on runner-manager pod on permanent nodes, plus a tainted Android CI node group scaling 0 -> N -> 0 for job pods. Cold start is acceptable.
+- Job pods need label `workload.youdo.sg/gitlab-android=true` and a toleration for the matching `NoSchedule` taint; the manager avoids nodes with that label.
+- Implemented, not applied, in `/home/slnnk/git/infra-tf/dev`: `dev/namespaces.tf`, `dev/gitlab-runner-android.tf`, `dev/config/gitlab-runner-android-values.yaml`, `dev/GITLAB_RUNNER_ANDROID.md`. Chart `0.74.3`, concurrency 6, non-privileged.
+- Secrets via Vault Secret Operator: `secret/resources/gitlab-runner-android` (`runner-token`), `...-cache`, `...-registry`. The `kubernetes-dev`/`resources` role check returned HTTP 403; an operator must verify it.
+- Validation done: `terraform validate`, `fmt`, `helm lint`, local render. No plan/apply, registration or Vault write.
+- Risks: node-local caches lost on scale-to-zero; manual publish jobs cause cold starts; resource requests unmeasured; Terraform state ownership unconfirmed; VM inventory holds plaintext access material.
+- Read "Decision update: 2026-09-16" and "Yandex runner-manager implementation" first; "Verified current state" for job profiles (`feature` ~15 min, `regress` ~85-90 min); "Open design items" for undecided points.
+- Resolved 2026-09-30: the VM `gitlab-runner-android` has one address, `172.28.0.175/24` (`eth0`), and `config.toml` names the runner `gitlab-runner-android (172.28.0.175)`, `concurrent = 6`; `10.16.24.175` in GitLab job records is unreachable by SSH and is probably the address GitLab sees after NAT (hypothesis). The planned tag of the Kubernetes runner is `k8s-android-dynamic` (protected, untagged jobs off), set in GitLab at registration per `infra-tf/dev/GITLAB_RUNNER_ANDROID.md`; that file and `dev/gitlab-runner-android.tf` are still untracked/uncommitted and not applied.
+
+Last checked: 2026-09-16 (frontmatter); sections below carry their own dates.
+
+Status: architecture agreed in principle; the Yandex runner-manager definition was added to `infra-tf/dev` on 2026-09-16 but nothing is applied (no plan/apply, registration or Vault write).
+
+Original header, 2026-09-09: "no repository or infrastructure changes have been made" (superseded 2026-09-16: see Yandex runner-manager implementation).
 
 ## Decision update: 2026-09-16
 
@@ -83,13 +97,16 @@ changes have been made.
 
 ## Goal and decisions
 
+(Partly superseded 2026-09-16: see Decision update; only the Selectel target line below is replaced, the rest still holds.)
+
 - Pilot project: `team-youdo-android/android-youdo4`.
 - GitLab project URL:
   `https://gitlab.youdo.sg/team-youdo-android/android-youdo4`.
 - Move all project CI jobs, including feature, regression, BrowserStack, Nexus
   uploads, notifications, and manual store publication jobs.
 - Target the existing Selectel Managed Kubernetes cluster `mks-infra` and add a
-  dedicated autoscaled node group.
+  dedicated autoscaled node group (superseded 2026-09-16: see Decision update,
+  target is Yandex `kube-test`).
 - Cold-start delay while a node is provisioned is acceptable.
 - Desired idle state: no Android job pods and zero nodes in the Android CI node
   group. One small GitLab Runner manager pod remains on the permanent platform
@@ -102,8 +119,10 @@ changes have been made.
 | Android application CI | `/home/slnnk/git/android-youdo4/.gitlab-ci.yml` | Job definitions, runner tag, job-specific resource requests and Gradle cache declaration. |
 | Existing VM runner | `/home/slnnk/git/automation-services/inventories/prod_yandex/host_vars/gitlab-runner-android.yml` and corresponding Selectel inventory | Current Docker executor configuration and S3 cache contract; contains access material that must not be copied to documentation. |
 | Current Android runner VM | `/home/slnnk/git/selectel-tf/prod/compute-gitlab-runners.tf` | Existing fixed runner shape and disk baseline. |
-| `mks-infra` cluster/node groups | `/home/slnnk/git/selectel-tf/prod-mks` | Selectel MKS cluster and dedicated Android CI node group. Terraform backend: Consul path `terraform/selectel-mks`. |
-| Cluster platform services | `/home/slnnk/git/infra-tf/prod` | Namespace, Helm release, RBAC, Vault Secret Operator resources, monitoring. Terraform backend: Consul path `terraform/selectel-k8s-infra`. |
+| `mks-infra` cluster/node groups | `/home/slnnk/git/selectel-tf/prod-mks` | (superseded 2026-09-16: Selectel target dropped) Selectel MKS cluster and dedicated Android CI node group. Terraform backend: Consul path `terraform/selectel-mks`. |
+| Cluster platform services | `/home/slnnk/git/infra-tf/prod` | (superseded 2026-09-16 for this runner: implemented in `infra-tf/dev` instead) Namespace, Helm release, RBAC, Vault Secret Operator resources, monitoring. Terraform backend: Consul path `terraform/selectel-k8s-infra`. |
+| Yandex cluster (current target) | `/home/slnnk/git/yandex-tf/test-k8s` | Existing `kube-test` cluster (added 2026-09-16); Android CI node group not yet evidenced there. |
+| Yandex runner-manager definition | `/home/slnnk/git/infra-tf/dev` | Namespace, VSO secrets, Helm release, values and `GITLAB_RUNNER_ANDROID.md` (added, not applied, 2026-09-16). |
 | Android Gradle image | `/home/slnnk/git/gradle` | Builds `registry.youdo.sg/sysadmins/devops-tools/gradle`; `android-youdo4` currently consumes tag `18`. |
 | Store publishing image | `/home/slnnk/git/fastlane-docker` | Images used by Google Play, Huawei AppGallery, and RuStore publication jobs. |
 
@@ -144,7 +163,8 @@ created them.
 - GitLab job records identify the active manager as
   `gitlab-runner-android (10.16.24.175)`.
 - Docker executor, privileged mode, shared S3 cache configuration,
-  `concurrent=3`.
+  `concurrent=3` (superseded 2026-09-16: live `config.toml` shows `concurrent=6`,
+  see Yandex runner-manager implementation).
 - The project CI itself does not declare Docker services or run Docker commands;
   its Gradle and publication containers execute directly. Privileged mode is
   therefore not a demonstrated requirement for this pipeline and should not be
@@ -157,6 +177,8 @@ created them.
   cache behavior must be tested.
 
 ### `mks-infra`
+
+(Historical, superseded 2026-09-16: see Decision update; Selectel target dropped.)
 
 Repository snapshot in `/home/slnnk/git/selectel-tf/prod-mks`:
 
@@ -182,6 +204,8 @@ taints. Selectel Cluster Autoscaler is managed by MKS and reacts to unschedulabl
 scale-down delay is 10 minutes.
 
 ## Selected architecture
+
+(Superseded 2026-09-16 for the target platform: see Decision update. The manager plus tainted scale-to-zero node group shape is kept, but the label/taint became `workload.youdo.sg/gitlab-android`, concurrency 6, and the cluster is `kube-test`.)
 
 ```text
 GitLab android-youdo4
@@ -226,7 +250,7 @@ the agreed target is `mks-infra`.
   `k8s-android-dynamic`.
 - Manager pod pinned to permanent platform nodes; job pods pinned to and
   tolerant of only the dedicated Android CI group.
-- Runner concurrency/limit initially 3 to preserve the current upper bound.
+- Runner concurrency/limit initially 3 to preserve the current upper bound (superseded 2026-09-16: concurrency 6 to match the live VM runner).
 - Default job resources plus bounded per-job overrides. Heavy Gradle builds
   should reserve enough memory to trigger a dedicated node; notification/upload
   jobs should request much less. Exact requests require measurement or a staged
@@ -243,7 +267,7 @@ the agreed target is `mks-infra`.
 
 ## Network and dependency checks before cutover
 
-From an Android job pod in `mks-infra`, verify:
+From an Android job pod in `mks-infra` (superseded 2026-09-16: now `kube-test`; the checklist itself still applies), verify:
 
 - `gitlab.youdo.sg` and GitLab artifacts/API;
 - `registry.youdo.sg` image pulls;
@@ -256,6 +280,8 @@ From an Android job pod in `mks-infra`, verify:
 - DNS, TLS trust, NAT/egress, and any required corporate routes.
 
 ## Rollout and rollback concept
+
+(Selectel-specific steps 1-3 superseded 2026-09-16: see Decision update and `infra-tf/dev`; steps 4-8 and rollback remain the intended concept.)
 
 1. Verify actual `mks-infra` state/quotas and measure current Android job resource
    peaks if monitoring retention permits.
@@ -280,7 +306,7 @@ From an Android job pod in `mks-infra`, verify:
 
 - GitLab queued duration and runner polling failures.
 - Kubernetes Pending/unschedulable events and pod startup timeout.
-- MKS node-group statuses, provision time, scale-down delay, and project quotas.
+- MKS node-group statuses, provision time, scale-down delay, and project quotas (superseded 2026-09-16: Selectel MKS; equivalent Yandex node-group and quota metrics apply).
 - Container image pull duration and failures.
 - CPU/RAM/OOM, ephemeral disk usage, Gradle cache hit rate, artifact upload.
 - Jobs are not currently rare every day: recent history contains bursts and
@@ -293,6 +319,8 @@ From an Android job pod in `mks-infra`, verify:
   copied; migration and rotation should be handled separately.
 
 ## Sources checked
+
+(Selectel documentation below is historical, superseded 2026-09-16: see Decision update.)
 
 - GitLab Runner Helm chart:
   https://docs.gitlab.com/runner/install/kubernetes/
@@ -310,9 +338,10 @@ From an Android job pod in `mks-infra`, verify:
 - Exact CPU/RAM requests and limits for heavy, BrowserStack, notification, Nexus,
   and Fastlane jobs.
 - Whether the existing S3 cache credentials/backend can be reused directly from
-  `mks-infra` and the desired Vault path/role.
+  `mks-infra` and the desired Vault path/role (partly resolved 2026-09-16: VM cache is at `storage.yandexcloud.net`, VSO paths defined; Vault role access still unverified, HTTP 403).
 - Helm chart/app version pin compatible with the self-managed GitLab instance;
-  current GitLab server version still needs verification.
+  current GitLab server version still needs verification (chart pin resolved
+  2026-09-16: `0.74.3` / Runner `17.9.3`; GitLab server version still unverified).
 - Expected cold node/image-pull time and required runner `poll_timeout`/
   `pod_pending_timeout`-related settings for the installed Runner version.
 - Final tag-switch and production validation window.

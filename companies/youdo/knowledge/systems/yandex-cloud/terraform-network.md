@@ -6,7 +6,20 @@ tags: [terraform, yandex-tf, network, base-image, ansible-provider, nlb]
 ---
 # Yandex Terraform: network
 
-Last verified: 2026-09-17.
+## Summary
+
+- System: Terraform root `/home/slnnk/git/yandex-tf/network` (repo `sysadmins/yandex/yandex-tf`) managing shared Yandex Cloud networking plus gateway, test balancers, Postfix, IPsec and NAT MSSQL VMs.
+- State in Consul `consul.service.selectel.consul:8500`, dc `selectel`, path `terraform/yandex-network`; provider auth via ignored `network/key.json` (CI takes it from GitLab Secure Files).
+- CI: `validate:network` (tflint), `plan:network`, manual `apply:network` on `master` for `network/**`. TODO: no `workflow:rules`, so a new branch's first push runs every `plan:*`, including prod.
+- Base image: six data sources look up `yc-base-image-ubuntu-22-04` in `var.folder_id` (now `fd8ot9ko30559cfp1p0o`); disks carry `ignore_changes = [image_id, snapshot_id]`, NAT MSSQL also has an instance-level ignore. Re-imaging needs a reviewed recreation.
+- Apply job `3154717` (2026-09-17) destroyed the old MTA NLB `youdo-mta-balancer`, target group and five public IPs, and applied seven VM metadata updates. Route `192.168.30.0/24 -> 10.16.20.3` is now explicit in `yandex_vpc_route_table.selectel_prod`.
+- Newest state, DevOps-866 (2026-09-23, MR `!229`, job `3170875`): Terraform no longer runs playbooks; only `ansible_host` inventory remains. Playbooks run manually from `automation-services/inventories/yandex`; `time` provider removed (no Vault creds left `/etc/ipsec.secrets` empty).
+- Risk: the balancer playbook failed in job `3154717` (`base_linux_login_user_password` missing), hidden by `ignore_playbook_failure = true`; nginx config was not reconciled. Since DevOps-866 (2026-09-23) it can only be rerun manually from `automation-services/inventories/yandex` via the approved Vault path; no evidence in the note that this was done.
+- Risk: gateway rollback needs a chosen automation-services baseline; deletion protection does not stop partial applies.
+- Read "Shared Ubuntu 22.04 base-image overwrite mitigation" for the image fix; "Failed apply:network job 3154707" for the YC CLI protection steps; "Successful apply with masked Ansible failure" for gateway/balancer results and rollback; "Related recipes" for portable lessons.
+- Historical sections ("Current plan breakdown", "Excessive GitLab plan log", "Master plan verification", "Ansible output clarification", "Failed apply:network job 3154707") are marked inline as superseded by job `3154717` and DevOps-866.
+
+Last verified: 2026-09-23 (DevOps-866); network apply results 2026-09-17.
 
 ## Scope and access
 
@@ -26,18 +39,18 @@ Last verified: 2026-09-17.
 - NAT MSSQL also declares its actual VM boot disk inline under `yandex_compute_instance.nat_mssql.boot_disk.initialize_params`; added a narrow instance lifecycle ignore for `boot_disk[0].initialize_params[0].image_id`. The separately declared `yandex_compute_disk.boot-nat_mssql` remains protected as well, although the VM configuration currently initializes its own disk rather than attaching that resource.
 - Updated the commented image data-source example in `compute-gateway.tf` to use the stable name; its existing disk has no configured `image_id`, so no lifecycle change was needed there.
 - `terraform validate` succeeds with provider `yandex-cloud/yandex` 0.136.0.
-- Read-only verification command: `terraform plan -refresh=false -lock=false -detailed-exitcode -no-color -compact-warnings`. Result: `0 to add, 9 to change, 17 to destroy`; no image-driven disk or VM replacements are present.
+- Read-only verification command: `terraform plan -refresh=false -lock=false -detailed-exitcode -no-color -compact-warnings`. Result at that time (superseded 2026-09-17: refresh-enabled plans later showed 7 destroys, applied in job `3154717`): `0 to add, 9 to change, 17 to destroy`; no image-driven disk or VM replacements are present.
 - The 17 unrelated destroys are existing retirement drift for the old production balancer/Postfix stack and associated load balancer, target group, and external addresses. The nine in-place changes include metadata updates plus snapshot-schedule cleanup. Review this destructive scope separately before apply.
 - Operational caveat: ignored `image_id` preserves existing disks/VMs when the named image is rebuilt. Re-imaging requires a separately reviewed controlled recreation or temporary removal of the ignore rule.
 
-## Current plan breakdown (2026-09-17)
+## Current plan breakdown (2026-09-17) (superseded 2026-09-17: see "Successful apply with masked Ansible failure: job 3154717"; Ansible parts also superseded 2026-09-23 by DevOps-866, see Scope and access)
 
 - The nine in-place changes are seven standalone VM metadata updates (`balancer-test01`, `balancer-test02`, `gate-vm`, `ipsec_vm`, `nat_mssql`, `postfix-test`, and `postfix-prod04`) plus the daily and weekly snapshot schedules. The VM drift originates from commit `b202bb5`, which changed the rendered SSH `user-data` input to `local.vm_ssh_key`. The schedule configuration excludes the old balancer-prod disks.
 - The 17 destroys originate from commit `2807179`, not from the base-image fix. That commit renamed `compute-balancer-prod.tf` and `compute-postfix-prod.tf` to `.tf.off`, commented out the Postfix load balancer resources, and removed the old external-address groups from `terraform.tfvars`.
 - Exact destroy set: two `yandex_compute_disk.boot_balancer_prod` disks, two `yandex_compute_instance.balancer-prod` VMs, three `yandex_compute_disk.boot_postfix` disks, three `yandex_compute_instance.postfix` VMs, `yandex_lb_network_load_balancer.youdo-postfix`, `yandex_lb_target_group.youdo-postfix`, two balancer external addresses, and three SMTP external addresses.
 - The former configuration set deletion protection on the Postfix load balancer and both balancer external addresses. Even though Terraform displays destroy actions, an apply may be rejected by the API until protection is deliberately disabled. Do not apply the network plan unless retirement of this complete 17-object set is confirmed and protection/backup/traffic migration are handled.
 
-## Excessive GitLab plan log: job 3153985 (2026-09-17)
+## Excessive GitLab plan log: job 3153985 (2026-09-17) (superseded 2026-09-17: see "Successful apply with masked Ansible failure: job 3154717"; Ansible parts also superseded 2026-09-23 by DevOps-866, see Scope and access)
 
 - GitLab job `3153985` (`plan:network`, pipeline `138954`, MR `!224`, commit `9cbc7a39`) succeeded but produced about 4.2 MB / 6429 lines of trace output.
 - The output size is not caused by `tf-summarize`; its tree accounts for only about 1 KB. The main source is Terraform rendering complete historical Ansible CLI logs stored in `ansible_playbook_stdout`.
@@ -56,7 +69,7 @@ Last verified: 2026-09-17.
 - Console screenshot verification on 2026-09-17: the seven remaining VMs listed above exist; all shown are running except `nat-mssql`, which is stopped.
 - After the user confirmed that route `192.168.30.0/24 -> 10.16.20.3` is required, it was added explicitly to `yandex_vpc_route_table.selectel_prod` in `network/vpc.tf`. `terraform validate` succeeds. A refresh-enabled read-only plan now reports `6 to add, 7 to change, 7 to destroy`, and JSON inspection confirms zero pending changes for the route table; the previous eighth in-place change is eliminated.
 
-## Master plan verification: job 3154029 (2026-09-17)
+## Master plan verification: job 3154029 (2026-09-17) (superseded 2026-09-17: see "Successful apply with masked Ansible failure: job 3154717"; Ansible parts also superseded 2026-09-23 by DevOps-866, see Scope and access)
 
 - GitLab pipeline `138961`, job `3154029` (`plan:network`), merge commit `7e712f93`, succeeded with `6 to add, 7 to change, 7 to destroy`.
 - The required route `192.168.30.0/24 -> 10.16.20.3` produces no pending route-table action after refresh, confirming that live infrastructure/state already matches the committed configuration.
@@ -66,7 +79,7 @@ Last verified: 2026-09-17.
 - The CI job's final targeted command still references nonexistent `ansible_playbook.playbook_check_mode`; it applied nothing and printed the standard target/incomplete-apply warnings. `network/terraform.tfvars` also retains the non-fatal undeclared `subnets` warning.
 - Operational decision remains: do not start `apply:network` until retirement of the NLB, target group, and all five public IPs is explicitly confirmed and deletion protection is handled deliberately.
 
-## Failed apply:network job 3154707 (2026-09-17)
+## Failed apply:network job 3154707 (2026-09-17) (superseded 2026-09-17: retry succeeded in job `3154717`, see "Successful apply with masked Ansible failure"; YC CLI steps kept as the protection recipe)
 
 - Pipeline `138961`, job `3154707`, merge commit `7e712f93`, failed when Terraform attempted to destroy protected NLB `youdo-mta-balancer` (`enp6sft3t08f0q8j5lc7`). Yandex Cloud returned `FailedPrecondition: Resource is protected from deletion` and explicitly required changing `deletion_protection` first.
 - Before the failure, in-place metadata updates completed successfully for `yandex_compute_instance.nat_mssql` and `yandex_compute_instance.postfix-test`. No destroy operation completed and no Ansible pseudo-resource creation started according to the trace.
@@ -75,7 +88,7 @@ Last verified: 2026-09-17.
 - Exact YC CLI operations for an approved retirement: `yc load-balancer network-load-balancer update enp6sft3t08f0q8j5lc7 --deletion-protection=false`, `yc vpc address update e9bfmqa9uimru8fdts5e --deletion-protection=false`, and `yc vpc address update e9bmd9jaie9jb7gn7i8p --deletion-protection=false`. Verify each object reports `deletion_protection: false` before rerunning Terraform. These updates do not delete resources by themselves; the subsequent Terraform apply will attempt all seven pending destroys.
 - Before retry, direct read-only YC API checks confirmed the NLB and both protected addresses now omit `deletion_protection` in JSON (proto default `false`), so protection is disabled on all three live objects. A simultaneous refresh-enabled Terraform plan still shows the old `true` values in the destroy-side state representation, but its action set is unchanged at `6 add, 5 change, 7 destroy`; the direct cloud reads are authoritative for the deletion guard.
 
-## Ansible output clarification: plan job 3154716 (2026-09-17)
+## Ansible output clarification: plan job 3154716 (2026-09-17) (superseded 2026-09-17: see "Successful apply with masked Ansible failure: job 3154717"; Ansible parts also superseded 2026-09-23 by DevOps-866, see Scope and access)
 
 - Job `3154716` is a successful `plan:network`, not an Ansible/apply execution. Its final command targeted nonexistent `ansible_playbook.playbook_check_mode`, returned `No changes`, and did not run any playbook.
 - The large `changed` sections are historical `ansible_playbook_stdout` values stored in Terraform state and exposed by root outputs. They are not changes made by job `3154716`; embedded timestamps and recaps correspond to earlier runs.

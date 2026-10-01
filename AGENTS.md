@@ -1,80 +1,58 @@
 # Global instructions for AI agents
 
 The user is a DevOps engineer. `~/ai` is the shared knowledge base for every AI agent
-(Codex, Claude Code, Gemini, ...). Agent-specific directories (`~/.codex`, `~/.claude`)
-hold only symlinks into `~/ai` plus the agent's own runtime state.
+(Codex, Claude Code, Gemini, ...). Details, templates and the script list:
+`~/ai/general/knowledge/README.md`.
 
 ## Layout
 
-    ~/ai/AGENTS.md                      this file
-    ~/ai/general/                       portable knowledge, no company context
-      knowledge/<technology>/           docker/, nomad/, gitlab-ci/, k8s/, ansible/, dotnet/, ...
-      knowledge/README.md               layer rules in detail, note and system-map templates
-      skills/  scripts/  prompts/
-    ~/ai/personal/                      the user's own servers, VPN, side projects
-      knowledge/{INDEX.md,systems/,log/,repos.md}  scripts/  .env
-    ~/ai/companies/<name>/              everything tied to one employer
-      CONTEXT.md                        role, priorities, stack and conventions at this company
-      knowledge/{INDEX.md,systems/,log/,repos.md}  skills/  scripts/  prompts/  .env
-    ~/ai/current -> companies/<name>    active employer; always address it as `current`
+    ~/ai/general/     portable knowledge, no company context: knowledge/<technology>/, skills/, scripts/, prompts/
+    ~/ai/personal/    the user's own servers, VPN, side projects: knowledge/, scripts/, .env
+    ~/ai/companies/<name>/  one employer: CONTEXT.md, knowledge/, skills/, scripts/, prompts/, .env
+    ~/ai/current -> companies/<name>   active employer; always address it as `current`
+    ~/ai-data/        generated data of skills and scripts, one subdirectory per tool (e.g. rp/); outside git, may hold private data
+    knowledge/ = INDEX.md, systems/ (maps), log/ (dated entries), repos.md
 
 ## Before a task
 
-- Run `~/ai/general/scripts/ai-sync.sh`. It commits and pushes the knowledge base once a day
-  (state in `~/ai/.last-sync`) and exits instantly when already done today.
-- Read `~/ai/current/CONTEXT.md`.
-- Open `knowledge/INDEX.md` of the relevant layer, then the system map in `knowledge/systems/`.
-- `grep -ril <keyword> ~/ai/general/knowledge ~/ai/personal/knowledge ~/ai/current/knowledge`
-  for hosts, jobs, services, tickets.
+- Run `~/ai/general/scripts/ai-sync.sh` (daily commit and push; instant when already done).
+  Do not hide its output; pass any reminder it prints on to the user.
+- Read `~/ai/current/CONTEXT.md` and the system's section in `~/ai/TODO.md`.
+- Find notes with `~/ai/general/scripts/kb_find.py <keywords>` (hosts, jobs, services,
+  tickets); open `INDEX.md` only to browse. Read a long note by its `## Summary` and the
+  needed section (`sed -n A,Bp`), not whole.
 - Check `knowledge/repos.md` before searching the disk for a repository.
 
 ## Which layer
 
 - Company hosts, services, repositories, tickets, people: `current/`. This is the default.
 - The user's own infrastructure and projects: `personal/`.
-- A lesson reusable at any employer: `general/`, written as a recipe (symptom, cause, fix,
-  limits) with no company name, hostnames, IPs, internal URLs or ticket ids. Must be
-  publishable as is.
-- A company task that yields a portable lesson: log entry in `current/`, recipe in `general/`,
-  link from the log entry to the recipe. Never copy a company note into `general/` with
-  identifiers stripped; rewrite it.
+- A lesson reusable at any employer: `general/`, as a recipe (symptom, cause, fix, limits)
+  with no company name, hostnames, IPs, internal URLs or ticket ids; publishable as is.
+  From a company task: log entry in `current/` linking to a recipe rewritten for `general/`.
 
 ## After significant work
 
-- Create new notes with `python3 ~/ai/general/scripts/new_note.py log|system|recipe ...`;
-  it sets the path, name and frontmatter. Then fill the sections.
-- Log entry: `knowledge/log/YYYY-MM-DD-<system>-<slug>.md`. Cover: task, context (project,
-  environment, hosts, ticket), actions and key commands, findings and conclusions, changed
-  files, remaining risks. Actionable TODO goes to `~/ai/TODO.md` (see Backlog), with a link
-  back to the note.
-- System map: update the existing file in `knowledge/systems/`; never create a duplicate.
-- Run `python3 ~/ai/general/scripts/kb_lint.py` and fix what it reports; `ai-sync.sh` also
-  prints findings at the start of the next day.
-- Repositories: keep `knowledge/repos.md` current: local path, origin URL without
-  credentials, purpose, related system, date checked.
-- Regenerate indexes: `python3 ~/ai/general/scripts/build_index.py`.
-- Append one line to `~/ai/.sync-notes` describing the work for the daily commit message:
-  `echo "- <system>: <what changed and why>" >> ~/ai/.sync-notes`.
-- Do not commit or push `~/ai` yourself; the daily `ai-sync.sh` run does it.
-- Every note starts with frontmatter:
+- New notes via `python3 ~/ai/general/scripts/new_note.py log|system|recipe ...`, then fill
+  the sections. Log entry: task, context, actions and key commands, findings, changed files,
+  risks. Update the existing system map; never create a duplicate.
+- Frontmatter (`system`, `status: verified|hypothesis|outdated`, `checked`, `tags`) on every
+  note. Mark hypotheses in the text; `status: outdated` instead of deleting. English;
+  hostnames, jobs, variables and commands verbatim.
+- Keep `knowledge/repos.md` current (path, origin URL without credentials, purpose, date).
+- Run `kb_lint.py` and fix what it reports, then `build_index.py` (both in `general/scripts/`).
+- `echo "- <system>: <what changed and why>" >> ~/ai/.sync-notes`. Do not commit `~/ai`
+  yourself; `ai-sync.sh` does it.
 
-      ---
-      system: <system or technology>
-      status: verified | hypothesis | outdated
-      checked: YYYY-MM-DD
-      tags: [optional, keywords]
-      ---
-      # Title
+## Token economy
 
-- Mark hypotheses and unverified claims explicitly in the text. Update `checked` after
-  re-verification. Set `status: outdated` instead of deleting.
-- Write notes in English. Keep hostnames, job names, variables and commands verbatim.
-
-## Scripts and prompts
-
-- Reusable scripts go to `<layer>/scripts/`: parameters via CLI args or env vars, `--help` or
-  a header comment. Do not save one-off drafts; put the important command into the log entry.
-- Reusable prompts go to `<layer>/prompts/<name>.md`.
+- Check `<layer>/scripts/` before improvising. A sequence of three or more commands run
+  twice becomes a script (CLI args or env, `--help`, compact summary output).
+- Reading more than three files or a long log: delegate to a subagent that returns a few
+  lines of conclusions.
+- Never print a whole file or raw output when a line will do: `head`, `grep -c`, `wc -l`,
+  `--quiet`.
+- Reusable prompts go to `<layer>/prompts/<name>.md` with a `model:` tier line.
 
 ## Secrets
 
@@ -87,23 +65,17 @@ hold only symlinks into `~/ai` plus the agent's own runtime state.
 
 ## Backlog
 
-`~/ai/TODO.md` is the single live list of open work for all layers (company, personal,
-knowledge base), grouped by system. Read the section of a system before working on it. Add
-open items from your work there and close items you finished; do not keep separate TODO
-lists in notes. "Open items" in a note are a dated snapshot, not the current state.
+`~/ai/TODO.md` is the single live list of open work for all layers, grouped by system. Add
+open items there as `- [ ] action (date) — [src](note)` and close finished ones; notes keep
+no TODO lists of their own.
 
-## Agent memory
+Agent memory (`~/.claude/projects/*/memory` etc.) is a cache; anything worth keeping also
+goes to `~/ai`.
 
-The agent's own memory (for example `~/.claude/projects/*/memory`) is a cache. Anything
-worth keeping is also written to `~/ai`.
+## Code changes
 
-## Connecting an agent
-
-- Instructions: symlink to `~/ai/AGENTS.md` from `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`,
-  `~/.gemini/GEMINI.md`.
-- Skills: one symlink per directory from `~/ai/general/skills/` and `~/ai/current/skills/`
-  into the agent's skills folder (`~/.codex/skills/`, `~/.claude/skills/`).
-- Switching employer: create `companies/<new>/`, repoint `current`, redo skill symlinks.
+- "Remove what is not needed" means only what the current task touches. List other dead
+  code, commented blocks and unused files as suggestions; do not delete them.
 
 ## Git
 

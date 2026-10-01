@@ -1,5 +1,7 @@
 # Prompt: normalize or migrate a batch of notes into the knowledge base
 
+model: mid (Sonnet-class) for mixed batches; small (Haiku-class) for pure frontmatter/rename fixes. Run batches as parallel subagents.
+
 Use when importing notes from another tool, another layout, or when a batch of existing
 notes drifted from the conventions. Give the agent this prompt plus a file listing the
 source paths. Split large sets into thematic batches of 15 to 35 files and run them in

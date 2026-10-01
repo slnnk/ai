@@ -1,0 +1,28 @@
+Token usage, last 7 days (since 2026-09-24)
+agent   project                            model                sess   fresh  c.read c.write     out
+claude  ~                                  claude-opus-5-5         7      1k   91.6M    1.4M    425k
+claude  ~/mygit/home-infra                 claude-fable-5-1        1      3k    8.9M    749k    103k
+claude  ~/git/cerberus2                    claude-opus-5-5         1     152    6.9M    224k     48k
+claude  /companies/youdo/knowledge/systems claude-sonnet-5-5       1     156    3.2M    651k     10k
+claude  ~/git/claude-code-config-infra     claude-opus-5-5         1      90    3.0M    165k     15k
+claude  ~/git/lenochka                     claude-fable-5-1        1     228    418k     33k      5k
+claude  ~/git/youdo.business               claude-opus-5-5         1      12    227k     16k      2k
+total                                                             12      5k  114.2M    3.2M    608k
+
+Top 5 sessions by input (fresh + cache read + cache write):
+  2026-09-28 18:01  claude   47.2M in   153k out  ~  c3834e1c
+  2026-09-29 23:29  claude   27.5M in   119k out  ~/ai/companies/youdo/knowledge/systems  8210cdc0
+  2026-09-25 21:18  claude    9.7M in   103k out  ~/mygit/home-infra  89307266
+  2026-09-30 00:24  claude    7.3M in    49k out  ~  d26e6a93
+  2026-09-30 15:30  claude    7.1M in    48k out  ~/git/cerberus2  ea64f9ef
+
+Knowledge-base access (heuristic, see --help):
+agent   sess  kb_find   search    index     full  partial  full KB
+claude    11       21      152        2       31       96      764
+codex      0        0        0        0        0        0        0
+Most read in full:
+    4x systems/dev-deployment/post-deploy-autotests.md
+    2x systems/yandex-cloud/terraform-test-k8s.md
+    2x systems/dev-deployment/jenkins-deploy-dev-b2b.md
+    2x systems/gitlab-ci/resource-groups.md
+    2x systems/yandex-cloud/terraform-network.md

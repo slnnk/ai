@@ -1,5 +1,7 @@
 # Prompt: extract a portable recipe from a log entry
 
+model: mid (Sonnet-class). Needs judgment on what is portable and on leaks; not a large-model task.
+
 Use after an incident or investigation was written up in `knowledge/log/` and it contains a
 lesson that would hold at any employer.
 

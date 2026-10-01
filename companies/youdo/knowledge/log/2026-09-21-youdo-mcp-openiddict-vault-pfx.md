@@ -1,7 +1,7 @@
 ---
 system: youdo-mcp
 status: verified
-checked: 2026-09-21
+checked: 2026-09-30
 tags: [vault, openiddict, pfx, certificates, nomad, production, DevOps-861]
 ---
 # youdo-mcp: OpenIddict PFX keys in Vault
@@ -57,3 +57,7 @@ A replacement pair was generated as distinct passwordless self-signed RSA-2048 P
 ## Portable lesson
 
 none
+
+## Update 2026-09-30
+
+The user uploaded the replacement values to Vault. The handoff directory `/tmp/youdo-mcp-openiddict-100y-final.68VN7g` no longer exists on the workstation.

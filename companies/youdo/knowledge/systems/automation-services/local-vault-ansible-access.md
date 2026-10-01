@@ -6,6 +6,18 @@ tags: [vault, ansible, hashi_vault, ldap, oidc, acl, workstation]
 ---
 # automation-services: local Ansible access to Vault
 
+## Summary
+
+- What: local `ansible-playbook` runs from `/home/slnnk/git/automation-services` read inventory secrets from HashiCorp Vault KV v1 via `community.hashi_vault` (Ubuntu 20.04 workstation).
+- Stack: Ansible Core `2.15.13` (python3.9), `hvac 2.4.0`, `community.hashi_vault 6.2.1`, Vault CLI `2.1.1` in `~/.local/bin/vault`; no `ansible.cfg` change needed.
+- Flow: token from `VAULT_TOKEN` or `~/.vault-token`; inventory supplies `vault_addr` and `vault_groups`; `playbooks/vault_fetch_tasks.yml` (an `always` pre-task) reads `secret/ansible/{prod_selectel,prod_yandex,common}` into `vault_secrets`.
+- Login: monthly interactive `vault login -method=ldap username=<FreeIPA UID>`; CLI OIDC needs `http://localhost:8250/oidc/callback` added to the `reader` role on both clusters.
+- Check: `playbooks/vault_check.yml` is read-only (`no_log: true`); it passed end-to-end with a `root`-policy token (key counts 18/5/1).
+- LDAP cause (AP-2228; still open per TODO.md 2026-09-18): intended policy `ansible-infra` (`infra-tf/vault/policies/ansible-infra.hcl`) is bound to group `vault-infra` only through an `oidc` alias, so LDAP tokens get `default,ipausers` and 403. Open fix: operator runs `vault write auth/ldap/groups/vault-infra policies=ansible-infra`, kept in IaC.
+- Prod and test Vault are separate clusters; `inventories/yandex` uses `vault.service.yandex-test.consul:8200`, so pass a test OIDC token via `VAULT_TOKEN`.
+- Risks: `root` token on the workstation must be replaced (coordinate with owner); a leaked live token needs revocation; do not switch to KV v2 `kv`; `~/.ansible_pass` is unrelated Ansible Vault.
+- Read: "Verified local setup" for versions, "Authentication state and operating procedure" for login, "AP-2228 and LDAP root cause" for the ACL fix, "Local token/password follow-up" for the root token, "Separate production and test tokens" for yandex runs.
+
 Last verified: 2026-09-18
 
 ## Context
@@ -27,7 +39,7 @@ Last verified: 2026-09-18
 ## Authentication state and operating procedure
 
 - The pre-existing `~/.vault-token` had mode `0600` but dated from 2022 and was rejected with HTTP 403 `invalid token`. Its value was not read or recorded.
-- Refresh monthly from an interactive user terminal:
+- Refresh monthly from an interactive user terminal (note: an LDAP token currently gets only `default,ipausers` and 403 on `secret/ansible/*` until the AP-2228 mapping is applied; see "AP-2228 and LDAP root cause"):
 
 ```bash
 export VAULT_ADDR=http://vault.service.consul:8200
@@ -57,6 +69,8 @@ The check is read-only. It reads `secret/ansible/{prod_selectel,prod_yandex,comm
 
 ## Remaining action
 
+(superseded 2026-09-18: see "AP-2228 and LDAP root cause" and "Local token/password follow-up". The denial below applies to the LDAP-issued `default,ipausers` token only; a later `root`-policy token passed the check, and the LDAP-to-`ansible-infra` mapping is still open in TODO.md.)
+
 - LDAP login was completed on 2026-09-18. The resulting token is valid through
   2026-10-20 and has Vault policies `default` and `ipausers`; no token value is
   recorded here.
@@ -73,6 +87,8 @@ The check is read-only. It reads `secret/ansible/{prod_selectel,prod_yandex,comm
   change, repeat `vault token capabilities` and `playbooks/vault_check.yml`.
 
 ## ACL investigation update
+
+(superseded 2026-09-18: see "AP-2228 and LDAP root cause". The idea of extending `ipausers` is dropped; the intended policy is `ansible-infra`. The cluster-alias and KV v1/v2 findings below still hold.)
 
 - The `ipausers` policy visible in the production Vault UI contains only
   `path "kv/*"` with `read` and `list`; it does not cover the new Ansible secret

@@ -29,6 +29,8 @@ AI_ROOT = pathlib.Path(os.environ.get("AI_ROOT", pathlib.Path.home() / "ai"))
 STATUSES = {"verified", "hypothesis", "outdated"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LOG_NAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$")
+SUMMARY_MIN_BYTES = 8 * 1024
+AGENTS_MAX_BYTES = 5632
 SKIP_NAMES = {"INDEX.md", "README.md", "CONTEXT.md", "TODO.md", "AGENTS.md"}
 SECRET_RES = [
     re.compile(p) for p in (
@@ -104,6 +106,8 @@ def note_files(staged_only):
     for layer in ("general", "personal"):
         files += (AI_ROOT / layer).rglob("*.md")
     files += (AI_ROOT / "companies").rglob("*.md")
+    if (AI_ROOT / "AGENTS.md").exists():
+        files.append(AI_ROOT / "AGENTS.md")
     return [f for f in files if ".git" not in f.parts]
 
 
@@ -131,6 +135,10 @@ def main():
         hit = find_cause(text, SECRET_RES)
         if hit:
             err(f, "secret", f"looks like a credential: {hit[:12]}...")
+
+        if f == AI_ROOT / "AGENTS.md" and len(text.encode()) > AGENTS_MAX_BYTES:
+            warn(f, "size", f"{len(text.encode())} bytes, over {AGENTS_MAX_BYTES}; move details to "
+                            "general/knowledge/README.md or CONTEXT.md")
 
         # leaks: general layer only
         if rel.parts[0] == "general" and f.name not in SKIP_NAMES:
@@ -172,6 +180,12 @@ def main():
             p = pathlib.Path(os.path.expanduser(t)) if t.startswith(("~", "/")) else (f.parent / t)
             if not p.exists():
                 err(f, "link", f"target not found: {t}")
+
+        # summary: long maps and recipes are read on every task; logs are not
+        if (len(text.encode()) > SUMMARY_MIN_BYTES and "log" not in rel.parts
+                and f.name != "repos.md"
+                and not re.search(r"^## Summary\b", text, re.M)):
+            warn(f, "summary", f"{len(text.encode()) // 1024} KB and no '## Summary' section")
 
         # language
         cyr = len(re.findall(r"[А-Яа-яЁё]", strip_code(text)))

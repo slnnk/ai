@@ -17,6 +17,13 @@
 #   ai-sync.sh --dry-run  show what would be committed, change nothing
 #   ai-sync.sh --status   print the last sync date and exit
 #
+# Once a week (newest personal/usage/*.txt older than 7 days) it also writes a token usage
+# report with general/scripts/token_usage.py --kb and adds a one-line summary to the commit.
+#
+# On the first sync of a month with notes due for review (build_index.py --stale 30) it adds
+# a "Monthly staleness review YYYY-MM" item to TODO.md and prints a reminder line.
+# Every daily sync prints open TODO.md items "- [ ] due YYYY-MM-DD: ..." whose date has come.
+#
 # Exit codes: 0 synced or nothing to do; 1 sync failed (state file not updated,
 # so the next call retries); 2 usage error.
 #
@@ -34,7 +41,7 @@ for arg in "$@"; do
     --force) FORCE=1 ;;
     --dry-run) DRY=1 ;;
     --status) echo "last sync: $(cat "$STATE" 2>/dev/null || echo never)"; exit 0 ;;
-    -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,/^set -u/{/^#/p}' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "ai-sync: unknown option $arg" >&2; exit 2 ;;
   esac
 done
@@ -50,6 +57,60 @@ fail() { log "FAILED: $*"; exit 1; }
 
 # 1. indexes
 python3 general/scripts/build_index.py >/dev/null || fail "build_index.py"
+
+# 1b. weekly token usage report: personal/usage/YYYY-MM-DD.txt when the newest is >= 7 days old.
+# Failures here never block the sync.
+USAGE_DIR="$AI_ROOT/personal/usage"
+if [ "$DRY" -eq 0 ]; then
+  last=$(ls "$USAGE_DIR"/????-??-??.txt 2>/dev/null | sort | tail -1)
+  age=999
+  [ -n "$last" ] && age=$(( ( $(date +%s) - $(date -d "$(basename "$last" .txt)" +%s) ) / 86400 ))
+  if [ "$age" -ge 7 ] && mkdir -p "$USAGE_DIR" \
+     && python3 general/scripts/token_usage.py --days 7 --kb > "$USAGE_DIR/$TODAY.txt.tmp" 2>&1; then
+    mv "$USAGE_DIR/$TODAY.txt.tmp" "$USAGE_DIR/$TODAY.txt"
+    brief=$(python3 general/scripts/token_usage.py --days 7 --brief 2>/dev/null)
+    log "weekly $brief (personal/usage/$TODAY.txt)"
+    echo "- knowledge-base: weekly $brief, report personal/usage/$TODAY.txt" >> "$NOTES"
+  else
+    rm -f "$USAGE_DIR/$TODAY.txt.tmp"
+  fi
+fi
+
+# 1c. monthly staleness reminder: on the first sync of a month with notes due for review
+# (maps > 30 days, recipes > 180 days, hypotheses), add one item to TODO.md "## Knowledge base"
+# and print it. The item itself is the state: it is added once per month.
+# Failures here never block the sync.
+MONTH="$(date +%Y-%m)"
+if [ "$DRY" -eq 0 ] && ! grep -q "Monthly staleness review $MONTH" TODO.md 2>/dev/null; then
+  due=$(python3 general/scripts/build_index.py --stale 30 --recipe-days 180 --count 2>/dev/null)
+  if [ "${due:-0}" -gt 0 ] 2>/dev/null && python3 - "$MONTH" "$due" <<'EOF'
+import sys
+month, due = sys.argv[1], sys.argv[2]
+item = (f"- [ ] Monthly staleness review {month}: {due} notes due; list with "
+        "`general/scripts/build_index.py --stale 30`; per note confirm, fix or set "
+        f"`status: outdated`, bump `checked`; offer to the user, do not run unasked ({month}-01)\n")
+text = open("TODO.md", encoding="utf-8").read()
+head = "## Knowledge base\n\n"
+if head not in text:
+    sys.exit(1)
+open("TODO.md", "w", encoding="utf-8").write(text.replace(head, head + item, 1))
+EOF
+  then
+    log "staleness review due: $due notes (TODO.md, build_index.py --stale 30)"
+    echo "- knowledge-base: monthly staleness review $MONTH added to TODO.md ($due notes due)" >> "$NOTES"
+  fi
+fi
+
+# 1d. dated reminders: open TODO.md items "- [ ] due YYYY-MM-DD: ..." whose date has come
+# are printed on every daily sync until they are closed. Agents pass them on to the user.
+python3 - "$TODAY" <<'EOF' 2>/dev/null | while IFS= read -r line; do log "reminder: $line"; done
+import re, sys
+for line in open("TODO.md", encoding="utf-8"):
+    m = re.match(r"- \[ \] due (\d{4}-\d{2}-\d{2}):\s*(.*)", line)
+    if m and m.group(1) <= sys.argv[1]:
+        text = m.group(2).strip()
+        print(f"{m.group(1)} {text[:110]}{'...' if len(text) > 110 else ''}")
+EOF
 
 # 2. stage and inspect
 git add -A || fail "git add"

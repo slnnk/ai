@@ -6,6 +6,19 @@ tags: [nginx, balancer-test, yandex-test, dev-routing, consul-dns, nomad-test, m
 ---
 # Yandex test nginx balancers
 
+## Summary
+
+- What: public nginx balancers of the Yandex test environment (`balancer-test01` at `10.16.20.35`, plus `balancer_test02`), nginx `1.30.1`, configured by Ansible repo `/home/slnnk/git/automation-services`.
+- Config lives in `inventories/yandex/group_vars/balancers_test` and `roles/nginx/templates/vhost/`; vhosts proxy to `<service>.<platform>.yandex-test.youdo.local`, a CNAME to `proxy.service.yandex-test.consul` (Nomad proxy clients/Traefik).
+- Dynamic `*.dev.youdo.sg` vhosts (eight regex entries) route to `traefik.dev.youdo.corp`; regex fix `f18471ca` is merged in `ccd39521` and verified live 2026-09-01.
+- Rollout caveat: removing an `nginx_vhost` item does not delete deployed `/etc/nginx/conf.d/<name>.conf`; only `state: absent` does.
+- Incident 2026-09-11: a literal `proxy_pass` hostname cached a powered-off proxy `10.16.26.50`, causing slow 499s; fixed by an nginx reload (30/30 OK, proxies `.33/.44/.55`).
+- Permanent fix is not done: dynamic re-resolve (upstream zone with resolver, or Consul-template reload), plus a short `proxy_connect_timeout`. Recurrence risk remains.
+- MCP vhost (2026-09-18): `mcp.test1.youdo.sg` returned 404 because `Host $host` did not match the Traefik rule. Local source fix uses `nginx_proxy_conf_without_host`, internal backend `Host`, and `X-Forwarded-Host`.
+- MCP rollout is not performed; `balancer_test02` default.conf drift would change the redirect from `public-test.youdo.sg` to `youdo.sg`. Never deploy the earlier inventory diff that removed about 361 lines.
+- Wildcard cert `wildcard.youdo.sg.crt` covers `*.dev.youdo.sg`, valid until 2026-10-08 (renewal risk).
+- Read: "Dynamic `*.dev.youdo.sg` routing" for regexes, "Operations: verification after inventory changes" for checks, "Known failure mode: stale Nomad proxy address" for the incident, "MCP test vhost HTTP 404 diagnosis" for the newest work, "Boundaries" for scope.
+
 Living map of the public nginx balancers of the Yandex test environment
 (`balancer-test01` / `balancer_test02`), configured from the `automation-services`
 Ansible repository. Last checked: 2026-09-18.

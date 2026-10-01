@@ -5,6 +5,14 @@ Usage:
     build_index.py                 # general, personal and current layers
     build_index.py ~/ai/personal   # only the given layer root(s)
     build_index.py --check         # exit 1 if any INDEX.md would change (for git hooks)
+    build_index.py --stale 30      # only report maps/recipes due for review, write nothing
+    build_index.py --stale 30 --recipe-days 180 --count   # print only the number due
+
+Review list (--stale DAYS): system maps (`systems/`) whose `checked` is older than DAYS,
+other notes (recipes, topic notes) older than --recipe-days (default 180), a missing
+`checked` counts as old, plus every `hypothesis` note regardless of date. Log entries and
+`outdated` notes are skipped. Sorted oldest first. Confirm, fix, or set `status: outdated`,
+then bump `checked`.
 
 A note is any *.md under <layer>/knowledge/ except INDEX.md and README.md. Frontmatter is
 the block between the first two '---' lines with `key: value` pairs; `tags` may be a
@@ -15,12 +23,14 @@ import os
 import re
 import sys
 from collections import defaultdict
+from datetime import date, timedelta
 from pathlib import Path
 
 AI_ROOT = Path(os.environ.get("AI_ROOT", Path.home() / "ai"))
 DEFAULT_LAYERS = ["general", "personal", "current"]
 SKIP = {"INDEX.md", "README.md"}
 DATE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
+DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def parse_frontmatter(text):
@@ -131,13 +141,50 @@ def render(layer_name, notes, missing):
     return "\n".join(out)
 
 
+def stale_report(roots, days, recipe_days, count_only=False):
+    cutoffs = {True: (date.today() - timedelta(days=days)).isoformat(),
+               False: (date.today() - timedelta(days=recipe_days)).isoformat()}
+    rows = []
+    for root in roots:
+        knowledge = root / "knowledge"
+        if not knowledge.is_dir():
+            continue
+        notes, _ = collect(knowledge)
+        for n in notes:
+            if n["rel"].parts[0] == "log" or n["status"] == "outdated":
+                continue
+            is_map = n["rel"].parts[0] == "systems"
+            old = not DATE_ONLY_RE.match(n["checked"]) or n["checked"] < cutoffs[is_map]
+            if old or n["status"] == "hypothesis":
+                path = (knowledge / n["rel"]).as_posix().replace(AI_ROOT.as_posix() + "/", "")
+                rows.append((n["checked"] or "----------", n["status"], "map" if is_map else "note", path))
+    rows.sort()
+    if count_only:
+        print(len(rows))
+        return 0
+    for row in rows:
+        print("{:<10}  {:<10}  {:<4}  {}".format(*row))
+    maps = sum(1 for r in rows if r[2] == "map")
+    hypo = sum(1 for r in rows if r[1] == "hypothesis")
+    print(f"review due: {len(rows)} notes (maps >{days}d: {maps}, recipes/notes >{recipe_days}d: "
+          f"{len(rows) - maps}, of them hypothesis: {hypo})")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("layers", nargs="*", help="layer roots (default: general, personal, current under ~/ai)")
     ap.add_argument("--check", action="store_true", help="do not write; exit 1 if any index is stale")
+    ap.add_argument("--stale", type=int, metavar="DAYS",
+                    help="write nothing; list maps with `checked` older than DAYS, old recipes, hypotheses")
+    ap.add_argument("--recipe-days", type=int, default=180, metavar="DAYS",
+                    help="with --stale: age threshold for recipes and other non-map notes (default 180)")
+    ap.add_argument("--count", action="store_true", help="with --stale: print only the number due")
     args = ap.parse_args()
 
     roots = [Path(p).expanduser() for p in args.layers] or [AI_ROOT / l for l in DEFAULT_LAYERS]
+    if args.stale is not None:
+        return stale_report(roots, args.stale, args.recipe_days, args.count)
     stale = 0
     for root in roots:
         knowledge = root / "knowledge"

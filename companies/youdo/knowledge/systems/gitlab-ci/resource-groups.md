@@ -6,6 +6,19 @@ tags: [resource-group, deploy-prod, child-pipeline, gitlab-ci-templates, seriali
 ---
 # GitLab CI: serialized production deploy (resource groups)
 
+## Summary
+
+- What: shared `gitlab-ci-templates` (`v3`) serialize production deploys across parallel `master` pipelines with `resource_group: production` (DevOps-846).
+- Mechanism: parent trigger job `deploy production` has `resource_group: production` and `trigger:strategy: depend` (GitLab 17.9.8; `mirror` only from 18.2). Deploy steps run in a child pipeline (`v3/child/`) without their own resource group (deadlock risk).
+- Locked: only the three auto entrypoints `v3/.deploy-prod-full-auto.yml`, `v3/.deploy-prod-only-web-auto.yml`, `v3/.deploy-prod-web-migrations-auto.yml`. Manual prod templates stay unlocked (user decision); manual rollback stays in the parent with the same group.
+- Variables: `DEPLOY_PROD_TEMPLATES_REF` (default `master`), `DEPLOY_PROD_CHILD_PROJECT`, `DEPLOY_PROD_CHILD_REF` (test harness); `APP_IMAGE_*` dotenv comes from `set-variables` via `needs:pipeline:job`.
+- State: Fixed 2026-09-28. MR !82 merged (`029b0ba5c`); first prod pipeline 139705 succeeded. youdo.business replica jobs moved to `.post` with `resource_group: production-replica` (`step 8 - replica pre migrations`, `step 9 - replica post migrations`).
+- History: the 2026-09-09 merge was reverted 2026-09-10; likely cause (hypothesis) was youdo.business parent `needs` on moved steps becoming invalid.
+- `process_mode` stays `unordered`; `oldest_first` can be set per project via the Resource Groups API (user 2026-09-28: not needed for now).
+- Risks: `v3/.deploy-prod-svc-migrations.yml` (2026-09-22) is not locked (manual template, accepted); 23 consumer projects; `a.solonenko/test_signals` include ref points to a deleted branch (user: not important); youdo.business `notify` job holds a plaintext credential in its CI file (open in TODO.md Security; value not recorded here).
+- Read: "Current status" for the timeline; "Verified mechanism" and "Several steps of one production deploy" for theory and YAML; "Implementation for v3 auto deploy-prod" for design and the `/home/slnnk/git/test_signals` harness; "Source" for repos.
+- Stale: none unresolved; superseded History and Implementation passages are marked inline. The reason for the 2026-09-10 revert is still a hypothesis.
+
 Last checked: 2026-09-28. Translated from Russian.
 
 ## Current status (2026-09-28, DevOps-846, Fixed)
@@ -21,9 +34,9 @@ History:
 
 - The branch was merged to `master` on 2026-09-09 (`68e31a0`, squash `7b3cf57`) and
   reverted on 2026-09-10 (`695775a`, merged as `0cb197f`). The reason for the revert is
-  not recorded (ask the user). `master` currently has no prod-deploy lock.
+  not recorded (ask the user); see the 2026-09-28 blocker bullet for the likely cause (hypothesis). `master` currently has no prod-deploy lock (superseded 2026-09-28: MR !82 merged, lock is on `master`).
 - YouTrack comment of 2026-09-21 by `a.kalmykov`: problems with running migrations on the
-  replica must be solved first.
+  replica must be solved first (superseded 2026-09-28: replica jobs moved to `.post`, see rollout).
 - Blocker verified 2026-09-28: `youdo.business/.gitlab-ci.yml` (DevOps-826, `5ffd11ae4`,
   2026-08-19) adds parent jobs `step 2.1 - pre migrations pg proxy` and
   `step 5.1 - post migrations pg proxy` (logical replica via PG proxy `172.24.0.230`,
@@ -35,16 +48,16 @@ History:
   likely reason for the 2026-09-10 revert (hypothesis: no failed youdo.business `master`
   pipeline exists between the merge at 18:48 and the revert at 00:13).
 - Remote branch `DevOps-846-block-stage-prod` no longer exists (deleted on merge); only the
-  local branch and the stale `origin/` ref remain.
+  local branch and the stale `origin/` ref remain (superseded 2026-09-28: branch pushed again, MR !82 merged; see below).
 - Chosen approach (user, 2026-09-28): keep the replica jobs in youdo.business only; they may
   run any time after the prod deploy (on failure the replica just queues changes).
   Implemented locally in youdo.business branch `DevOps-846-fix-replica-migrations`
-  (uncommitted): hidden `.deploy-prod-migrations-pg-proxy` gets `stage: .post` and
+  (uncommitted at that time; superseded 2026-09-28: merged, pipeline 139705): hidden `.deploy-prod-migrations-pg-proxy` gets `stage: .post` and
   `resource_group: production-replica`; jobs `step 8 - replica pre migrations`
   (`needs: [set-variables, deploy production]`) and `step 9 - replica post migrations`
   (`needs: step 8`). Numeric prefix keeps alphabetical order in the stage view.
   CI Lint: valid with templates `7b3cf57`, invalid with current templates `master`
-  (`undefined need: deploy production`), so the templates must be merged first.
+  (`undefined need: deploy production`), so the templates must be merged first (superseded 2026-09-28: !82 merged).
 - Consumer audit 2026-09-28: 23 projects include one of the three auto templates; all pass
   CI Lint against `7b3cf57` except `a.solonenko/test_signals` (its include ref points to the
   deleted branch). Only youdo.business had parent jobs depending on moved steps.
@@ -57,7 +70,7 @@ History:
   covered by the lock branch.
 - Local branch `DevOps-846-block-stage-prod` has an unpushed merge of `master`
   (`c205041`, 2026-09-23); it is 12 commits ahead of `origin/DevOps-846-block-stage-prod`
-  (`185e3f8`). The sections below describe the implementation as of 2026-09-09.
+  (`185e3f8`) (superseded 2026-09-28: pushed and merged as !82). The sections below describe the implementation as of 2026-09-09.
 
 ## Task
 
@@ -152,9 +165,9 @@ The implementation is committed as `185e3f8` (`add prod-deploy block`), publishe
 on top of the current `origin/master` (`7ddb881`), without conflicts and without
 uncommitted changes. `git diff --check` and a repeated syntax check of
 all YAML files passed; `git push --dry-run` returned `Everything up-to-date`.
-The branch is ready to merge into `master`.
+The branch was ready to merge into `master` (superseded 2026-09-28: merged as MR !82, `029b0ba5c`; see Current status).
 
-Operational next step after rollout: set
+Operational next step after rollout (superseded 2026-09-28: user decided `oldest_first` is not needed for now): set
 `process_mode=oldest_first` through the API in every consumer project where strict
 production deploy pipeline order is needed.
 

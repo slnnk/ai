@@ -1,7 +1,7 @@
 ---
 system: youdo-mcp
-status: hypothesis
-checked: 2026-09-18
+status: verified
+checked: 2026-09-30
 tags: [nomad, yandex-test, healthcheck, aspnet, port-8080, base-images, kestrel]
 ---
 # youdo-mcp: test Nomad health check does not reach the application
@@ -67,3 +67,9 @@ Remaining checks / risks:
 ## Portable lesson
 
 [`~/ai/general/knowledge/dotnet/aspnet-container-default-port-8080-healthcheck.md`](../../../../general/knowledge/dotnet/aspnet-container-default-port-8080-healthcheck.md)
+
+## Update 2026-09-30
+
+Resolved with the platform correction: `base-images` master `a6d14d5` (merge of `dotnet-10-ports`, commit `1600dcf`) restores `ASPNETCORE_HTTP_PORTS=80` and `ASPNETCORE_URLS=http://*:80` in `microsoft/aspnet/10.0/Dockerfile`. The user reports no port problem now. `devops/production.hcl` still sets only `YouDo__Core__Port=80`, so production relies on a service image built after that base-image merge.
+
+Data Protection keys at rest (2026-09-30): `Startup.cs` uses `PersistKeysToDbContext<McpDbContext>()` without `ProtectKeysWith*`, so keys sit as plaintext XML in `data_protection_keys`. They protect only the short-lived consent bridge cookie and antiforgery tokens; OpenIddict tokens use the Vault PFX certificates. The user classified it as an application-side concern, not DevOps work; removed from TODO. Possible fix for developers: `ProtectKeysWithCertificate` with a certificate from Vault.
