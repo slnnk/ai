@@ -28,7 +28,11 @@ of each test, where the WebDriver session is created (tens of seconds instead of
 - Measure first: compare per-test logs before/after and time the gap before the first
   browser command; compare wall time with the sum of test durations to separate
   "slower tests" from "less parallelism".
-- Lower `autoscaling.scaledOptions.pollingInterval` to a few seconds.
+- Lower `autoscaling.scaledOptions.pollingInterval` to a few seconds. Observed effect of
+  20 -> 3 s on a 12-thread suite: median session start ~60 s -> ~10 s, p90 ~140 s -> ~35 s;
+  the remaining ~10 s is Job pod start and node registration. Switching to
+  `scalingType: deployment` removed it: on a 1600-test, 12-thread suite median session start
+  ~24 s -> 0.7 s and wall time ~3 h -> 1 h 48 min.
 - Set `maxReplicaCount` at least to the sum of threads of suites that run at once, and make
   sure the node group can host that many browser pods.
 - Keep a warm pool: `minReplicaCount` near the usual thread count, or use

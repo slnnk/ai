@@ -19,7 +19,6 @@ Paths below are relative to `~/ai/`.
 ---
 
 ## YouDo (`current`)
-- [ ] lenochka.youdo.sg: rotate the basic-auth password (old one is in youdo.business git history) and update LENOCHKA_PASS in GitLab CI/CD variables (2026-09-30)
 
 ### Security: leaked or plaintext credentials
 
@@ -32,7 +31,6 @@ Paths below are relative to `~/ai/`.
 - [ ] Android autotest reports: stop `--acl public-read` on Yandex Object Storage, redact headers and credential-bearing app URLs from HTML logs/capabilities (2026-08-12) — [src](companies/youdo/knowledge/log/2026-08-12-android-farm-autotests-report-3063278.md)
 - [ ] Nexus `raw-private` is anonymously downloadable by URL: fix access; delete the ADB-key archive `/root/android-avd-nexus-5x-template-api29-20260805.tar.zst` on M-K0057 (2026-08-04) — [src](companies/youdo/knowledge/log/2026-08-04-android-farm-avd-template-transfer.md)
 - [ ] Replace the workstation `~/.vault-token` with `root` policy by a token limited to `ansible-infra` (coordinate with the owner); ask Vault admins to map the LDAP group to read `secret/ansible/{prod_selectel,prod_yandex,common}` (2026-09-18) — [src](companies/youdo/knowledge/systems/automation-services/local-vault-ansible-access.md)
-- [ ] youdo.business `.gitlab-ci.yml` job `notify`: plaintext Basic Auth for `lenochka.youdo.sg` in the `curl -u` line; move to a masked CI variable and rotate (2026-09-28) — [src](companies/youdo/knowledge/systems/gitlab-ci/resource-groups.md)
 - [ ] sc-except: move secrets out of `/data/docker-compose.yml` and Zabbix scripts (2026-06-13) — [src](companies/youdo/knowledge/log/2026-06-13-sc-except-mssql-unavailable.md)
 
 ### dev-deployment (B2B ephemeral dev, DevOps-832, DevOps-A-50)
@@ -73,7 +71,6 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [ ] After the next agent-group power-on: 9/9 nodes ready, quorum, blocked evals -> 0, `proxy.service` DNS vs nginx upstreams, CSI and periodic jobs (2026-09-11) — [src](companies/youdo/knowledge/log/2026-09-11-nomad-test-agent-group-stop-pilot.md)
 - [ ] Follow up `http-headers-viewer` port conflict, `similar-tasks/indexer` prestart failure, stale `spb2` child of `jaeger-index-cleaner`; do not scale below 7 clients without reconciling reservations (2026-09-13) — [src](companies/youdo/knowledge/log/2026-09-13-nomad-test-agent-scale-down.md)
 - [ ] Resource optimization: next iteration with pooled cross-stand soft reservation and global peak hard max; monitor OOM/restarts after lowered reservations (2026-09-13) — [src](companies/youdo/knowledge/log/2026-09-13-nomad-test-resource-optimization.md), [src](companies/youdo/knowledge/log/2026-09-09-nomad-test-automation-test-yandex-nomad-memory.md)
-- [ ] Hangfire lock on worker restart: tolerate `PostgreSqlDistributedLockException` at recurring-job registration, avoid old/new worker overlap (2026-09-11) — [src](companies/youdo/knowledge/log/2026-09-11-youdo-business-test14-hangfire-lock.md)
 - [ ] Upgrade Nomad from `1.5.3` (all 7 clients and 3 servers on Yandex test, API 2026-09-30), fix `KillMode=process` (still in `automation-test-yandex` `deprecated/roles/nomad-client/templates/nomad.systemd.j2:10`); clean stale `/var/lib/nomad/alloc` on agent-test-02 (2026-07-21) — [src](companies/youdo/knowledge/log/2026-07-21-nomad-test-agent-test-02-crash-loop.md)
 
 ### automation-services (nginx, Ansible)
@@ -104,7 +101,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 ### android-farm
 
 - [ ] Restore `/opt/adb/adb_pkg.sh` on both Appium nodes or fix the CI contract; drop `|| true` masking; reconcile `EMULATORS="emulator_1 emulator_2"` with per-host inventory; fail fast on helper/IME errors (2026-09-08) — [src](companies/youdo/knowledge/log/2026-09-08-android-farm-android-dig-job-3121092.md), [src](companies/youdo/knowledge/systems/android-farm/system-map.md)
-- [ ] INCIDENT: farm logs not reaching Loki since 2026-09-14: `M-K0057`/`M-K0058` cannot resolve `loki.dev.youdo.corp` (office resolver `192.168.30.1` does not answer `youdo.corp`). Fix DNS for `youdo.corp` (corporate DNS `172.30.62.1` reachable and correct), restart/verify Alloy, confirm streams in Loki; find out what changed on `192.168.30.1` (2026-09-30). Decision 2026-09-30: the user asked the network team to check `192.168.30.1`; do not change the farm hosts (no resolved drop-in, no `/etc/hosts`) until they answer; afterwards only verify Alloy pushes and Loki streams — [src](companies/youdo/knowledge/log/2026-09-30-knowledge-base-stale-map-live-checks.md)
+- [ ] Gate_K (Kazan): clean srv0 `192.168.60.10` leftovers (disabled dstnat/static, layer7 mangle marks, srcnat masquerade "DNS Forwarding for ...", IPsec `peer1` to `185.11.49.180`, `192.168.60.0/27` in `ip service ssh/ftp`); check whether `youdo.test` is still used in Kazan; update team doc `docs/infra/office.md` (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-android-farm-kazan-gate-k-dns-forward-to-decommissioned-srv0.md)
 - [ ] Samsung A55 on M-K0057: reproduce create -> quit -> create race on port `15903` before changing timeouts (2026-09-08) — [src](companies/youdo/knowledge/log/2026-09-08-android-farm-android-dig-job-3121092.md)
 - [ ] Validate `FailedTestSuite.xml` download (HTTP status, XML check) before Gradle (2026-09-07) — [src](companies/youdo/knowledge/log/2026-09-07-android-farm-android-dig-job-3120554.md)
 - [ ] Trend memory pressure on M-K0057/M-K0058 and the M-K0057 iowait spike (2026-09-07) — [src](companies/youdo/knowledge/log/2026-09-07-android-farm-android-dig-job-3120554.md)
@@ -112,13 +109,13 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [ ] Hotfix pipeline fix on `DevOps-833-fix-hotfix`: merge and verify with a real hotfix build; protected environments for store jobs; pin images by digest (2026-08) — [src](companies/youdo/knowledge/systems/android-farm/ci-cd.md)
 - [ ] CI suites: `InfoMessagesTestSuite` option is broken (XML and class absent); `MindBoxTestSuite` has zero enabled tests — [src](companies/youdo/knowledge/systems/android-farm/ci-suites.md)
 - [ ] M-K0056: monitor Selenium Grid on `4444` in Zabbix; check active-checks timeout to `172.24.0.107:10051` (2026-08-13) — [src](companies/youdo/knowledge/log/2026-08-13-android-farm-selenium-hub-zabbix.md)
-- [ ] android-dig: confirm `instance` label values for M-K0057/M-K0058 on the first real diagnosis (2026-08-20) — [src](companies/youdo/knowledge/log/2026-08-20-android-farm-global-skill-android-dig.md)
 
 ### web-autotests (Jenkins `Web+API Tests`, Selenium Grid k8s-dev)
 
-- [ ] infra-tf `dev/config/selenium-grid-values.yaml`: lower KEDA `autoscaling.scaledOptions.pollingInterval` (20 -> 2-5), raise `maxReplicaCount` 10 -> >=30, consider warm pool / `scalingType: deployment`; re-measure regress part 1 (was 1h29m on Selenoid, now ~3h) (2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-30-web-autotests-selenium-grid-k8s-slow-regress.md)
-- [ ] Check CPU throttling of Chrome pods and node-group capacity/image pre-pull for the selenium namespace (2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-30-web-autotests-selenium-grid-k8s-slow-regress.md)
-- [ ] Jenkins `youdo_web_testing_*` keep only 30 builds: raise retention or upload regress reports to S3 so durations can be compared (2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-30-web-autotests-selenium-grid-k8s-slow-regress.md)
+- [ ] Wait for QA feedback on web autotests after `scalingType: deployment`; for a fair wall-time comparison with Selenoid run regress part 1 from `master` on `test7` (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
+- [ ] Selenium Grid deployment mode: during the next regress runs (only then do chrome pods exist; none on 2026-10-01, no tests running) watch scale-down of busy node pods and browser state leaks across sessions (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
+- [ ] uitests: set a sane WebDriver HTTP read timeout (selenium-java 3.141.59 default 3 h; regress three/1621 hung 3 h on findElement after grid inactivity timeout) and find why nodes stop answering (collect selenium pod logs in Loki) (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
+- [ ] Regress 108 vs 94 min (three/1622 vs Selenoid two/1978): stands currently have problems with SBR (safe deal) and insurance (reported to the user 2026-10-01), likely part of the gap; re-measure after the stands are fixed, and only if a gap remains check Chrome pod CPU throttling in VictoriaMetrics (`container_cpu_cfs_throttled_periods_total` / `container_cpu_cfs_periods_total`, pods `selenium-node-chrome`); image pre-pull is moot in deployment mode (2026-10-01) — [src](companies/youdo/knowledge/log/2026-09-30-web-autotests-selenium-grid-k8s-slow-regress.md)
 
 ### Other systems
 
@@ -161,6 +158,16 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 
 ## Done
 
+- [x] web-autotests: raise Jenkins `youdo_web_testing_*` retention (30 builds) or upload regress reports to S3 — closed without action 2026-10-01: the one-off Selenoid vs k8s comparison is done, extra report storage not needed (user) — [src](companies/youdo/knowledge/log/2026-09-30-web-autotests-selenium-grid-k8s-slow-regress.md)
+- [x] lenochka.youdo.sg: rotate the basic-auth password, update `LENOCHKA_PASS`, move the plaintext `curl -u` in youdo.business job `notify` to a masked variable — closed without action 2026-10-01: lenochka is planned to be decommissioned (user) — [src](companies/youdo/knowledge/systems/gitlab-ci/resource-groups.md)
+- [x] web-autotests: infra-tf `dev/config/selenium-grid-values.yaml`: `pollingInterval` 3, `maxReplicaCount` 20 (`77ce4c2`); Smokus session start median 50-70 s -> 10.5 s (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
+- [x] web-autotests: Re-measured regress part 1: `scalingType: deployment` (`10062f0`) gives 108 min, session start median 0.7 s (was ~3 h, 24 s) (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
+- [x] cerberus2: Restart cerberus2 worker on msk3-nomad01; repeat API unbans that failed with 25006 — dropped 2026-10-01, no further work on cerberus2 by user decision — [src](companies/youdo/knowledge/log/2026-09-30-cerberus2-readonly-transaction-check.md)
+- [x] youdo-business: Forward SIGTERM in gitlab-ci-templates v3/files/dotnet.entrypoint.sh (merged 7fabb47, 2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-youdo-business-worker-hard-kill-hangfire-lock.md)
+- [x] youdo-business: Hangfire lock on worker restart — closed 2026-10-01 without separate action: DevOps-872 entrypoint fix delivers SIGTERM, workers stop gracefully; reopen if lock errors recur — [src](companies/youdo/knowledge/log/2026-09-11-youdo-business-test14-hangfire-lock.md), [src](companies/youdo/knowledge/log/2026-10-01-youdo-business-worker-hard-kill-hangfire-lock.md)
+- [x] android-farm: farm logs not reaching Loki 2026-09-14..2026-10-01 — Gate_K DNATed youdo.* DNS to decommissioned srv0; DNAT disabled, streams arrive (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-android-farm-kazan-gate-k-dns-forward-to-decommissioned-srv0.md)
+- [x] android-dig: `instance` labels `M-K0057`/`M-K0058` confirmed in Loki (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-android-farm-kazan-gate-k-dns-forward-to-decommissioned-srv0.md)
+
 - [x] Knowledge base: feed `knowledge/log/` and `TODO.md` into the `rp` skill — closed without action 2026-09-30: not relevant, `rp` unused and may be redone (user).
 - [x] Jenkins root URL `https://build.youdo.sg/` — closed 2026-09-30: already in place (user; builds from 121 show the external URL) — [src](companies/youdo/knowledge/systems/dev-deployment/gitlab-ci-deploy-dev.md)
 - [x] team-copilot: `ANTHROPIC_BASE_URL` in Vault — closed without action 2026-09-30: not relevant (user); repo passes it through `envFrom` — [src](companies/youdo/knowledge/log/2026-06-11-team-copilot-deploy-gitlab-ci.md)
@@ -201,7 +208,3 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 - [x] DevOps-846: MR !82 and youdo.business replica jobs merged, pipeline 139705 OK (done 2026-09-28) — [src](companies/youdo/knowledge/log/2026-09-28-gitlab-ci-devops-846-prod-deploy-lock-rollout.md)
 - [x] DevOps-846: linted all 23 auto-template consumers against the lock, only youdo.business affected (done 2026-09-28) — [src](companies/youdo/knowledge/systems/gitlab-ci/resource-groups.md)
 - [x] Consolidated open items from all notes into this file (done 2026-09-28).
-
-## cerberus2
-
-- [x] (dropped 2026-10-01, no further work on cerberus2 by user decision) Restart cerberus2 worker on msk3-nomad01 (not restarted after DB switchover); repeat API unbans that failed with 25006 on 2026-09-30 (2026-10-01) — [src](companies/youdo/knowledge/log/2026-09-30-cerberus2-readonly-transaction-check.md)
