@@ -62,8 +62,8 @@ For the described state the expected results are `olympus HTTP 404`, `logout HTT
 
 ## Findings: recovery
 
-Preferably upgrade to fastlane 2.240.0 once it is published and run through a pinned
-`Gemfile.lock`: `bundle exec fastlane ...`.
+Preferably upgrade to fastlane 2.240.0 once it is published, pinned in `Gemfile`, and run it as
+`bundle exec fastlane ...` (YouDoApp does not track `Gemfile.lock`).
 
 Until the release, a git version of fastlane pinned to the merge commit `5bb425e` can be used in a separate temporary bundle,
 and only the session generation run through it. Example Gemfile entry:
@@ -94,10 +94,10 @@ preferable to session auth: no dependency on 2FA and short-lived regional cookie
 
 ## Open items: TODO
 
-- Check the actual fastlane version and installation method on `idcn-10`.
-- After 2.240.0 is released, update the project's Gemfile/Gemfile.lock and remove the temporary git pin.
+- Check the actual fastlane version and installation method on `idcn-10`. Done: the user installed `2.240.0` on the runner (stated 2026-10-05).
+- After 2.240.0 is released, update the project's Gemfile and remove the temporary git pin. Done: `Gemfile` pins `2.240.0` (IOS-5036 `ceb8f4e881`, checked 2026-10-05). `Gemfile.lock` is not tracked in YouDoApp: removed in 2019 (`936297d245`), listed in `.gitignore`.
 - Check which lanes still require an Apple-ID session and which can be moved to an App Store
-  Connect API key.
+  Connect API key. Checked 2026-10-05: only `build_release` (`testflight(username: ...)`, `Fastfile:608`) uses the Apple-ID session; migration tracked in DevOps-880.
 
 ## Portable lesson
 

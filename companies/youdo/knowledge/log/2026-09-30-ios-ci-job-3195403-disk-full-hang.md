@@ -1,7 +1,7 @@
 ---
 system: ios-ci
 status: verified
-checked: 2026-09-30
+checked: 2026-10-05
 tags: [gitlab-ci, ios, disk, idcn-10]
 ---
 # iOS CI job 3195403 hung: idcn-10 disk full
@@ -38,6 +38,17 @@ Runner `idcn-10` (id 93, gitlab-runner 17.9.3, darwin), host `iosdev@192.168.30.
 
 ## Open items
 - Free disk on idcn-10 (needs user approval) and add a job timeout / disk check.
+
+## Follow-up 2026-10-05
+
+Read-only check over ssh (`iosdev@192.168.30.144`):
+- `/System/Volumes/Data` 89%, 23G free (65G free on 2026-09-30): about 42G regrown in 5 days.
+- Usage: `~/builds` 17G, `Xcode/Archives` 15G (9 archives, one per day), `CoreSimulator/Devices` 14G (simulator `C0F24BAE-...` 8.2G, its `containermanagerd/Dead` 2.1G again), `DerivedData` 5.9G, `Library/Caches` 4.7G, simulator runtimes 31.8G (iOS 18.0, 18.4, 26.4, 26.5).
+- No cleanup job: crontab empty, `~/Library/LaunchAgents` holds only `gitlab-runner.plist`.
+- No Zabbix agent (no binary, process, package or LaunchDaemon); host absent in `zabbix-selectel` and `zabbix-test`.
+- fastlane `2.240.0` installed in rbenv `3.2.2` and Homebrew Ruby 3.3; system Ruby 2.6 still has 2.188.0/2.225.0.
+- macOS has no `timeout` binary: remote scripts must not rely on it.
+- Zabbix agent install and cron disk cleanup tracked in DevOps-881.
 
 ## Portable lesson
 

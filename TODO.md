@@ -94,9 +94,8 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### ios-ci
 
-- [ ] Check fastlane version/installation on `idcn-10`; after 2.240.0 update Gemfile.lock and drop the git pin; move lanes from Apple-ID session to App Store Connect API key (2026-09-14) — [src](companies/youdo/knowledge/log/2026-09-14-ios-ci-fastlane-spaceauth-service-key.md)
-- [ ] iOS `.ipa` in Nexus: change `5cf852ca96` exists only on `IOS-5008`; YouDoApp `develop` still uploads `gitlab_youdo.zip` (`Fastfile:481-508`) and `Build development` keeps `YDMainApp.app.zip` (checked 2026-09-30) — [src](companies/youdo/knowledge/log/2026-08-04-ios-ci-build-dev-ipa.md)
-- [ ] Runner `idcn-10`: disk filled up (job 3195403, freed to 65G on 2026-09-30) — add job `timeout:`, a disk-space alert and periodic cleanup of simulator `containermanagerd/Dead` (`simctl erase` blocked by sandbox) (2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-30-ios-ci-job-3195403-disk-full-hang.md)
+- [ ] YouDoApp fastlane (DevOps-880): move `build_release` `testflight` from Apple-ID session to App Store Connect API key; key setup per https://developer.apple.com/documentation/appstoreconnectapi/creating-api-keys-for-app-store-connect-api (no `app_store_connect_api_key` in `develop` Fastfile; fastlane `2.240.0` pinned in `Gemfile` and installed on `idcn-10` by the user; checked 2026-10-05) (2026-09-14) — [src](companies/youdo/knowledge/log/2026-09-14-ios-ci-fastlane-spaceauth-service-key.md)
+- [ ] Runner `idcn-10` (DevOps-881: install Zabbix agent, cron disk cleanup): disk filled up (job 3195403, freed to 65G on 2026-09-30) — add job `timeout:`, a disk-space alert and periodic cleanup of simulator `containermanagerd/Dead` (`simctl erase` blocked by sandbox); no job `timeout:` in `develop` `.gitlab-ci.yml`, project timeout 7200 s; `idcn-10` / `192.168.30.144` absent in `zabbix-selectel` and `zabbix-test` and no Zabbix agent installed on the host; no cron/LaunchAgent cleanup; disk back to 89% (23G free) on 2026-10-05 (checked 2026-10-05) (2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-30-ios-ci-job-3195403-disk-full-hang.md)
 
 ### android-farm
 
@@ -158,6 +157,7 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 
 ## Done
 
+- [x] iOS `.ipa` in Nexus: change `5cf852ca96` exists only on `IOS-5008`; YouDoApp `develop` still uploads `gitlab_youdo.zip` (`Fastfile:481-508`) and `Build development` keeps `YDMainApp.app.zip` (checked 2026-09-30) — closed without action 2026-10-05: not the user's task (user) — [src](companies/youdo/knowledge/log/2026-08-04-ios-ci-build-dev-ipa.md)
 - [x] web-autotests: raise Jenkins `youdo_web_testing_*` retention (30 builds) or upload regress reports to S3 — closed without action 2026-10-01: the one-off Selenoid vs k8s comparison is done, extra report storage not needed (user) — [src](companies/youdo/knowledge/log/2026-09-30-web-autotests-selenium-grid-k8s-slow-regress.md)
 - [x] lenochka.youdo.sg: rotate the basic-auth password, update `LENOCHKA_PASS`, move the plaintext `curl -u` in youdo.business job `notify` to a masked variable — closed without action 2026-10-01: lenochka is planned to be decommissioned (user) — [src](companies/youdo/knowledge/systems/gitlab-ci/resource-groups.md)
 - [x] web-autotests: infra-tf `dev/config/selenium-grid-values.yaml`: `pollingInterval` 3, `maxReplicaCount` 20 (`77ce4c2`); Smokus session start median 50-70 s -> 10.5 s (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
