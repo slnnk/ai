@@ -1,7 +1,7 @@
 ---
 system: ios-ci
 status: verified
-checked: 2026-09-14
+checked: 2026-10-06
 tags: [ios, fastlane, spaceauth, app-store-connect, apple-id, keychain, runner]
 ---
 # YouDo iOS: fastlane `spaceauth` — `Service key is empty`
@@ -98,6 +98,7 @@ preferable to session auth: no dependency on 2FA and short-lived regional cookie
 - After 2.240.0 is released, update the project's Gemfile and remove the temporary git pin. Done: `Gemfile` pins `2.240.0` (IOS-5036 `ceb8f4e881`, checked 2026-10-05). `Gemfile.lock` is not tracked in YouDoApp: removed in 2019 (`936297d245`), listed in `.gitignore`.
 - Check which lanes still require an Apple-ID session and which can be moved to an App Store
   Connect API key. Checked 2026-10-05: only `build_release` (`testflight(username: ...)`, `Fastfile:608`) uses the Apple-ID session; migration tracked in DevOps-880.
+  Correction 2026-10-06: `.gitlab-ci.yml` also calls `fastlane sigh download_all -u $APPLE_DEVELOPER_USER` in `Build beta ad-hoc`, `Build development` and `Build release`; in branch `IOS-5054` they switched to `--api_key_path` (JSON written from `ASC_*` CI variables to `/tmp/asc_api_key_${CI_JOB_ID}.json`, removed in `after_script` of template `.asc_api_key`) and `testflight` to `app_store_connect_api_key`.
 
 ## Portable lesson
 
