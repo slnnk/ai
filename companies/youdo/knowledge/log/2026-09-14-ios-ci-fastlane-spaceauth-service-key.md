@@ -1,7 +1,7 @@
 ---
 system: ios-ci
 status: verified
-checked: 2026-10-06
+checked: 2026-10-07
 tags: [ios, fastlane, spaceauth, app-store-connect, apple-id, keychain, runner]
 ---
 # YouDo iOS: fastlane `spaceauth` — `Service key is empty`
@@ -99,6 +99,7 @@ preferable to session auth: no dependency on 2FA and short-lived regional cookie
 - Check which lanes still require an Apple-ID session and which can be moved to an App Store
   Connect API key. Checked 2026-10-05: only `build_release` (`testflight(username: ...)`, `Fastfile:608`) uses the Apple-ID session; migration tracked in DevOps-880.
   Correction 2026-10-06: `.gitlab-ci.yml` also calls `fastlane sigh download_all -u $APPLE_DEVELOPER_USER` in `Build beta ad-hoc`, `Build development` and `Build release`; in branch `IOS-5054` they switched to `--api_key_path` (JSON written from `ASC_*` CI variables to `/tmp/asc_api_key_${CI_JOB_ID}.json`, removed in `after_script` of template `.asc_api_key`) and `testflight` to `app_store_connect_api_key`.
+  Verified 2026-10-07: MR !3273 (`IOS-5054` -> `develop`, https://gitlab.youdo.sg/team-youdo-ios/YouDoApp/-/merge_requests/3273, commit `abc9cbaa41`), pipeline 140282 `success`: `Unit tests` and `Build beta ad-hoc` (job 3209802) passed; trace shows `Creating authorization token for App Store Connect API` and all profiles downloaded by `sigh download_all --api_key_path`, no Apple-ID login. Later 2026-10-07: `Build development` (job 3209803) succeeded with the same API-key auth (21 profiles); MR !3273 merged into `develop` at 11:04 (`bf7d07f089`). Not yet exercised: `Build release` / `testflight` (runs only on release refs; release planned later by the iOS team).
 
 ## Portable lesson
 

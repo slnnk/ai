@@ -1,7 +1,7 @@
 ---
 system: dev-deployment
 status: verified
-checked: 2026-09-07
+checked: 2026-10-07
 tags: [b2b, ephemeral-dev, jenkins, gitlab-ci, helm, kubernetes, yandex-dev, roadmap]
 ---
 # B2B dev deployment: authoritative system map and roadmap
@@ -13,7 +13,7 @@ tags: [b2b, ephemeral-dev, jenkins, gitlab-ci, helm, kubernetes, yandex-dev, roa
 - Catalog: 13 Jenkins services, all active (Jenkins `master` `10ef2517` removed the pilot `allowed_services`); fresh full-catalog deploy proven by Jenkins build `145` (GitLab job `3100718`); nine service repos have `devops/dev.yml` plus the CI include in `master`. Repeat, lifecycle, `fns`-primary and negative cases are operator-verified without job IDs.
 - Post-deploy autotests: Tochka (pipeline `137961`), Billing (`137991`/`137992`) and TKB (`138093`) runtime-proven; Tochka/TKB/Billing autotest support merged to `master` 2026-09-29, youdo.business pending; old-ReplicaSet fix verified by build `158`, 512Mi/1Gi consumed (build `155`); test failures are masked by `ignoreFailures=true`/`allow_failure`. Details in `post-deploy-autotests.md`.
 - Naming: task ID (`Site-`, `DevOps-`, `AP-`) from MR title/branch, else branch slug; primary `master` forbidden; primary always upgraded, existing dependents skipped; lifecycle jobs guard with `createdBy`, environment and `jenkinsJobId`.
-- Known problems: no Jenkins lock on final namespace (collision proven 2026-09-29, Jenkins `166`); no automatic HTTP health smoke in Jenkins; no `k8s-ttl-controller` (TTL annotations are metadata only, GitLab `on_stop` is the only cleanup; real `auto_stop_in: 7 days` expiry verified 2026-09-14 by job `3120803`); memory OOMs (Billing webapp, TKB `mock-api`/`worker-mock`, fixes via 512Mi/1Gi limits; TKB fix `aa4d083` deployed by job `3120801` on 2026-09-07, same 2 test failures); Jenkins agent lacked `python3` (pinned to `AutoTest`); no chart schema tests; Jenkins job still named `test`; local kubeconfig permissions `0664`.
+- Known problems: no Jenkins lock on final namespace (collision proven 2026-09-29, Jenkins `166`); no automatic HTTP health smoke in Jenkins; `k8s-ttl-controller` installed 2026-10-07 as a safety net (DevOps-886, infra-tf `1f5f6c4`, watches only namespaces; TTL = GitLab auto-stop + 1 day: deploy `8d`, `2 update ttl dev` `6d`, verified by pipeline `140403`; [log](../../log/2026-10-07-dev-deployment-devops-886-ttl-controller.md)) (TTL annotations are metadata only, GitLab `on_stop` is the only cleanup; real `auto_stop_in: 7 days` expiry verified 2026-09-14 by job `3120803`); memory OOMs (Billing webapp, TKB `mock-api`/`worker-mock`, fixes via 512Mi/1Gi limits; TKB fix `aa4d083` deployed by job `3120801` on 2026-09-07, same 2 test failures); Jenkins agent lacked `python3` (pinned to `AutoTest`); no chart schema tests; Jenkins job still named `test`; local kubeconfig permissions `0664`.
 - Read `Current status` for dated runtime evidence (newest first, long); `End-to-end delivery path` and `Naming and lifecycle contract` for design; `Routing model` for `routing.env`; `Kubernetes and shared infrastructure` for cluster and Jenkins prerequisites.
 - Read `Repositories and ownership` for local paths; `Service catalog and rollout state` and `dev.yml freshness audit` for per-service status (project IDs); `Verified runtime history` for pilot and two-service runs.
 - Read `Known gaps and risks` and `Rollout plan` (Phases 0-4) for open work; `Basic diagnostics` for kubectl/helm commands and the failure investigation order; `Related log entries` for detail. Never store secrets or kubeconfig contents.
@@ -82,7 +82,7 @@ Deploy a B2B service under development, together with its catalog dependencies, 
 7. For every selected service, Jenkins loads `devops/dev.yml`, generates a routing overlay, and applies the `microservice` chart.
 8. Jenkins waits for namespace infrastructure, Vault-backed secrets, migration hooks, deployments, and pods, then archives generated routing and `generated/deploy-dev.env`.
 9. GitLab imports the Jenkins dotenv artifact and creates the GitLab Environment used by `2 extend dev` and `3 delete dev`.
-10. Cleanup is performed by the GitLab environment `on_stop`/delete job. Kubernetes TTL annotations are currently metadata only because no TTL controller is installed.
+10. Cleanup is performed by the GitLab environment `on_stop`/delete job. Since 2026-10-07 `k8s-ttl-controller` (infra-tf `dev`) deletes namespaces whose `k8s-ttl-controller.twin.sh/ttl` (from `refreshed-at`) expired, one day after GitLab auto-stop; Jenkins drops an orphan namespace release in `default` before reinstall.
 
 ## Naming and lifecycle contract
 
@@ -119,9 +119,17 @@ Last live check: 2026-08-27, kubeconfig `/home/slnnk/.kube/config-yandex-dev`.
 - Kubernetes API server version was `1.34.1`.
 - Traefik, Vault Agent Injector, Vault Secrets Operator, VictoriaMetrics, and Loki workloads were Ready.
 - No ephemeral `dev-*` namespace remained after job `3095886`.
-- No `k8s-ttl-controller` workload, resource, or API was found.
+- No `k8s-ttl-controller` workload, resource, or API was found. (superseded 2026-10-07: installed, DevOps-886)
 - Local kubeconfig permissions were observed as `0664`; reduce them to `0600` if this file remains a personal credential.
 - Local kubectl was 1.29 while the server was 1.34. Lifecycle jobs use the controlled `kubectl:1.34.0` CI image.
+
+### Developer and QA kubectl access (DevOps-883, verified 2026-10-07)
+
+- Shared kubeconfig, no SSO: ServiceAccount `k8s-access/k8s-dev-developer`, long-lived token Secret `k8s-dev-developer-token`, ClusterRole `dev-namespace-lister` (namespaces get/list/watch) in `infra-tf/dev/developer-access.tf`; namespace `k8s-access` in `infra-tf/dev/namespaces.tf`.
+- `helm-charts/ephemeral-namespace` (master `7b3b491`) adds RoleBinding `developer-access` -> ClusterRole `edit` and Pod Security `baseline` labels (`enforce`/`warn`/`audit`) to every `dev-*`; takes effect on the next deploy of a namespace.
+- Kubeconfig: Vaultwarden `https://vaultwarden.youdo.com`, collection `test_passwords/yandex-test`, item `k8s kubeconfig dev cluster`. Developer instruction and rotation: YouTrack DevOps-A-51 (child of DevOps-A-50).
+- Build/check: `~/ai/current/scripts/k8s_dev_developer_kubeconfig.sh build|check`. Rotation: `terraform apply -replace=kubernetes_secret_v1.k8s_dev_developer_token` in `infra-tf/dev`, rebuild, update Vaultwarden.
+- Limits: no per-user audit (all actions as the ServiceAccount), revocation only by rotation; `edit` exposes namespace secrets including the registry pull secret. SSO alternative (Pinniped + Keycloak `auth-tech.youdo.com/realms/youdo`) in the DevOps-883 log entry.
 
 The namespace chart creates RabbitMQ and Redis without persistence. The microservice chart can create PostgreSQL as a StatefulSet with a PVC. The PVC persists across Helm upgrades inside the namespace and is deleted with the namespace. `PGDATA` points to a subdirectory to avoid `lost+found` initialization failures.
 
@@ -241,7 +249,7 @@ This historical run proved dependency deployment and skip-existing-dependent beh
 
 ### Deferred, non-MVP improvements
 
-- Developer access to namespace-local Redis without distributing a cluster kubeconfig.
+- Developer access to namespace-local Redis without distributing a cluster kubeconfig. (superseded 2026-10-07: shared developer kubeconfig with `edit` in `dev-*`, DevOps-883; see `Kubernetes and shared infrastructure`.)
 - Optional Adminer or a database catalog/autodiscovery mechanism.
 - Removal of old stopped GitLab Environment records created under superseded naming schemes.
 - `youdo-business-tickets` onboarding, which requires an explicit catalog decision.

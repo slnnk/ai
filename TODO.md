@@ -31,6 +31,7 @@ Paths below are relative to `~/ai/`.
 - [ ] Android autotest reports: stop `--acl public-read` on Yandex Object Storage, redact headers and credential-bearing app URLs from HTML logs/capabilities (2026-08-12) — [src](companies/youdo/knowledge/log/2026-08-12-android-farm-autotests-report-3063278.md)
 - [ ] Nexus `raw-private` is anonymously downloadable by URL: fix access; delete the ADB-key archive `/root/android-avd-nexus-5x-template-api29-20260805.tar.zst` on M-K0057 (2026-08-04) — [src](companies/youdo/knowledge/log/2026-08-04-android-farm-avd-template-transfer.md)
 - [ ] Replace the workstation `~/.vault-token` with `root` policy by a token limited to `ansible-infra` (coordinate with the owner); ask Vault admins to map the LDAP group to read `secret/ansible/{prod_selectel,prod_yandex,common}` (2026-09-18) — [src](companies/youdo/knowledge/systems/automation-services/local-vault-ansible-access.md)
+- [ ] infra-tf `dev/config/vmalertmanager.yml` and `prod/config/vmalertmanager.yml`: plaintext Rocket.Chat webhook token; move to Vault and rotate (2026-10-07) — [src](companies/youdo/knowledge/log/2026-10-07-dev-deployment-devops-886-ttl-controller.md)
 - [ ] sc-except: move secrets out of `/data/docker-compose.yml` and Zabbix scripts (2026-06-13) — [src](companies/youdo/knowledge/log/2026-06-13-sc-except-mssql-unavailable.md)
 
 ### dev-deployment (B2B ephemeral dev, DevOps-832, DevOps-A-50)
@@ -50,19 +51,19 @@ Platform hardening (roadmap phases 1, 3, 4):
 - [ ] Jenkins lock keyed by the final namespace (GitLab `resource_group` is per project/ref; proven 2026-09-29: three services on task DevOps-832 deployed into `dev-devops-832` at once, Jenkins 166 failed with Helm `another operation ... is in progress`, smoke of 164/165 rejected by the ownership check) — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 - [ ] HTTP health smoke stage after rollout, driven by service health config — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 - [ ] `values.schema.json` and template regression tests for `ephemeral-namespace` and `microservice` charts; include 63-char migration Job name cases and a central name helper (2026-09-30: `helm-charts` `master` `4ab8743` shortened the name to `<projectName>-m<type>` but has no `trunc 63` guard) — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md), [src](companies/youdo/knowledge/log/2026-08-30-dev-deployment-jenkins-test-142-migration-job-name-length.md)
-- [ ] Decide TTL-controller ownership or standardize GitLab `on_stop` (real `auto_stop_in` expiry verified 2026-09-14, see Done) — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 - [ ] Document source of truth/owner for Vault role `dev-ephemeral-deployer`; restrict `~/.kube/config-yandex-dev` permissions — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
-- [ ] Reconcile or archive stale docs: `helm-charts/docs/agents-ephemeral-deploy-plan.md`, `helm-charts/AGENTS.md`, `helm-charts/docs/ephemeral-namespace-role.md` — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
+- [ ] Reconcile or archive stale docs: `helm-charts/docs/agents-ephemeral-deploy-plan.md`, `helm-charts/AGENTS.md`, `examples/jenkins/Jenkinsfile.ephemeral-namespace` (`docs/ephemeral-namespace-role.md` rewritten in DevOps-883 branch 2026-10-07) — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 - [ ] Verify `youdo-notifications` and `docvalidation` fallback and ephemeral routing independently — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 - [ ] Rename Jenkins pilot job `test`, update the shared CI default/variable — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
-- [ ] Monitoring: stale `dev-*` namespaces, failed migrations, Vault secret failures, expired GitLab environments with live resources — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
+- [ ] Monitoring: Helm release records in `default` without their namespace, stale `dev-*` namespaces, failed migrations, Vault secret failures, expired GitLab environments with live resources — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 - [ ] Operator docs: routine cleanup and recovery commands — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 - [ ] Delete stale stopped GitLab environments in docvalidation: id 440 `dev/youdo-microservices-docvalidation-` and 441 `...-devops-689-k8s`; names already use `dev/$CI_COMMIT_REF_SLUG`, `CI_PIPELINE_ID` gone (checked 2026-09-30) — [src](companies/youdo/knowledge/systems/dev-deployment/gitlab-ci-deploy-dev.md)
 - [ ] helm-charts bug: `microservice/templates/service.yaml:4` `ne ($serviceConfig.enabled | default true) false` renders a Service for `service.enabled: false` (Sprig `default` replaces `false`); fix with `hasKey` or `toString` (checked 2026-09-30); recipe [default true overrides false](general/knowledge/helm/default-true-overrides-false.md) — [src](companies/youdo/knowledge/log/2026-06-25-dev-deployment-docvalidation-dev-yml.md)
 - [ ] Helm list merge makes generated `services[]` overrides fragile; move to a separate dependencies section or a fully merged values file; still a list at `microservice/values.yaml:197` in `4ab8743` (checked 2026-09-30) — [src](companies/youdo/knowledge/log/2026-06-18-dev-deployment-ephemeral-dev-dependencies.md)
 - [ ] Vault `secret/dev/projects/youdo-kitcut`: add `SentryDsn` or fix the mapping; youdo.kitcut `b31af25` `devops/dev.yml:41-43` still maps `Sentry__Dsn: SentryDsn`, Vault key not checked (checked 2026-09-30) — [src](companies/youdo/knowledge/log/2026-06-17-dev-deployment-youdo-business-auth-service-jenkins-dev.md)
 
-Deferred, decide later: developer Redis access without cluster kubeconfig; Adminer / DB discovery; `youdo-business-tickets` onboarding — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
+
+Deferred, decide later: Adminer / DB discovery; `youdo-business-tickets` onboarding — [src](companies/youdo/knowledge/systems/dev-deployment/overview.md)
 
 QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billing `GetYouDoBalanceHistoryTest` assertions; Tochka hard-coded token fallback — [src](companies/youdo/knowledge/log/2026-09-04-dev-deployment-devops-832-handoff.md)
 
@@ -96,7 +97,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### ios-ci
 
-- [ ] YouDoApp fastlane (DevOps-880): move `build_release` `testflight` from Apple-ID session to App Store Connect API key; key setup per https://developer.apple.com/documentation/appstoreconnectapi/creating-api-keys-for-app-store-connect-api (no `app_store_connect_api_key` in `develop` Fastfile; fastlane `2.240.0` pinned in `Gemfile` and installed on `idcn-10` by the user; checked 2026-10-05; 2026-10-06: `ASC_KEY_ID`/`ASC_ISSUER_ID`/`ASC_KEY_CONTENT` (base64 .p8, masked, not protected — no protected tags) added in GitLab; branch `IOS-5054`: `testflight` uses `app_store_connect_api_key`, all three `sigh download_all` CI calls use `--api_key_path`; uncommitted — commit, MR, test release job, then drop `APPLE_DEVELOPER_USER`/`FASTLANE_SESSION` if unused) (2026-09-14) — [src](companies/youdo/knowledge/log/2026-09-14-ios-ci-fastlane-spaceauth-service-key.md)
+- [ ] YouDoApp fastlane (DevOps-880): move `build_release` `testflight` from Apple-ID session to App Store Connect API key; key setup per https://developer.apple.com/documentation/appstoreconnectapi/creating-api-keys-for-app-store-connect-api (no `app_store_connect_api_key` in `develop` Fastfile; fastlane `2.240.0` pinned in `Gemfile` and installed on `idcn-10` by the user; checked 2026-10-05; 2026-10-06: `ASC_KEY_ID`/`ASC_ISSUER_ID`/`ASC_KEY_CONTENT` (base64 .p8, masked, not protected — no protected tags) added in GitLab; branch `IOS-5054`: `testflight` uses `app_store_connect_api_key`, all three `sigh download_all` CI calls use `--api_key_path`; 2026-10-07: MR !3273 merged (`bf7d07f089`), `Build beta ad-hoc` and `Build development` pass with API key; remaining: the first release job (`testflight` with API key), then drop `APPLE_DEVELOPER_USER`/`FASTLANE_SESSION` if unused) (2026-09-14) — [src](companies/youdo/knowledge/log/2026-09-14-ios-ci-fastlane-spaceauth-service-key.md)
 - [ ] Runner `idcn-10`: verify the first nightly cron cleanup (2026-10-07 03:30, `~/Library/Logs/gitlab-runner-disk-cleanup.log`) and that trigger 568940 returns to OK; if one nightly run is not enough (builds add 20G+ per day), run the cleanup every few hours. DevOps-881 closed 2026-10-06 (agent, cron, Zabbix item/trigger done, MR `0c421bd0`). YouDoApp job `timeout:` still absent (2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-30-ios-ci-job-3195403-disk-full-hang.md)
 
 ### android-farm
@@ -157,6 +158,10 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 ---
 
 ## Done
+
+- [x] DevOps-886 k8s-ttl-controller installed as safety net (TTL deploy 8d / update 6d), verified end to end, YouTrack closed by the user (2026-10-07) — [src](companies/youdo/knowledge/log/2026-10-07-dev-deployment-devops-886-ttl-controller.md)
+
+- [x] test5: delete exchange `youdo.user.signin` (auto_delete=false vs publisher true) so it is redeclared; check bindings first; needs admin creds and approval (2026-10-07) — [src](companies/youdo/knowledge/log/2026-10-07-rabbitmq-test5-signin-exchange-auto-delete-mismatch.md) — done 2026-10-07
 
 - [x] Deleted stale namespace `dev-hide-employee-api-swagger` and its Helm releases (2026-10-06) — [src](companies/youdo/knowledge/log/2026-10-06-dev-deployment-hide-employee-api-swagger-namespace.md)
 

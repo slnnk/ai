@@ -1,0 +1,24 @@
+Token usage, last 7 days (since 2026-10-01)
+agent   project                            model                sess   fresh  c.read c.write     out
+claude  ~                                  claude-opus-5-5        17      1k   62.9M    1.5M    452k
+claude  ~/git/youdo.business               claude-opus-5-5         2     364   16.6M    228k    104k
+codex   ~                                  gpt-5.6-sol             1      8k     28k       0     319
+total                                                             20      9k   79.5M    1.7M    556k
+
+Top 5 sessions by input (fresh + cache read + cache write):
+  2026-10-02 15:03  claude   12.9M in    68k out  ~/git/youdo.business  82192f96
+  2026-10-07 12:31  claude   12.7M in    68k out  ~  b1f66b76
+  2026-10-06 08:38  claude   10.2M in    74k out  ~  ebf28b93
+  2026-10-07 10:06  claude   10.2M in    67k out  ~  2bd12486
+  2026-10-01 07:12  claude    9.0M in    50k out  ~  92036a02
+
+Knowledge-base access (heuristic, see --help):
+agent   sess  kb_find   search    index     full  partial  full KB
+claude    19       29      143        1        5       84       25
+codex      0        0        0        0        0        0        0
+Most read in full:
+    1x log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md
+    1x log/2026-10-02-web-autotests-failed-rerun-3h-webdriver-read-timeout.md
+    1x log/2026-10-01-android-farm-kazan-gate-k-dns-forward-to-decommissioned-srv0.md
+    1x log/2026-10-07-dev-deployment-devops-886-ttl-controller.md
+    1x kubernetes/k8s-ttl-controller-least-privilege.md
