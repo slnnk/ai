@@ -1,7 +1,7 @@
 ---
 system: automation-services
 status: verified
-checked: 2026-09-23
+checked: 2026-10-08
 tags: [nginx, traefik, prod-selectel, balancers, consul]
 ---
 # prod_selectel nginx edge balancers
@@ -19,6 +19,10 @@ configured by the `automation-services` Ansible repo (playbook `balancers.yml`, 
 - Templates: `roles/nginx/templates/vhost/<template>.j2`; proxy header lists in
   `roles/nginx/defaults/main.yml` (`nginx_proxy_conf*`, `nginx_vhost_https_*`).
 - Certificates: `ssl: wildcard.youdo.com` for `*.youdo.com`.
+- `chat-agent.youdo.com`: shared `traefik.youdo.com` vhost added by DevOps-882;
+  the user reported applying the Ansible role on 2026-10-08. Public routing/application
+  readiness has not been independently verified. Evidence:
+  [task log](../../log/2026-10-08-gitlab-ci-devops-882-chat-agent-infrastructure.md).
 - DNS: `*.youdo.com` is a wildcard, so a new subdomain needs only a vhost. Unknown names fall
   into the default server and get `301 -> https://youdo.com` with `x-source: nginx`.
 
@@ -41,6 +45,7 @@ Client -> nginx edge (`server_name`) -> one of:
 
 ## Operations
 
+- Validation convention confirmed by the user on 2026-10-08: Molecule is obsolete and must not be used for these nginx inventory changes. Parse YAML and render the shared template with strict undefined handling, checking existing vhosts stay unchanged; use deployment-time `nginx -t` after separately approved rollout.
 - Adding a Host-routed Nomad service: append an item with `template: traefik.youdo.com`, the
   public `server_name`, `ssl: wildcard.youdo.com`; roll out `balancers.yml` (tag `nginx`),
   check `nginx -t`, then `curl` the name: `301 -> youdo.com` means the vhost is not live.
@@ -61,6 +66,7 @@ inventory secrets: [local Ansible access to Vault](local-vault-ansible-access.md
 
 ## History
 
+- 2026-10-08: `chat-agent.youdo.com` vhost published in [automation-services MR !1364](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1364) under DevOps-882; merge and rollout remain pending. [Work log](../../log/2026-10-08-gitlab-ci-devops-882-chat-agent-infrastructure.md).
 - 2026-09-23: `giveaway-admin.youdo.com` added (DevOps-864),
   [log](../../log/2026-09-23-automation-services-prod-selectel-nginx-giveaway-admin.md).
 - 2026-09: `mcp.youdo.com` added (DevOps-861).

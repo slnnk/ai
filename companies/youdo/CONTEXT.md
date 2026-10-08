@@ -52,3 +52,7 @@ and diagnostics.
 
 - `knowledge/INDEX.md`, then `knowledge/systems/<system>.md`.
 - `knowledge/repos.md` for local clones under `~/git` and `~/mygit`.
+
+## Operational scripts
+
+- `scripts/gitlab_task_mr.py`: GitLab task publication helper (`inspect`, `publish`, `verify`; see `--help`). Uses the existing company GitLab token environment variable without printing its value. Publication requires the supervised workflow approval in `knowledge/systems/gitlab-ci/agent-git-workflow.md`.

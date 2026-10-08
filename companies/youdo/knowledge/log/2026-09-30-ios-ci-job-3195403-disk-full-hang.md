@@ -1,7 +1,7 @@
 ---
 system: ios-ci
 status: verified
-checked: 2026-10-06
+checked: 2026-10-08
 tags: [gitlab-ci, ios, disk, idcn-10]
 ---
 # iOS CI job 3195403 hung: idcn-10 disk full
@@ -37,7 +37,7 @@ Runner `idcn-10` (id 93, gitlab-runner 17.9.3, darwin), host `iosdev@192.168.30.
 - By the user on idcn-10: removed the whole checkout `~/builds/6gfbuVYj/0/team-youdo-ios/YouDoApp` (14G), then `Dead/*` and `var/db/diagnostics/*` of simulator `C0F24BAE-...`. Result: `/System/Volumes/Data` 69%, 65G free; simulator 6.1G, still listed (Shutdown). Job 3195403 cancelled by the user.
 
 ## Open items
-- Free disk on idcn-10 (needs user approval) and add a job timeout / disk check.
+- Free disk on idcn-10 (needs user approval) and add a disk check. The missing job timeout was later confirmed as intentional; do not change it.
 
 ## Follow-up 2026-10-05
 
@@ -75,6 +75,10 @@ Read-only check over ssh (`iosdev@192.168.30.144`):
 - Created via API on user request 2026-10-06: item `vfs.fs.size[/System/Volumes/Data,pfree]` (itemid 4049627, 5m, `%`) and trigger "Free disk space is less than 10% on /System/Volumes/Data" `max(/idcn-10/vfs.fs.size[/System/Volumes/Data,pfree],30m)<10`, Warning (triggerid 568940). First value 7.72 at 12:30:47, trigger went to PROBLEM at once (real: ~17G free during a job).
 - 2026-10-06 ~12:40, on user request: deleted `~/Library/Developer/Xcode/DerivedData/*` (5.9G: `YDMainApp-gamgmxgznxhophabjlsqvyzjmkdm`, `SymbolCache.noindex`, `.DS_Store`) during two running jobs (`build_beta_adhoc` in checkout 0, `test` in checkout 1). Free space still 16G right after: the running builds consumed more than was freed. Old Archives and the iPhone 16 Pro simulator junk were left for the nightly cleanup (user decision).
 - 2026-10-06 ~12:50, on user request: deleted idle `~/builds/6gfbuVYj/1/team-youdo-ios/YouDoApp/build` (14G) while a new `build_beta_adhoc` ran in checkout 0; free space 24G -> 33G (84%). Earlier at 12:44 free space had dropped to 12G (5.2%) with two concurrent jobs; `git clean` at the next job start freed checkout 0. MR `DevOps-881-zabbix-macos` merged as `0c421bd0`.
+- Read-only check 2026-10-08: cron cleanup completed successfully on both nights. The 2026-10-07 run freed 30,923M (17G -> 47G); the 2026-10-08 run freed 17,612M (25G -> 42G). At check time `/System/Volumes/Data` had 43Gi available (80% used). Daily cleanup is effective, but the second run began with only 25G free, close to the 10% alert threshold; keep observing peak build consumption. The log contained no errors.
+- Zabbix API check 2026-10-08: trigger 568940 is enabled and OK (`value=0`, `state=0`, no error); it recovered at 2026-10-07 16:18:47 MSK. Item 4049627 reported 18.6492% free at 2026-10-08 09:18:47 MSK.
+- User decision 2026-10-08: the YouDoApp job intentionally has no `timeout:`. Do not add or change it.
+- User decision 2026-10-08: the two successful nightly runs and recovered Zabbix trigger are sufficient observation; close the remaining disk-monitoring TODO. Reopen only if the trigger or cleanup failures recur.
 
 ## Portable lesson
 

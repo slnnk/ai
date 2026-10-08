@@ -79,11 +79,51 @@ goes to `~/ai`.
 
 ## Git
 
+- Work in the existing repository checkout (`~/git/<repo>` by default), not a separate
+  git worktree. Create a separate worktree only when the user explicitly requests it.
+  Preserve unrelated local changes; if they block switching branches, explain the
+  conflict before taking any action that moves or discards them.
+- Commits must contain only changes made by the agent for the current task, unless
+  the user explicitly asks to include other changes. Check the actual staged diff,
+  including pre-staged changes and mixed user/agent edits within the same file;
+  selecting a task file does not authorize committing every change in that file.
 - Never run state-changing git commands (`git add`, `git commit`, `git push`, `git tag`,
   `git merge`, `git rebase`, `git reset`, `git stash`, ...) in any repository unless the
   user explicitly asks for it in the current task. Read-only commands (`status`, `diff`,
   `log`, `show`, `fetch`) are fine.
-- Exception: the daily `~/ai/general/scripts/ai-sync.sh` run, which commits and pushes `~/ai`.
+- Exceptions: the daily `~/ai/general/scripts/ai-sync.sh` run, which commits and pushes
+  `~/ai`, and the explicitly confirmed training stages below.
+
+### Supervised Git/MR training (2026-10-08 through 2026-10-30)
+
+- Before editing repository task files, propose the branch name, repository and base
+  branch; wait for explicit confirmation. That approval permits creating/switching to
+  the approved task branch and making the task's local file changes. If reusing a branch,
+  propose reuse for approval. Read-only investigation and KB bookkeeping can proceed.
+- After implementation and checks, present the actual diff summary, check results,
+  commit message, MR title, source/target and relevant CI effects. Wait for explicit
+  confirmation. That approval covers staging the task's explicit paths, committing,
+  pushing the approved branch and creating/updating its MR as one publication action;
+  do not ask again for each command. Corrections must be applied before execution.
+  Material changes to approved names, scope, target or effects require renewed approval.
+- Branch: `<TASK-ID>-<english-kebab-case>`; respect observed project exceptions.
+  Commit: concise lowercase English action + object, no mandatory task ID or feat:/fix:.
+  MR title: `<TASK-ID> <change summary>`. Preserve project settings.
+  MR description: one short paragraph in Russian describing the change, then a link
+  to the task, and nothing else. Do not include checks, related tasks/MRs, dependencies
+  or CI details. Keep those details in the work log and publication approval summary.
+  No separate Closes policy is needed.
+- No merge, auto-merge, direct target-branch push, force push, tags, history rewriting
+  or deployment is authorized by these approvals. CI runtime changes/releases still
+  need explicit approval covering those effects. Preserve unrelated user changes.
+- Record each task's proposed/final names, approvals, corrections, results and MR link
+  in its work log. Apply reusable user corrections immediately to the canonical rules
+  below (and this file if global); keep task-specific exceptions scoped to that task.
+  Do not infer broader permissions from wording corrections.
+- Canonical details and training evidence: `~/ai/current/knowledge/systems/gitlab-ci/agent-git-workflow.md`.
+  Prepare the training report on 2026-10-30, or the first session after that date,
+  following the due item in `~/ai/TODO.md`. Continue supervised mode until the user
+  reviews the results and explicitly chooses automation or further training.
 
 ## Changes outside local files
 
@@ -94,7 +134,9 @@ goes to `~/ai`.
   over ssh, and API calls that create, update or delete (POST/PUT/PATCH/DELETE to GitLab,
   YouTrack, Zabbix, cloud providers, ...).
 - Say what the command changes and where, then wait for an explicit yes. A yes covers only
-  that action; ask again for the next one.
+  that action; ask again for the next one. Exception: the second training-stage approval
+  above covers commit + branch push + MR creation/update for the reviewed task together;
+  it does not authorize other external changes.
 - No permission is needed for editing local files (including files in a repository
   checkout), or for read-only commands: `terraform plan`, `--check`/`--diff`, `kubectl get`,
   GET requests, reading logs.
