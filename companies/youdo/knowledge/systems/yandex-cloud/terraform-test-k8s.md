@@ -1,12 +1,15 @@
 ---
 system: yandex-cloud
 status: verified
-checked: 2026-09-14
+checked: 2026-10-09
 tags: [terraform, yandex-tf, test-k8s, managed-kubernetes, infra-tf, kubeconfig, autoscaling]
 ---
 # Yandex Cloud test-k8s
 
 ## Summary
+
+- Current recovery: yc-a-k8s-dev1.35 in ru-central1-a/test-platform-folder/subnet-a deployed through MR !235 and successful job3217390/pipeline140497. NodeReadyTrue/v1.35.1; CoreDNS forwarding applied/reloaded, deployment1/1ready; refreshplan no changes. Workloads/data and end-to-end corporateDNS query still pending; preservedmax10 exceeds previously checked freeComputeCPU/RAM.
+- Live recovery preflight (2026-10-09): e cloud cluster absent but stale tainted state entry remains; SA plus seven IAM bindings still exist. New a folder/subnet/read access verified, a Consul state absent; User approved saved destroy plan; eight e remnants deleted successfully. Cloud SA/bindings absent, legacy kube-test RUNNING/HEALTHY, e state serial4/resources[], original serial2 backed up and empty key retained. A configuration subsequently published as MR !235 and merged by user; see latest apply assessment. See [destroy plan](../../log/2026-10-09-yandex-cloud-devops-888-e-destroy-plan.md) and [preflight](../../log/2026-10-09-yandex-cloud-devops-888-e-to-a-preflight.md).
 
 - What: Terraform root `test-k8s` in `/home/slnnk/git/yandex-tf` (origin `sysadmins/yandex/yandex-tf`) managing Managed Kubernetes cluster `kube-test` (`catd03r096n9ih2qahac`, private API `https://10.16.26.3`) and node group `kube-test-node-group` (`catd0sn7d33n3rrgivh6`), plus ConfigMap `kube-system/coredns-user`.
 - How: Consul state `terraform/yandex-test-k8s`, Yandex provider `~> 0.169.0` with `test-k8s/key.json`, Kubernetes provider `~> 2.0` via `yc managed-kubernetes create-token`. CI (MR 220): `validate:test-k8s`, `plan:test-k8s`, `apply:test-k8s` on `gitlab-runner-docker-1`.
@@ -25,6 +28,14 @@ tags: [terraform, yandex-tf, test-k8s, managed-kubernetes, infra-tf, kubeconfig,
 - Safe origin: `git@gitlab.youdo.sg:sysadmins/yandex/yandex-tf.git`.
 - Terraform root: `/home/slnnk/git/yandex-tf/test-k8s`.
 - Purpose: Yandex Managed Kubernetes test environment.
+
+## Naming convention: 2026-10-09
+
+The user announced the new `yc-a-` prefix for Yandex Cloud resource naming in zone a. Exact approved recovery cluster spelling: `yc-a-k8s-dev` (the message's trailing slash is punctuation, not part of the cloud name). Proposed corresponding SA `yc-a-k8s-dev-sa` and node group `yc-a-k8s-dev-node-group` use this prefix. The proposed Consul backend remains `terraform/yandex-dev-k8s-a` until a different state key is explicitly agreed; state keys and Git branches are not cloud resource names. No other-zone prefix or renaming of existing unrelated resources is inferred. The user subsequently explicitly approved branch `DevOps-888-recovery-k8s-a` and local implementation from origin/master95e4f60; stage2 publication explicitly approved and completed as dd272c7 / MR !235.
+
+## DevOps-888 recovery preparation: 2026-10-09
+
+Final local implementation reuses `test-k8s` on approved branch `DevOps-888-recovery-k8s`; no new root directory remains. Cluster `kube-dev-e` uses Kubernetes 1.35/STABLE, zone `ru-central1-e` and subnet `subnet-test-e` (`ajcbvev5ac7hjj691c5v`). VPC/master/node zone derive from the explicit subnet. New Consul backend path is `terraform/yandex-dev-k8s-e`; original `terraform/yandex-test-k8s` is not migrated. Existing CI plan/apply:test-k8s use `init -reconfigure -upgrade` to bypass cached old backend metadata without migration. CoreDNS adopts pre-created ConfigMap data; SA/node-group names are distinct. Format/validate/local CI checks passed; cloud plan, remote state-key emptiness and private API reachability remain unverified. Published as commit `3f8415a` / [MR !232](https://gitlab.youdo.sg/sysadmins/yandex/yandex-tf/-/merge_requests/232), without Draft. MR pipeline 140484 validate/plan passed. User merged MR !232. First apply job 3217042 failed because inherited pod range `10.128.0.0/16` overlaps existing subnet `e9bfsliq0opqgpepndrt`; SA and all seven IAM bindings exist in the new state, cluster creation failed. User console screenshot confirms both old reservations remain: Pod `10.128.0.0/16` and Service `10.144.0.0/16` in shared_network. Approved local follow-up on `DevOps-888-recovery-k8s-cidr` changes Pod to `10.129.0.0/16` and Service to `10.145.0.0/16`; format/validate/static overlap check and review passed, published commit `c269e4a` / [MR !233](https://gitlab.youdo.sg/sysadmins/yandex/yandex-tf/-/merge_requests/233) without Draft. MR pipeline 140489 validation passed; plan pending at last check. These avoid the six screenshot subnets; live connected-network/route overlap remains unverified. Keep the partial new state; choose nonoverlapping pod/service ranges before retry. User merged CIDR MR !233; apply job 3217180 (master 95e4f60) now fails at managed master VM allocation in e with ResourceExhausted/Not enough resources, operation catcuj6cadvq2usrdjl0. CIDR conflict is resolved; latest plan is 3 add/0 change/0 destroy, SA and seven bindings retained. Cluster creation did not complete; no node/CoreDNS started. Failed cloud object/state presence is unverified; keep existing new state. Contact Yandex support or retry only after explicit approval and capacity recovery. Agent did not merge, deploy or retry. User changed the recovery destination to test-platform-folder b1gra6b6tvv67paql8hs and test-platform-subnet-a e9b32eqch1la7rq0ed6e, requesting planning first. Proposed sequence: inventory/destroy-plan e, approved cleanup, new a configuration/state, reviewed plan/publication and approved apply. Read-only preflight now confirms actual e remnants are SA+seven bindings; cluster catm6t35irdu867q0ab0 is NotFound despite its tainted state entry. Target subnet e9b32eqch1la7rq0ed6e is ru-central1-a/10.16.28.0/24 in shared_network, owned by the existing network folder; a state key absent. See [verified preflight](../../log/2026-10-09-yandex-cloud-devops-888-e-to-a-preflight.md). No migration/deletion was performed; see [e-to-a work plan](../../log/2026-10-09-yandex-cloud-devops-888-e-to-a-plan.md). See [work log](../../log/2026-10-09-yandex-cloud-devops-888-dev-k8s-e-recovery.md).
 
 ## State and access map
 
@@ -234,3 +245,51 @@ The plan included existing uncommitted changes under `test-k8s` (`k8s-cluster.tf
 
 - [Terraform destroy of a managed Kubernetes cluster stops half-way](../../../../../general/knowledge/terraform/destroy-order-managed-k8s-iam-bindings.md)
 - [Autoscaled node group stays at two nodes although one node would fit the load](../../../../../general/knowledge/k8s/cluster-autoscaler-cannot-scale-down-to-one-node.md)
+
+## Zone a implementation verification (2026-10-09)
+
+Eight local Terraform files updated,49 additions/49 deletions; CI unchanged. Cluster yc-a-k8s-dev, SA yc-a-k8s-dev-sa and node group yc-a-k8s-dev-node-group use Kubernetes1.35 in ru-central1-a, folder b1gra6b6tvv67paql8hs, subnet e9b32eqch1la7rq0ed6e. New backend remains absent after the live plan; no migration/apply. e cleanup completed with zero managed state resources. Initial8CPU/48GiB/93GiB worker fits available42CPU/96GiB/1396GiB Compute quota headroom; preserved max10 does not fit CPU/RAM headroom. Private runner API access, connected routes and registry access outside the new folder remain unverified. Stage2 publication explicitly approved and completed as commit dd272c7 / [MR !235](https://gitlab.youdo.sg/sysadmins/yandex/yandex-tf/-/merge_requests/235); final CI outcome pending. See [a implementation log](../../log/2026-10-09-yandex-cloud-devops-888-yc-a-k8s-dev.md).
+
+## Original cluster incident recheck (2026-10-09)
+
+Original kube-test catd03r096n9ih2qahac is zonal: one master in ru-central1-b, etcd size1, Kubernetes1.34, privateAPI10.16.26.3; cloud RUNNING/HEALTHY. Original node group has four RUNNING_ACTUAL worker VMs in b. Workstation readyz/nodes GETs using matching kubeconfig timed out; API readiness and workload health unverified. User-supplied regional-master relocation update does not directly cover this topology. Verify API from the established runner/bastion route before considering new a workers; zonal-master recovery needs Yandex confirmation if API remains unavailable. See [live migration assessment](../../log/2026-10-09-yandex-cloud-devops-888-original-cluster-migration-check.md).
+
+## Zone a apply timeout and state reconciliation (2026-10-09)
+
+Apply3217265 failed with DeadlineExceeded/stream timeout on nodegroup creation after cluster success. Livecluster catg1hn09gu2jslb8vgl yc-a-k8s-dev is RUNNING/HEALTHY1.35 in a, privateAPI10.16.28.49. Livegroup cat2jn302140sq4qlfkb yc-a-k8s-dev-node-group is RUNNING in targeta subnet. Consul a serial2 contains9managedresources but not nodegroup/CoreDNS. Import existing group before reapplying; remote state mutation requires approval. Node Ready/API/workload health unverified. See [job/state assessment](../../log/2026-10-09-yandex-cloud-devops-888-job-3217265.md).
+
+## Zone a state import completed (2026-10-09)
+
+After explicit user authorization, existing nodegroupcat2jn302140sq4qlfkb imported into terraform/yandex-dev-k8s-a; serial3/10managedresources, previousIDs unchanged, protected serial2backup retained. Refreshplan only CoreDNSdata create;0otherchanges/deletions. PrivateAPI10.16.28.49 reachable and one nodeReadyTrue/v1.35.1/ru-central1-a via separatelocalkubeconfig. CoreDNSapply awaits separateapproval. See [import and plan](../../log/2026-10-09-yandex-cloud-devops-888-a-state-import.md).
+
+## CI private API access blocked (2026-10-09)
+
+Retryjob3217387 on runner106/gitlab-runner-docker-2/172.28.0.172 failed CoreDNSGET with TCPtimeout to10.16.28.49:443. LocalAPI reads succeed: nodeReadyTrue/v1.35.1, systempodsready; coredns-user stilldefault. Usercolleagues are adding runnernetworkaccess to newnetwork, pendingcompletion. Afterconnectivityrestored reviewfreshplan and retryapprovedapply; expectonlyCoreDNS. See [job3217387](../../log/2026-10-09-yandex-cloud-devops-888-job-3217387.md).
+
+## Zone a infrastructure converged (2026-10-09)
+
+Userjob3217390/pipeline140497 succeeded on runner2 after colleaguesaddednetworkaccess. CoreDNScorporateforwarding applied; deploymentready1/1 and reloadcomplete, nodeReadyv1.35.1. Independentrefreshplan no changes. No application/data recovery implied; end-to-endDNSprobe pending. See [successfulapply and readiness](../../log/2026-10-09-yandex-cloud-devops-888-a-cluster-ready.md).
+
+## Terraform CI access local implementation (2026-10-09)
+
+ApprovedbranchDevOps-888-k8s-ci-kubeconfig frommasterce0151f adds3managedKubernetesCIresources: kube-system/admin-user SA, cluster-adminbinding and staticTokenSecret; sensitiveci_kubeconfig preservesdefault/kube-test/admin-useraliases. CIplan:test-k8s usesredactedordinaryplan withoutsavedplan/JSONsummary. Nativechecks/review/liveplan3create0change0destroy passed; publication/apply pending. Existingmanualmanifestunapplied. TokenwillpersistinConsulstate; neverlograwoutput. See [implementation and approvals](../../log/2026-10-09-yandex-cloud-devops-888-terraform-ci-kubeconfig.md).
+
+## CIidentity applied, sourcepublication pending (2026-10-09)
+
+Userauthorizedmanualapply oflocal3-resourceTerraformproposal. SAkube-system/admin-user, cluster-adminbinding andtokensecretcreated; Consula serial6/14resources. Sensitiveci_kubeconfig exportedto protected0600file under~/ai-data/terraform-recovery/DevOps-888/yc-a-k8s-dev-ci.kubeconfig; authenticatednodesGET andRBACcheckpass, refreshplan no changes. SourcebranchDevOps-888-k8s-ci-kubeconfig stilluncommitted; existingmasterwouldplanremovalofnewresources untilconfigurationpublished/merged. GitLabKUBECONFIG_YANDEX_DEV notupdated. See [approval/result](../../log/2026-10-09-yandex-cloud-devops-888-ci-manual-apply.md).
+
+## CIidentity sourcepublished (2026-10-09)
+
+Userauthorizedpublication; commit43ff422 onDevOps-888-k8s-ci-kubeconfig, [MR !236](https://gitlab.youdo.sg/sysadmins/yandex/yandex-tf/-/merge_requests/236) withoutDraft->master, CI140511runningatlastcheck. Checkoutclean. SA/RBAC/Secretalreadyappliedandkubeconfigtested; mergepending beforemasterconfigurationincludesnewresources. GitLabCIvariableunchanged. See [publicationrecord](../../log/2026-10-09-yandex-cloud-devops-888-terraform-ci-kubeconfig.md).
+
+## MR236 CI plan verification (2026-10-09)
+
+Job3217580/plan:test-k8s and MRpipeline140512 succeeded. CI1.7.5/sameproviders2.38.0+0.169.0 shows0add1in-placeCISecretchange0destroy, withnochangedattribute/outputvisible. Local1.9.4refreshplan no changes. Exactphantomdiffcauseunverified, notconfirmedtokenrotation; noapply. See [jobassessment](../../log/2026-10-09-yandex-cloud-devops-888-job-3217580.md).
+
+## CI configuration merged and converged (2026-10-09)
+
+MR !236 merged as master5958abf; user pipeline140514 succeeded. Apply3217716 updated one CI Secret; subsequent plan3217717 reports no changes. Current static CI kubeconfig prepared at ~/ai-data/terraform-recovery/DevOps-888/yc-a-k8s-dev-ci-140514.kubeconfig0600, contextdefault/clusterkube-test/useradmin-user/API10.16.28.49; authenticated node GET passes. Token matches earlier export. GitLab KUBECONFIG_YANDEX_DEV delivery remains user-managed unless separately authorized. See [delivery record](../../log/2026-10-09-yandex-cloud-devops-888-ci-kubeconfig-140514.md).
+
+## Local and CI kubeconfig delivery (2026-10-09)
+
+User reports KUBECONFIG_YANDEX_DEV updated with deliveredtext. Local ~/.kube/config now selectsdefault/kube-test/admin-user forAPI10.16.28.49, preservingunrelated mks-infra/tempentries; ~/.kube/test-k8s-ci.kubeconfig updatedaswell. Both0600, protectedpreviousbackupsretained. Defaultkubectl nodesGET passesReady/v1.35.1; dedicatedconfigreadyzok. See [localupdate](../../log/2026-10-09-yandex-cloud-devops-888-local-kubeconfig.md).

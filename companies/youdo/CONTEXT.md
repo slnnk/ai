@@ -40,6 +40,8 @@ and diagnostics.
 
 ## Conventions
 
+- Yandex Cloud naming: new resources in zone a use prefix `yc-a-` (user, 2026-10-09); recovery cluster `yc-a-k8s-dev`. Do not infer other-zone prefixes or rename unrelated existing resources.
+
 - Environment names carry meaning: `prod`/`production` is sensitive, `test` and `dev`
   are shared stands. Treat anything named prod as change-controlled.
 - Company skills live in `~/ai/current/skills/`: `rp` (daily and sprint reports from
@@ -56,3 +58,4 @@ and diagnostics.
 ## Operational scripts
 
 - `scripts/gitlab_task_mr.py`: GitLab task publication helper (`inspect`, `publish`, `verify`; see `--help`). Uses the existing company GitLab token environment variable without printing its value. Publication requires the supervised workflow approval in `knowledge/systems/gitlab-ci/agent-git-workflow.md`.
+- `scripts/gitlab_ci_lint.py`: read-only GitLab CI lint/dry-run helper; see `--help`. Validates parent/child configuration without creating a real pipeline.

@@ -20,8 +20,8 @@
 # Once a week (newest personal/usage/*.txt older than 7 days) it also writes a token usage
 # report with general/scripts/token_usage.py --kb and adds a one-line summary to the commit.
 #
-# On the first sync of a month with notes due for review (build_index.py --stale 30) it adds
-# a "Monthly staleness review YYYY-MM" item to TODO.md and prints a reminder line.
+# Starting in November 2026, on the first sync of a month with notes due for review
+# (not necessarily day 1), add/update its TODO.md item and offer the review once.
 # Every daily sync prints open TODO.md items "- [ ] due YYYY-MM-DD: ..." whose date has come.
 #
 # Exit codes: 0 synced or nothing to do; 1 sync failed (state file not updated,
@@ -76,28 +76,35 @@ if [ "$DRY" -eq 0 ]; then
   fi
 fi
 
-# 1c. monthly staleness reminder: on the first sync of a month with notes due for review
+# 1c. monthly staleness reminder: first sync in the month, starting November 2026
 # (maps > 30 days, recipes > 180 days, hypotheses), add one item to TODO.md "## Knowledge base"
-# and print it. The item itself is the state: it is added once per month.
+# and offer the review. A pre-created item is refreshed, not duplicated.
 # Failures here never block the sync.
-MONTH="$(date +%Y-%m)"
-if [ "$DRY" -eq 0 ] && ! grep -q "Monthly staleness review $MONTH" TODO.md 2>/dev/null; then
+MONTH="${TODAY:0:7}"
+LAST_SYNC_MONTH="$(cut -c 1-7 "$STATE" 2>/dev/null)"
+if [ "$DRY" -eq 0 ] && [[ "$MONTH" > "2026-10" ]] && [ "$LAST_SYNC_MONTH" != "$MONTH" ]; then
   due=$(python3 general/scripts/build_index.py --stale 30 --recipe-days 180 --count 2>/dev/null)
-  if [ "${due:-0}" -gt 0 ] 2>/dev/null && python3 - "$MONTH" "$due" <<'EOF'
-import sys
-month, due = sys.argv[1], sys.argv[2]
+  if [ "${due:-0}" -gt 0 ] 2>/dev/null && python3 - "$MONTH" "$due" "$TODAY" <<'EOF'
+import re, sys
+month, due, today = sys.argv[1:]
 item = (f"- [ ] Monthly staleness review {month}: {due} notes due; list with "
         "`general/scripts/build_index.py --stale 30`; per note confirm, fix or set "
-        f"`status: outdated`, bump `checked`; offer to the user, do not run unasked ({month}-01)\n")
+        f"`status: outdated`, bump `checked`; offer to the user, do not run unasked ({today})\n")
 text = open("TODO.md", encoding="utf-8").read()
+if f"- [x] Monthly staleness review {month}" in text:
+    sys.exit(1)
 head = "## Knowledge base\n\n"
 if head not in text:
     sys.exit(1)
-open("TODO.md", "w", encoding="utf-8").write(text.replace(head, head + item, 1))
+pattern = rf"^- \[ \] Monthly staleness review {re.escape(month)}:.*\n"
+text, replaced = re.subn(pattern, lambda _: item, text, count=1, flags=re.M)
+if not replaced:
+    text = text.replace(head, head + item, 1)
+open("TODO.md", "w", encoding="utf-8").write(text)
 EOF
   then
-    log "staleness review due: $due notes (TODO.md, build_index.py --stale 30)"
-    echo "- knowledge-base: monthly staleness review $MONTH added to TODO.md ($due notes due)" >> "$NOTES"
+    log "offer monthly staleness review $MONTH: $due notes (TODO.md, build_index.py --stale 30); wait for user agreement"
+    echo "- knowledge-base: monthly staleness review $MONTH offered; TODO.md updated ($due notes due)" >> "$NOTES"
   fi
 fi
 

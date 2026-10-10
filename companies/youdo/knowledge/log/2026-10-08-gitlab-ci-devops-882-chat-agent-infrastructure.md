@@ -106,3 +106,7 @@ the rollout report.
 
 ## Portable lesson
 None; existing [Traefik Host routing recipe](../../../../general/knowledge/nginx/traefik-host-router-behind-nginx.md) applies.
+
+## Service deployment follow-up
+
+On 2026-10-09 the user approved preparing production HCL and CI in the service repository and selected automatic deployment after merge to master. [Follow-up work and pending publication](2026-10-09-youdo-chat-agent-prod-deploy.md).

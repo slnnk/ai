@@ -43,6 +43,7 @@ Global entry point: `~/ai/AGENTS.md`. Baseline: [weekly review](../../log/2026-1
 
 ## Naming and MR conventions
 - Branch: exact tracker ID + short English kebab-case, e.g. `DevOps-879-http-timeout`.
+  Suffix describes the change, not the repository name (user correction, DevOps-882, 2026-10-09).
   Respect established project exceptions, including iOS task-only branch `IOS-5054`.
   Do not invent a ticket. One task branch/MR per repo; related repos may share a branch
   name. Reuse the task's MR; never overwrite another person's colliding branch.
@@ -105,3 +106,7 @@ scheduler; a report cannot run without an active agent session.
   the separate Closes rule as redundant with automatic MR creation behavior, required
   feedback to update canonical rules, and set the review date to October 30.
 - [Adoption log](../../log/2026-10-08-gitlab-ci-agent-git-training-adoption.md).
+
+## Minimal adaptation scope (user correction, 2026-10-09)
+
+For existing infrastructure automation, keep adaptations limited to the configuration and targeting needed for the requested run. Do not expand folder/zone/network migration work into SQL behavior changes, refactoring, helpers or test infrastructure. Put optional improvements in the single TODO list and implement them only on a separate request. DevOps-889 evidence: user rejected the expanded implementation; final changes are destination/name/subnet arguments, scoped inventory/play host groups and the required target DNS lookup in the existing Zabbix script. See the [work log](../../log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md). This correction narrows scope; it grants no additional Git or external-action permissions.

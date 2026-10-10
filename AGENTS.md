@@ -17,6 +17,9 @@ The user is a DevOps engineer. `~/ai` is the shared knowledge base for every AI 
 
 - Run `~/ai/general/scripts/ai-sync.sh` (daily commit and push; instant when already done).
   Do not hide its output; pass any reminder it prints on to the user.
+  Starting in November 2026, offer the knowledge-base staleness review on the first
+  session in each new month, even if it is after day 1. Use the monthly proposal from
+  `ai-sync.sh`; wait for user agreement and do not repeat it later in the same month.
 - Read `~/ai/current/CONTEXT.md` and the system's section in `~/ai/TODO.md`.
 - Find notes with `~/ai/general/scripts/kb_find.py <keywords>` (hosts, jobs, services,
   tickets); open `INDEX.md` only to browse. Read a long note by its `## Summary` and the
@@ -74,6 +77,10 @@ goes to `~/ai`.
 
 ## Code changes
 
+- Keep repository adaptations minimal: change only what is needed for the requested run.
+  Put optional hardening, refactors, helper tooling and other improvement proposals in
+  `~/ai/TODO.md`; do not implement them without a separate request.
+
 - "Remove what is not needed" means only what the current task touches. List other dead
   code, commented blocks and unused files as suggestions; do not delete them.
 
@@ -106,7 +113,7 @@ goes to `~/ai`.
   pushing the approved branch and creating/updating its MR as one publication action;
   do not ask again for each command. Corrections must be applied before execution.
   Material changes to approved names, scope, target or effects require renewed approval.
-- Branch: `<TASK-ID>-<english-kebab-case>`; respect observed project exceptions.
+- Branch: `<TASK-ID>-<english-kebab-case>`; suffix describes the change, not the repository name; respect observed project exceptions.
   Commit: concise lowercase English action + object, no mandatory task ID or feat:/fix:.
   MR title: `<TASK-ID> <change summary>`. Preserve project settings.
   MR description: one short paragraph in Russian describing the change, then a link

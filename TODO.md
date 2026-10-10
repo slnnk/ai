@@ -85,6 +85,24 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### yandex-cloud / Terraform
 
+- [ ] DevOps-889: adapt the weekend scheduler to use mssql_inventory.ini after publication; existing dynamic inventory has no client-side folder filter (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+- [ ] MSSQL refresh proposal: verify exact backup readability/type/date and destination capacity before dropping DB; add sqlcmd -b and guaranteed login re-enable on failure (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+- [ ] MSSQL refresh proposal: version prepared images and retain the last good image until acceptance; define retention and image quota needs separately (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+- [ ] MSSQL refresh proposal: distinguish missing resources from API errors and validate intended folder/resource before deletion; add quota preflight only if separately requested (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+- [ ] MSSQL refresh proposal: replace fixed waits/ignored errors with readiness checks for all three VMs, SQL hostname and monitoring; review xp_cmdshell dependency and fragile ping parsing (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+- [ ] MSSQL automation proposal: migrate plaintext credentials in SQL/Windows group_vars, tester task and inventory client to the established secret store; preserve values only in approved secret locations (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+
+- [ ] DevOps-889: resolve SSD quota headroom before three-stand recovery (959 GiB free vs 1200 GiB needed); image-quota increase is unnecessary with the original image replacement workflow (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+
+- [ ] DevOps-889: minimal seven-stage Ansible destination/inventory edits checked; execute reviewed stages after SSD quota resolution, then review publication (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+
+- [x] DevOps-888: deploy a recovery cluster and CoreDNS after runnernetwork fix; job3217390 successful, nodeReady and refreshplan no changes (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-dev-k8s-e-recovery.md)
+- [ ] DevOps-888: verify corporate DNS from a workload and prepare application/data recovery plus infra-tf/dev integration with yc-a-k8s-dev (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-a-cluster-ready.md)
+- [x] DevOps-888: review CI and merge MR !236 for already manually applied Terraform CI identity before another masterapply; kubeconfig exported/protected/tested, update CI integration after approval (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-ci-kubeconfig.md) — done 2026-10-09; MR merged/pipeline140514 converged, current CI kubeconfig delivered; variable update not performed by agent
+- [x] DevOps-888: compare CI1.7.5 and local1.9.4 plans for empty in-place CI Secret diff in job3217580 before diagnosing token change (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-job-3217580.md) — closed 2026-10-09 after user CI apply and repeat plan no changes; exact cause unproven
+- [ ] DevOps-888: verify original kube-test private API from runner/bastion and assess zonal-master recovery vs new a workers (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-original-cluster-migration-check.md)
+- [ ] DevOps-888: resolve Compute CPU/RAM quota headroom for preserved max10 workers and rollout capacity; initial1 fits (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-yc-a-k8s-dev.md)
+
 - [ ] `yandex-tf/.gitlab-ci.yml`: `workflow:rules` for MR and default branch only (deferred by the user 2026-09-23) — [src](companies/youdo/knowledge/log/2026-09-23-yandex-cloud-yandex-tf-network-ansible-job.md)
 - [ ] Ansible for `ipsec`/`balancers_test` is manual; nothing re-applies config after VM changes (2026-09-23) — [src](companies/youdo/knowledge/log/2026-09-23-yandex-cloud-yandex-tf-network-ansible-job.md)
 - [ ] test-k8s: choose K8s version and upgrade chain, pin module source, fix `template_name`/default zone, re-plan; review SG egress and audit logging (2026-08-11) — [src](companies/youdo/knowledge/log/2026-08-11-yandex-cloud-yandex-tf-test-k8s-audit.md)
@@ -93,7 +111,6 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### selectel
 
-- [ ] `prod-dbaas-grants` CI apply: `-parallelism=1` or a dependency chain; retry and confirm an empty plan (2026-09-21) — [src](companies/youdo/knowledge/log/2026-09-21-selectel-tf-job-3163660-postgresql-acl-race.md)
 
 ### ios-ci
 
@@ -121,10 +138,12 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [ ] due 2026-10-30: Prepare Git/MR training results for 2026-10-08 through 2026-10-30: proposal acceptance, user corrections, rule updates, permission/check outcomes and recommendation; review with the user before automation or extended training. Keep supervised mode until that decision (2026-10-08) — [src](companies/youdo/knowledge/systems/gitlab-ci/agent-git-workflow.md)
 
+### youdo-chat-agent (DevOps-882)
+
+- [x] Infrastructure and production launch completed; pipelines 140457/140458 successful. User closed DevOps scope on 2026-10-09; functional verification belongs to developers. Additional inferred operational checks and shared-template improvements were not requested and are not completion blockers — [src](companies/youdo/knowledge/log/2026-10-09-youdo-chat-agent-prod-deploy.md)
+
 ### Other systems
 
-- [ ] Elasticsearch msk3-elastic-cls02: analyze heap dump `/data/data-es6/java_pid1.hprof` (sensitive, 16 GB), heap/GC alerts, plan upgrade from 6.8.23 (2026-07-31) — [src](companies/youdo/knowledge/log/2026-07-31-elasticsearch-msk3-elastic-cls02-restart.md)
-- [ ] sc-mta-01 postfix: correlate mass-mailing bursts, check SMTP egress/NAT limits, consider transport rate limits — [src](companies/youdo/knowledge/systems/mail/sc-mta-01-postfix.md)
 - [ ] gitlab-ci Nomad canary rollback: unsafe with concurrent deployments (`nomad job promote` targets the latest one) — [src](companies/youdo/knowledge/systems/gitlab-ci/nomad-canary-rollback.md)
 - [ ] youdo.business dotnet tests: xUnit already capped (`79254cc49`, `maxParallelThreads: 4`); remaining: dedicated runner or lower concurrency for `dotnet-unit-tests`, `section_start` timing sections (checked 2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-03-youdo-business-dotnet-tests-duration.md)
 - [ ] Base images: LibreOffice PPA still via plain `add-apt-repository` (3 images), move to explicit key + `signed-by`; buster archive sources only in `dotnet-core-aspnet/3.1`, missing in other 3.1 images; `3.1-gdilibs`/`3.1-libvips*` still use `apt-key adv` (checked 2026-09-30) — [src](companies/youdo/knowledge/log/2026-06-26-base-images-docker-libreoffice-ppa-gpg-timeout.md), [src](companies/youdo/knowledge/log/2026-06-26-base-images-dotnet-aspnet-3-1-buster-archive.md)
@@ -146,7 +165,7 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 
 ## Knowledge base
 
-- [ ] Monthly staleness review 2026-10: 15 notes due; list with `general/scripts/build_index.py --stale 30`; per note confirm, fix or set `status: outdated`, bump `checked`; offer to the user, do not run unasked (2026-10-01)
+- [ ] Monthly staleness review 2026-11: first review; offer on the first agent session in November, not necessarily November 1; refresh the due-note count with `general/scripts/build_index.py --stale 30`; wait for user agreement (rescheduled by user 2026-10-09) — [src](personal/knowledge/log/2026-10-09-knowledge-base-monthly-review-first-session.md)
 - [ ] due 2026-10-12: Observe agent behaviour for two weeks (from 2026-09-28): do daily sync commits have a non-empty
       "Work recorded by agents" section when "Files" is non-empty? Do agents add new open
       items here instead of only in notes? If not, tighten AGENTS.md or move the rule into
@@ -161,6 +180,11 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 ---
 
 ## Done
+
+- [x] Elasticsearch msk3-elastic-cls02: analyze heap dump, heap/GC alerts, upgrade planning — closed without action, done 2026-10-09: no longer relevant by user decision — [src](companies/youdo/knowledge/log/2026-07-31-elasticsearch-msk3-elastic-cls02-restart.md)
+- [x] sc-mta-01 postfix: mass-mailing bursts and SMTP egress/NAT limits — closed without action, done 2026-10-09: no longer relevant by user decision — [src](companies/youdo/knowledge/systems/mail/sc-mta-01-postfix.md)
+
+- [x] DevOps-887: added `-parallelism=1` to `prod-dbaas-grants` CI apply; MR !93 merged and task closed by the user; done 2026-10-09. Apply/empty plan not independently verified by the agent — [MR](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/merge_requests/93), [task](https://youtrack.youdo.com/youtrack/issue/DevOps-887), [src](companies/youdo/knowledge/log/2026-09-21-selectel-tf-job-3163660-postgresql-acl-race.md)
 
 - [x] Runner `idcn-10`: disk cleanup and monitoring verified — cron succeeded on 2026-10-07 and 2026-10-08 (30,923M and 17,612M freed), Zabbix trigger 568940 recovered to OK; observation period accepted as sufficient by the user; the intentionally absent YouDoApp job `timeout:` remains unchanged — done 2026-10-08 — [src](companies/youdo/knowledge/log/2026-09-30-ios-ci-job-3195403-disk-full-hang.md)
 

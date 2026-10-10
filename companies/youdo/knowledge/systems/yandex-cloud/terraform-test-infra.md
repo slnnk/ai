@@ -1,7 +1,7 @@
 ---
 system: yandex-cloud
 status: verified
-checked: 2026-09-17
+checked: 2026-10-09
 tags: [terraform, yandex-tf, test-infra, nomad-test, base-image, instance-group]
 ---
 # Yandex Terraform: test-infra
@@ -124,3 +124,11 @@ Assessment date: 2026-09-15.
 ## Related recipes
 
 - [Rebuilt cloud image with the same name makes Terraform plan mass disk and VM replacements](../../../../../general/knowledge/terraform/image-rebuild-forces-disk-replacement.md)
+
+## MSSQL recovery dependency (2026-10-09)
+
+The three Windows/WinRM-managed stand VMs sql-test, sql-test1 and sql-test6 are created by automation-test-yandex through YC CLI, not by this Terraform root. Their old zone-b control-plane status is RUNNING, each 4 vCPU/8 GiB with one 400 GiB network-ssd boot disk and auto-delete enabled. All reference yc-sql-base fd8fig4dgkdkc1gnk1mm, READY from October 4; guest/SQL availability is unverified. The user confirmed image data freshness on 2026-10-09; recovery will use that existing image without restoring a backup or rebuilding the base. Proposed DevOps-889 recovery clones target ru-central1-a/test-platform-folder/subnet 10.16.28.0/24 in the same shared VPC as yc-a-k8s-dev. Preserve old VMs and images; do not run the legacy playbook wholesale because it deletes old resources and omits explicit target networking. See the [recovery plan](../../log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md) for verified IDs, data-source choices, network gates and approvals. No MSSQL recovery was executed.
+
+Approved image copy completed: yc-a-sql-base fd8rim6q4rkns8c35q3s is READY in test-platform-folder b1gra6b6tvv67paql8hs, minimum disk 400 GiB. The original yc-sql-base fd8fig4dgkdkc1gnk1mm remains READY in the old folder. Use the new image ID for recovery VMs; no VM creation or repository edits were performed.
+
+User corrected recovery scope to minimal edits. Current branch DevOps-889-recover-mssql-vms changes target folder/zone/subnet/names in four existing cloud task files, three play host groups, two Zabbix lookup lines and a small root mssql_inventory.ini; existing SQL/Windows/default logic is restored. Syntax, list-hosts, diff checks and independent review passed. No recovery stages or quota requests have run. SSD headroom remains 959 GiB versus 1200 GiB required; image quota is sufficient for original step_4 replacement because the copied target image is deleted before rebuild. Optional improvements are only in TODO. Use the recovery log for exact commands/effects and remaining approvals.

@@ -186,9 +186,12 @@ GitFlic (a separate `gitflic` remote also exists).
 The company layer and the `current` symlink are tracked in it; `.gitignore` holds only `.env`
 and the sync state files. Do not ignore `companies/` or split it into a nested repository.
 
-Monthly staleness review: on the first sync of a month with notes due, `ai-sync.sh` adds
-`Monthly staleness review YYYY-MM` to `TODO.md` "Knowledge base" and prints a reminder. The
-agent offers the review to the user; checks are read-only.
+Monthly staleness review starts in November 2026. On the first agent session/sync in a
+new month with notes due, regardless of the day of the month, `ai-sync.sh` adds or refreshes
+`Monthly staleness review YYYY-MM` in `TODO.md` "Knowledge base" and prints a proposal.
+The agent offers the review and waits for user agreement before reviewing notes.
+Do not repeat the proposal on subsequent successful syncs in the same month. The pending
+task remains in TODO.md until addressed; the review is not run automatically.
 
 Dated reminders: an open `TODO.md` item written as `- [ ] due YYYY-MM-DD: ...` is printed by
 `ai-sync.sh` as `reminder:` on every daily sync from that date until the item is closed.
