@@ -1,7 +1,7 @@
 ---
 system: gitlab-ci
 status: hypothesis
-checked: 2026-09-16
+checked: 2026-10-10
 tags: [gitlab-runner, kubernetes, autoscaling, scale-to-zero, yandex-cloud]
 ---
 # Dynamic GitLab runners in Kubernetes
@@ -20,6 +20,12 @@ Last checked: 2026-09-09. Design document; no runner has been applied yet (see t
 - A Kubernetes runner is feasible with the official GitLab Runner Helm chart.
   The runner manager polls GitLab and creates one Kubernetes pod per accepted CI
   job.
+
+## Existing Docker runner DNS incident (2026-10-10)
+
+Job `sysadmins/dynamic_inventory` / `3217892` failed resolving `nomad.service.yandex-test.consul`. Runner Docker DNS `.8`/`.9` uses Windows forwarders; host DNS `.6`/`.7` works. After the user corrected upstream IPs to `10.16.28.11-13`, Windows still returned delayed `SERVFAIL`. SSH confirmed the recovery gap: all three new Nomad masters serve Consul TCP/UDP 8600 but lack functioning dnsmasq on external port 53; direct UDP 53 is refused. The existing role expects dnsmasq forwarding `/consul/127.0.0.1#8600`. Restore that proxy after repair approval. No remote or repository fix occurred. See [evidence](../../log/2026-10-10-gitlab-ci-dynamic-inventory-consul-dns.md).
+
+Resolved after the user's temporary playbook run: at 15:51:31 MSK all three masters had active external dnsmasq TCP/UDP 53; both runners resolved the service through both Windows DNS servers with `NOERROR` and three current addresses in 0–8 ms. Nomad leader GET succeeded. No agent job retry or remote mutation occurred; Terraform inventory integration remains deferred.
 
 ## Recommended architecture
 

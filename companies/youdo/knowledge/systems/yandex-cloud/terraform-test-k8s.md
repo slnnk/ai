@@ -1,12 +1,16 @@
 ---
 system: yandex-cloud
 status: verified
-checked: 2026-10-09
+checked: 2026-10-10
 tags: [terraform, yandex-tf, test-k8s, managed-kubernetes, infra-tf, kubeconfig, autoscaling]
 ---
 # Yandex Cloud test-k8s
 
 ## Summary
+
+- Active recovery state (user identified, checked 2026-10-10): terraform/yandex-dev-k8s-a, serial16/Terraform1.14.3, owns cluster/cloud, CI identity, Vault reviewer/VSO, Sentry integration/ClickHouse, AWX and Traefik. Three Helm entries match current cluster. Legacy infra-tf backend terraform/yandex-k8s-dev is not the recovery state; establish ownership/backend before running infra-tf. User prioritizes this reconciliation before application deployment. See [verification and correction](../../log/2026-10-10-yandex-cloud-devops-888-vault-integration.md).
+
+- Vault recovery verified 2026-10-10: kubernetes-dev API/CA match yc-a-k8s-dev; reviewer SA/RBAC exists; VSO successfully synchronizes Sentry via resources role. Ephemeral dev-ephemeral-deployer consumer remains unverified. See [Vault verification](../../log/2026-10-10-yandex-cloud-devops-888-vault-integration.md).
 
 - Current recovery: yc-a-k8s-dev1.35 in ru-central1-a/test-platform-folder/subnet-a deployed through MR !235 and successful job3217390/pipeline140497. NodeReadyTrue/v1.35.1; CoreDNS forwarding applied/reloaded, deployment1/1ready; refreshplan no changes. Workloads/data and end-to-end corporateDNS query still pending; preservedmax10 exceeds previously checked freeComputeCPU/RAM.
 - Live recovery preflight (2026-10-09): e cloud cluster absent but stale tainted state entry remains; SA plus seven IAM bindings still exist. New a folder/subnet/read access verified, a Consul state absent; User approved saved destroy plan; eight e remnants deleted successfully. Cloud SA/bindings absent, legacy kube-test RUNNING/HEALTHY, e state serial4/resources[], original serial2 backed up and empty key retained. A configuration subsequently published as MR !235 and merged by user; see latest apply assessment. See [destroy plan](../../log/2026-10-09-yandex-cloud-devops-888-e-destroy-plan.md) and [preflight](../../log/2026-10-09-yandex-cloud-devops-888-e-to-a-preflight.md).
@@ -293,3 +297,11 @@ MR !236 merged as master5958abf; user pipeline140514 succeeded. Apply3217716 upd
 ## Local and CI kubeconfig delivery (2026-10-09)
 
 User reports KUBECONFIG_YANDEX_DEV updated with deliveredtext. Local ~/.kube/config now selectsdefault/kube-test/admin-user forAPI10.16.28.49, preservingunrelated mks-infra/tempentries; ~/.kube/test-k8s-ci.kubeconfig updatedaswell. Both0600, protectedpreviousbackupsretained. Defaultkubectl nodesGET passesReady/v1.35.1; dedicatedconfigreadyzok. See [localupdate](../../log/2026-10-09-yandex-cloud-devops-888-local-kubeconfig.md).
+
+## Restored Vault integration (2026-10-10)
+
+Vault is active/unsealed. Auth mount kubernetes-dev already targets https://10.16.28.49 with matching CA and a configured reviewer JWT. ServiceAccount vault/vault-kubernetes-reviewer has system:auth-delegator via binding vault-kubernetes-reviewer; a service-account-token Secret exists. VSO 1.5.1 connects successfully and sentry/sentry-external reports synced/healthy/ready. No dev-* consumers were present, so the audience-vault ephemeral path remains pending. infra-tf does not declare reviewer resources or this auth backend. Full evidence and limits: [verification log](../../log/2026-10-10-yandex-cloud-devops-888-vault-integration.md).
+
+## infra-tf key switched and plan checked (2026-10-10)
+
+User approved branch DevOps-888-infra-state-a from infra-tf origin/master f57349d and local backend key change to terraform/yandex-dev-k8s-a. init -reconfigure succeeded without migration. Full refresh plan with explicit new-cluster kubeconfig and existing Yandex key exited2:77add/3change/17destroy, including cloud cluster/nodegroup/SA/IAM, CI admin identity, Vault reviewer identity and root VSO release. These tracked objects are absent or differently addressed in dev configuration. Local one-line change retained; no apply or publication. See [full verification](../../log/2026-10-10-yandex-cloud-devops-888-vault-integration.md).

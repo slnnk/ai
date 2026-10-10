@@ -76,6 +76,8 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [ ] Resource optimization: next iteration with pooled cross-stand soft reservation and global peak hard max; monitor OOM/restarts after lowered reservations (2026-09-13) — [src](companies/youdo/knowledge/log/2026-09-13-nomad-test-resource-optimization.md), [src](companies/youdo/knowledge/log/2026-09-09-nomad-test-automation-test-yandex-nomad-memory.md)
 - [ ] Upgrade Nomad from `1.5.3` (all 7 clients and 3 servers on Yandex test, API 2026-09-30), fix `KillMode=process` (still in `automation-test-yandex` `deprecated/roles/nomad-client/templates/nomad.systemd.j2:10`); clean stale `/var/lib/nomad/alloc` on agent-test-02 (2026-07-21) — [src](companies/youdo/knowledge/log/2026-07-21-nomad-test-agent-test-02-crash-loop.md)
 
+- [ ] Elasticsearch recovery: if implementation is requested, minimally adapt Ansible disk zone/folder/source-image and CSI FolderId, fix existing detach-debug Jinja typo; verify zone-a clients/yc-csi/image/quota and ACL access before reviewed run (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-nomad-test-elasticsearch-recovery-destination-review.md)
+
 ### automation-services (nginx, Ansible)
 
 - [ ] Yandex test nginx: dynamic upstream refresh for `proxy.service.yandex-test.consul` (or consul-template reload); drain procedure before removing a proxy client (2026-09-11) — [src](companies/youdo/knowledge/log/2026-09-11-automation-services-yandex-test-nginx-stale-nomad-proxy.md)
@@ -92,11 +94,13 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [ ] MSSQL refresh proposal: replace fixed waits/ignored errors with readiness checks for all three VMs, SQL hostname and monitoring; review xp_cmdshell dependency and fragile ping parsing (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
 - [ ] MSSQL automation proposal: migrate plaintext credentials in SQL/Windows group_vars, tester task and inventory client to the established secret store; preserve values only in approved secret locations (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
 
-- [ ] DevOps-889: resolve SSD quota headroom before three-stand recovery (959 GiB free vs 1200 GiB needed); image-quota increase is unnecessary with the original image replacement workflow (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+- [ ] DevOps-889: HDD selected; base fits current quotas, resolve final-three HDD capacity (505/1100 GiB usage/limit; minimum 1705 GiB MSSQL alone or conditional 1825 GiB with ES on same three stands; propose 2000 GiB, confirm ES stand scope), recheck resource state before approved runtime retry (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-yandex-cloud-devops-889-mssql-hdd-disk-selection.md)
 
-- [ ] DevOps-889: minimal seven-stage Ansible destination/inventory edits checked; execute reviewed stages after SSD quota resolution, then review publication (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-889-mssql-recovery-plan.md)
+- [ ] DevOps-889: minimal seven-stage destination/inventory and HDD edits checked; execute each reviewed stage with explicit runtime approval, resolve final HDD quota before step_6, then review publication (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-yandex-cloud-devops-889-mssql-hdd-disk-selection.md)
 
 - [x] DevOps-888: deploy a recovery cluster and CoreDNS after runnernetwork fix; job3217390 successful, nodeReady and refreshplan no changes (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-dev-k8s-e-recovery.md)
+- [ ] DevOps-888: reconcile infra-tf/dev declarations/addresses with terraform/yandex-dev-k8s-a before apply; checked plan deletes cluster, cloud identity, CI identity, Vault reviewer and VSO (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-yandex-cloud-devops-888-vault-integration.md)
+- [ ] DevOps-888: after infra-tf/dev state and platform reconciliation, verify dev-ephemeral-deployer login and registry/RabbitMQ secret sync in a dev-* namespace; Sentry resources integration already works (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-yandex-cloud-devops-888-vault-integration.md)
 - [ ] DevOps-888: verify corporate DNS from a workload and prepare application/data recovery plus infra-tf/dev integration with yc-a-k8s-dev (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-a-cluster-ready.md)
 - [x] DevOps-888: review CI and merge MR !236 for already manually applied Terraform CI identity before another masterapply; kubeconfig exported/protected/tested, update CI integration after approval (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-ci-kubeconfig.md) — done 2026-10-09; MR merged/pipeline140514 converged, current CI kubeconfig delivered; variable update not performed by agent
 - [x] DevOps-888: compare CI1.7.5 and local1.9.4 plans for empty in-place CI Secret diff in job3217580 before diagnosing token change (2026-10-09) — [src](companies/youdo/knowledge/log/2026-10-09-yandex-cloud-devops-888-job-3217580.md) — closed 2026-10-09 after user CI apply and repeat plan no changes; exact cause unproven
@@ -128,6 +132,10 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [ ] CI suites: `InfoMessagesTestSuite` option is broken (XML and class absent); `MindBoxTestSuite` has zero enabled tests — [src](companies/youdo/knowledge/systems/android-farm/ci-suites.md)
 - [ ] M-K0056: monitor Selenium Grid on `4444` in Zabbix; check active-checks timeout to `172.24.0.107:10051` (2026-08-13) — [src](companies/youdo/knowledge/log/2026-08-13-android-farm-selenium-hub-zabbix.md)
 
+### Jenkins recovery (DevOps-890)
+
+- [ ] Restore Jenkins on yc-a-jenkins-test/agent: prepare and mount data disks, supply inventory host_type/root SSH, restore validated October 7 archive before controller start, configure agent secret/controller address and redirect backup DAG source; runtime changes require explicit approvals (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-jenkins-devops-890-recovery-audit.md)
+
 ### web-autotests (Jenkins `Web+API Tests`, Selenium Grid k8s-dev)
 
 - [ ] Wait for QA feedback on web autotests after `scalingType: deployment`; for a fair wall-time comparison with Selenoid run regress part 1 from `master` on `test7` (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
@@ -144,6 +152,9 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### Other systems
 
+- [x] nomad-test / gitlab-ci dynamic_inventory: dnsmasq port 53 proxy restored by the user's temporary playbook on `10.16.28.11-13`; verified 2026-10-10 15:51:31 MSK, both runners resolve through Windows `.8`/`.9` with `NOERROR` and Nomad leader GET succeeds — [src](companies/youdo/knowledge/log/2026-10-10-gitlab-ci-dynamic-inventory-consul-dns.md)
+- [ ] yandex-tf AP-2347: integrate recovery module `recovery_hosts` into Terraform Ansible inventory instead of legacy `nomad_master_ips`/old `10.16.26.x` resources; proposed branch `AP-2347-recovery-ansible-inventory` from `origin/master` explicitly deferred by the user, temporary three-master inventory prepared locally (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-gitlab-ci-dynamic-inventory-consul-dns.md)
+- [ ] automation-services dnsmasq: after a separate code-change request, make the `/etc/resolv.conf` symlink condition tolerate missing files with `resolv_conf_stat.stat.islnk | default(false)`; interrupted runs currently omit `stat.islnk` and fail on rerun (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-gitlab-ci-dynamic-inventory-consul-dns.md)
 - [ ] gitlab-ci Nomad canary rollback: unsafe with concurrent deployments (`nomad job promote` targets the latest one) — [src](companies/youdo/knowledge/systems/gitlab-ci/nomad-canary-rollback.md)
 - [ ] youdo.business dotnet tests: xUnit already capped (`79254cc49`, `maxParallelThreads: 4`); remaining: dedicated runner or lower concurrency for `dotnet-unit-tests`, `section_start` timing sections (checked 2026-09-30) — [src](companies/youdo/knowledge/log/2026-09-03-youdo-business-dotnet-tests-duration.md)
 - [ ] Base images: LibreOffice PPA still via plain `add-apt-repository` (3 images), move to explicit key + `signed-by`; buster archive sources only in `dotnet-core-aspnet/3.1`, missing in other 3.1 images; `3.1-gdilibs`/`3.1-libvips*` still use `apt-key adv` (checked 2026-09-30) — [src](companies/youdo/knowledge/log/2026-06-26-base-images-docker-libreoffice-ppa-gpg-timeout.md), [src](companies/youdo/knowledge/log/2026-06-26-base-images-dotnet-aspnet-3-1-buster-archive.md)
