@@ -1,12 +1,14 @@
 ---
 system: automation-services
 status: verified
-checked: 2026-09-18
+checked: 2026-10-11
 tags: [nginx, balancer-test, yandex-test, dev-routing, consul-dns, nomad-test, mcp]
 ---
 # Yandex test nginx balancers
 
 ## Summary
+
+- Jenkins route verified October 11: `build.youdo.sg` -> `178.154.207.53` -> balancer-test01 -> recovered `10.16.28.8:80`; HTTPS login/API and TLS checks passed. Matching DNS/upstream changes published in [MR !1368](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1368); no merge or deployment followed publication.
 
 - What: public nginx balancers of the Yandex test environment (`balancer-test01` at `10.16.20.35`, plus `balancer_test02`), nginx `1.30.1`, configured by Ansible repo `/home/slnnk/git/automation-services`.
 - Config lives in `inventories/yandex/group_vars/balancers_test` and `roles/nginx/templates/vhost/`; vhosts proxy to `<service>.<platform>.yandex-test.youdo.local`, a CNAME to `proxy.service.yandex-test.consul` (Nomad proxy clients/Traefik).
@@ -16,12 +18,18 @@ tags: [nginx, balancer-test, yandex-test, dev-routing, consul-dns, nomad-test, m
 - Permanent fix is not done: dynamic re-resolve (upstream zone with resolver, or Consul-template reload), plus a short `proxy_connect_timeout`. Recurrence risk remains.
 - MCP vhost (2026-09-18): `mcp.test1.youdo.sg` returned 404 because `Host $host` did not match the Traefik rule. Local source fix uses `nginx_proxy_conf_without_host`, internal backend `Host`, and `X-Forwarded-Host`.
 - MCP rollout is not performed; `balancer_test02` default.conf drift would change the redirect from `public-test.youdo.sg` to `youdo.sg`. Never deploy the earlier inventory diff that removed about 361 lines.
-- Wildcard cert `wildcard.youdo.sg.crt` covers `*.dev.youdo.sg`, valid until 2026-10-08 (renewal risk).
+- Historical September 18 wildcard certificate observation: `*.dev.youdo.sg`, expiry October 8. Superseded for the live `build.youdo.sg` endpoint by October 11 verification (expiry November 26); other endpoints were not rechecked.
 - Read: "Dynamic `*.dev.youdo.sg` routing" for regexes, "Operations: verification after inventory changes" for checks, "Known failure mode: stale Nomad proxy address" for the incident, "MCP test vhost HTTP 404 diagnosis" for the newest work, "Boundaries" for scope.
 
 Living map of the public nginx balancers of the Yandex test environment
 (`balancer-test01` / `balancer_test02`), configured from the `automation-services`
 Ansible repository. Last checked: 2026-09-18.
+
+## Jenkins recovery routing (2026-10-11)
+
+User-approved manual cutover completed on balancer-test01 (10.16.20.35), accessed through root@10.16.28.8 ProxyJump without agent forwarding. Active /etc/nginx/conf.d/build.youdo.sg.conf now proxies to http://10.16.28.8/. Baseline reload was blocked by old Consul DNS forwarders10.16.26.11–13; /etc/dnsmasq.d/common.conf now uses10.16.28.11–13, preserving both other forwarders. dnsmasq restarted; nginx test/reload and independent active-service checks passed. Backups retained at /root/devops-890-routing/20261010T222502Z.
+
+Publicbuild.youdo.sg remains178.154.207.53; https://build.youdo.sg/login returns200 with successful TLS verification. Authenticated public API reports Jenkins2.555.1,11 restored jobs,116 active plugins, empty queue and AutoTest online with5 executors. Existing certificate expires2026-11-26. Matching automation-services changes were published as commit `3ad647f0ff6ed5b8d17e14f42401b0577a5ede21` in [MR !1368](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1368): build vhost upstream and complete balancers_test-only DNS list override. YAML/render/syntax/scoped diff checks and independent review passed. See [cutover evidence](../../log/2026-10-11-jenkins-devops-890-public-route.md). No jobs triggered; publication pipeline140550 skipped as expected. No merge or deployment followed publication.
 
 ## Components
 

@@ -134,13 +134,41 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### Jenkins recovery (DevOps-890)
 
-- [ ] Restore Jenkins on yc-a-jenkins-test/agent: prepare and mount data disks, supply inventory host_type/root SSH, restore validated October 7 archive before controller start, configure agent secret/controller address and redirect backup DAG source; runtime changes require explicit approvals (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-jenkins-devops-890-recovery-audit.md)
+- [ ] Persist the controller root Git config fix in the image under separate approval; runtime removal and branch lookup verified by user screenshot (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-jenkins-devops-890-git-parameter.md)
+
+- [ ] Review and approve proposed Ansible recovery stages/guards, endpoint and secret parameters, DNS/Nginx rollback, Docker/containerd storage and consistent backup verification (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-jenkins-devops-890-recovery-runbook.md)
+
+- [ ] Restore Jenkins on yc-a-jenkins-test/agent: verify representative workflows, restore backup DAG and monitoring; runtime changes require explicit approvals. Stage1 done October11: two-host/root inventory, Vault/registry authorization with VAULT_YANDEX_TEST_TOKEN. Stage2 done: both disks ext4/mounted at /data, UUID fstab entries and systemd mount units verified after approved daemon-reload. Stage3 done October11: backup restored and independently verified (11 jobs,116 plugins); Stage4 done October11: controller apply passed, API auth works,11 jobs/116 active plugins; Stage5 done October11: agent deployed, AutoTest online via WebSocket with5 executors. Stage6 done October11: public build.youdo.sg routes to newcontroller, HTTPS/API verified; localbalancer DNS/upstream persistence prepared. Publication completed October11 under explicit approval: five-file commit3ad647f0ff6ed5b8d17e14f42401b0577a5ede21, [MR !1368](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1368) targetingmaster; pipeline140550 skipped, no merge/deployment. User excluded recoveryinventory, which remains local/untracked; functional workflows/backup/monitoring still open (2026-10-10) — [plan](companies/youdo/knowledge/log/2026-10-10-jenkins-devops-890-recovery-audit.md), [stage 1](companies/youdo/knowledge/log/2026-10-11-jenkins-devops-890-inventory-dependencies.md), [stage 2](companies/youdo/knowledge/log/2026-10-11-jenkins-devops-890-data-disks.md)
 
 ### web-autotests (Jenkins `Web+API Tests`, Selenium Grid k8s-dev)
 
 - [ ] Wait for QA feedback on web autotests after `scalingType: deployment`; for a fair wall-time comparison with Selenoid run regress part 1 from `master` on `test7` (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
 - [ ] Selenium Grid deployment mode: during the next regress runs (only then do chrome pods exist; none on 2026-10-01, no tests running) watch scale-down of busy node pods and browser state leaks across sessions (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
 - [ ] Regress 108 vs 94 min (three/1622 vs Selenoid two/1978): stands currently have problems with SBR (safe deal) and insurance (reported to the user 2026-10-01), likely part of the gap; re-measure after the stands are fixed, and only if a gap remains check Chrome pod CPU throttling in VictoriaMetrics (`container_cpu_cfs_throttled_periods_total` / `container_cpu_cfs_periods_total`, pods `selenium-node-chrome`); image pre-pull is moot in deployment mode (2026-10-01) — [src](companies/youdo/knowledge/log/2026-09-30-web-autotests-selenium-grid-k8s-slow-regress.md)
+
+### Nexus recovery
+
+- [x] Applied approved Maven storage/proxy/group configuration; GET settings verified and five representative upstream POMs fetched through public group with admin auth; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [x] Created approved Maven CI user `maven` and sole consolidated role `nx-maven`, GET-verified exact privileges and CI credential POM200; anonymous remains disabled; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [ ] Decide Maven dependency authentication for Android and autotest-core, whose download blocks have no credentials; autotest-core first `gradle :jar` also lacks Nexus property flags, so cover repository auth and that command together; earlier anonymous Maven-read proposal is outdated and unapproved, current unauthenticated GET401 (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [ ] Resolve Cyberity Maven upstream connection timeout from workstation and Nexus host; proxy configured, artifact availability unverified (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+
+- [x] Fresh Nexus3.96.4 deployed on `10.18.24.233` after explicit approval; apply exit0 and local/external REST/UI HTTP200, separate data storage verified; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [x] Nexus Docker hosted/group repositories, blob stores, DockerToken realm and gitlab CI user initialized after approval excluding Docker Hub proxy; GET-verified configuration, no CI retry; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [x] Nexus internal Docker `/v2/` existing GitLab CI credentials HTTP200 verified; Basic challenge compatible, DockerToken active; no Docker CLI/CI retry claimed; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [ ] Check public Nexus HTTPS availability: `nexus.youdo.com` latest status endpoint404 and cached Maven POM10-second timeout (earlier15-second redirect/read timeout); internal CI endpoint already verified (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [ ] Review cleaner client stale credentials/rate-limit429 separately from working gitlab CI user (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+
+### GitLab recovery
+
+- [x] GitLab registry enabled/reconfigured after explicit approval; user DNS update to `138.16.203.174`, JWT and authenticated `/v2/` HTTP200 verified; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
+- [x] Bootstrap `youdo/base-images/docker:git` and `docker:dind` built/pushed after explicit approval; authenticated manifest/config hashes and container checks pass; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
+- [ ] Base-images recovery follow-up: all54eligible pipelines launched; 42 successful/12 failed, none running;51registry targets verified. Resolve Debian HTTP10.255.0.50 path and failed legacy Dockerfiles; recover external Nomad/Nexus ARM64 parents; retry ASP.NET8 then its LibreOffice child (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-base-images-rebuild.md)
+- [ ] After separate task-branch approval, fix base-images `docker/git/Dockerfile` to keep curl/libcurl versions coherent; task-run temporary `--upgrade curl libcurl` build passed, repository unchanged (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
+- [x] GitLab Silent Mode disabled after explicit user approval; settings PUT returned HTTP200/false, independent GET and database reads confirmed persisted false; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
+- [ ] Review historical webhook 56 HTTP404 and webhook 72 HTTP401; current hook 109 delivery/authentication verified HTTP204 by approved test, legacy cleanup requires explicit permission (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
+- [ ] Inspect/remediate preexisting `SetProjectVulnerabilityCount` background migration 332 after review and repair permission (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
+- [ ] Update affected domain SSH clients for the verified changed host key; Git SSH transport already passed using the trusted IP host-key alias (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
 
 ### Agent Git/MR training
 
@@ -167,6 +195,11 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 ---
 
 ## Personal
+
+### TrustTunnel client
+
+- [x] TrustTunnel corporate endpoint exclusion active with both VPNs connected; Nexus UI GET and default-MSS6000-byte request HTTP200 verified; browser refresh/symptom confirmation belongs to user; done2026-10-11 — [src](personal/knowledge/log/2026-10-11-trusttunnel-client-corporate-vpn-exclusion.md)
+
 
 - [ ] Home network phase 1: TV and Lampa via Media Station X, C64 backup, device list, tunnel speed test (2026-09-26) — [src](personal/knowledge/log/2026-09-26-home-network-initial-plan.md)
 - [ ] Bench tests: podkop fail-open on `ifdown tun0`, FakeIP DNS with AdGuard Home DoT upstream, VPS public IP from inside the tunnel (2026-09-26) — [src](personal/knowledge/log/2026-09-26-home-network-initial-plan.md)
@@ -256,3 +289,8 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 - [x] DevOps-846: MR !82 and youdo.business replica jobs merged, pipeline 139705 OK (done 2026-09-28) — [src](companies/youdo/knowledge/log/2026-09-28-gitlab-ci-devops-846-prod-deploy-lock-rollout.md)
 - [x] DevOps-846: linted all 23 auto-template consumers against the lock, only youdo.business affected (done 2026-09-28) — [src](companies/youdo/knowledge/systems/gitlab-ci/resource-groups.md)
 - [x] Consolidated open items from all notes into this file (done 2026-09-28).
+
+## Corporate network access
+
+- [ ] Diagnose size-dependent packet loss on VPN tun1 toward 10.18.24.233; SSH algorithm-list restriction permits youdo login (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-corporate-network-ssh-10-18-24-233.md)
+- [x] Complete host-specific SSH config for 10.18.24.233: user runs prepared sudo script to exclude SendEnv, then verify plain interactive login (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-corporate-network-ssh-10-18-24-233.md)

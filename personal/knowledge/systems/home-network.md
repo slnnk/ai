@@ -27,7 +27,7 @@ TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segme
 - VPN clients: phone and PC. PC runs `trusttunnel_client` from `~/trusttunnel/` with
   `vpn_mode = "general"`, killswitch on, exclusions `ru`, `xn--p1ai`, `local`, `consul`,
   `corp`, work domains and a few CDN domains; `included_routes = ["0.0.0.0/0"]`, private
-  ranges and three public IPs excluded, MTU 1280, `change_system_dns = false`.
+  ranges and four public IPs excluded, MTU 1280, `change_system_dns = false`.
 - Family uses the network; one policy for all devices, no per-device exceptions; phone
   and PC keep their own TrustTunnel clients. Tunnel failure must be fail-open with a
   Telegram notification. Decided 2026-09-26.
@@ -50,6 +50,15 @@ TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segme
 Planned: router config via UCI driven by Ansible from `/home/slnnk/mygit/ansible`
 (group `home-routers`), server via Ansible + docker compose (group `home-servers`).
 
+## Client routing observations
+
+Verified 2026-10-11 with both VPNs: public Kickstarter, ChatGPT and GitHub destinations
+route through TrustTunnel table `880`. System resolution of `api.openai.com` returns private
+`10.255.0.31`, routed through corporate OpenVPN; its HTTPS root returns 403. Explicit DNS queries confirm corporate resolver `172.30.63.1` supplies that private
+answer; Wi-Fi and `1.1.1.1` return public addresses. Intent of the mapping is unknown. Both Wi-Fi and OpenVPN advertise DNS
+routing domain `~.`; TrustTunnel has `change_system_dns = false`.
+See [diagnostic evidence](../log/2026-10-11-trusttunnel-client-kickstarter-routing.md).
+
 ## Control points
 
 Not yet. Planned: OpenWrt `/etc/config/*`, procd service for the TrustTunnel client,
@@ -71,3 +80,13 @@ Router LAN only, from the user's PC. No remote access yet.
 ## Related log entries
 
 - [2026-09-26 questions and deployment plan](../log/2026-09-26-home-network-initial-plan.md)
+
+## PC TrustTunnel corporate VPN exclusion (2026-10-11)
+
+Verified corporate OpenVPN endpoint `msk-vpn.youdo.sg:1194` UDP resolves45.159.210.228. Before change, it routed through TrustTunnel tun1/table880, nesting the corporate tunnel. User authorized one local route exclusion `45.159.210.228/32` in `[listener.tun].excluded_routes`; parse and exact-only diff assertions passed, mode0600 and private local backup retained. User restarted the client; public corporate VPN endpoint route bypasses TrustTunnel via WiFi as verified. Corporate VPN reconnection and controlled Nexus transport verification subsequently passed; no remote endpoint/firewall changes. See [client log](../log/2026-10-11-trusttunnel-client-corporate-vpn-exclusion.md).
+
+## Final nested-VPN transport verification
+
+After user reconnected corporate VPN, simultaneous route checks show public corporate endpoint45.159.210.228 directly viaWiFi192.168.192.1; Nexus10.18.24.233 via172.30.63.1 devtun1 source172.30.63.6; public1.1.1.1 viaTrustTunnel tun0/table880 source172.16.219.2. Interface names changed with reconnect; roles are identified by routes, not names.
+
+Identical6000-byte-header HTTP test now passes with default MSS: HTTP200,591 bytes,0.06s (previously7s timeout/0 bytes). MSS1100 comparison also HTTP200/0.05s. Nexus UI GET `http://10.18.24.233/` returns HTTP200. Local endpoint exclusion fixes the reproduced transport failure with both VPNs active; no firewall/MSS or remote-network changes were applied. User should refresh the browser and confirm its UI symptom is gone; browser-session behavior itself is not yet independently verified. Nexus repository/realm/CI-user initialization remains separate pending work.

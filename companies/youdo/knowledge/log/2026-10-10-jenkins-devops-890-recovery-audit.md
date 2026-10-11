@@ -1,7 +1,7 @@
 ---
 system: jenkins
 status: verified
-checked: 2026-10-10
+checked: 2026-10-11
 tags: [recovery, ansible, backup]
 ---
 # DevOps-890: Jenkins recovery role and backup audit
@@ -10,12 +10,13 @@ tags: [recovery, ansible, backup]
 
 - Task: restore Jenkins on recovered zone-a controller/agent, validate workflows, then publish final changes.
 - Controller `10.16.28.8`, agent `10.16.28.26`; both RUNNING, verified SSH root.
-- Secondary disks 150/10 GiB are blank/unmounted; Docker and `/data` are absent; unzip is installed.
+- Stage2 completed October11: secondary disks150/10GiB are ext4 at /data with UUID fstab entries; systemd mount units verified. Docker is absent; unzip installed.
 - Validated October 7 archive is 1.53 GB and records Jenkins 2.555.1; host home is `/data/jenkins/data/jenkins`.
 - Archive contains controller config, credentials/encryption files, 11 job configs, 116 plugin archives and AutoTest node configuration.
-- Local approved branch updates controller/agent image pins only; no task commit, push, MR or runtime changes.
-- Remaining runtime gates: disks, inventory metadata, restore-before-start, agent secret/address, routing and backup source.
-- User deferred publication until recovery and functional validation; see the numbered recovery sequence below.
+- Controller/agent recovery and public routing are verified. Five repository changes published as commit `3ad647f0ff6ed5b8d17e14f42401b0577a5ede21` in [MR !1368](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1368); recovery inventory remains local/untracked by explicit task-specific user exclusion.
+- Remaining acceptance: representative functional workflows, backup-source adaptation and monitoring; track open work in `~/ai/TODO.md`.
+- Backup transfer/restoration completed October 11 with matching SHA256 and preserved ownership/modes. Controller is Jenkins 2.555.1; AutoTest is online through WebSocket with five executors; public HTTPS/API checks passed.
+- User superseded the earlier publication deferral, reviewed final scope and explicitly approved commit/push/MR; no merge or deployment was authorized.
 - Read Findings for audit evidence; Recovery plan for ordering, acceptance gates and rollback.
 
 ## Task
@@ -90,6 +91,34 @@ User explicitly deferred commit/push/MR until Jenkins is restored and functional
 
 **Rollback:** retain the October 7 source archive and old infrastructure. If startup changes restored state or fails validation, stop only the new controller and restore from the untouched archive after explicit approval; do not downgrade the restored home. If routing was switched, restore its recorded previous destination when rollback is requested. A blank-disk format has no data rollback; its gate is fresh disk identity/emptiness verification. Backup retention needs consideration before a successful new run because the DAG then removes archives older than seven days.
 
+## Stage 1 completion (2026-10-11)
+
+Stage 1 completed on October 11 after the user's explicit start instruction: two-host inventory, root/Python connectivity, Vault role checks and registry manifest authorization passed with the existing Yandex-specific token. Public route remains on the old controller; TLS is healthy. See [stage 1 evidence](2026-10-11-jenkins-devops-890-inventory-dependencies.md). Publication remains deferred by the user.
+
 ## Portable lesson
 
 none
+
+## Publication preparation (October 11)
+
+User now requests publication and the complete task-related change list, superseding the earlier defer-publication preference. Read-only final diff/index review and independent six-file package review passed; index is empty. Scope: inventories/yandex/jenkins-recovery.ini (new), inventories/yandex/group_vars/jenkins-yandex, inventories/yandex/group_vars/balancers_test, roles/jenkins/tasks/install-jenkins-agent.yml, roles/jenkins/templates/docker-compose-agent.j2 and roles/nginx/templates/vhost/build.youdo.sg.j2. Preexisting Terraform backend switch in inventories/yandex/main.tf and runner changes are excluded.
+
+Proposed source remains approved DevOps-890-update-jenkins-images, targetmaster in sysadmins/automation-services (project216). Commit: restore jenkins on recovered vms. MR title: DevOps-890 Restore Jenkins on recovered VMs. MR body prepared as one Russian paragraph plus task link in /home/slnnk/ai-data/jenkins-recovery/mr-body.txt. GitLab read-only inspect finds no open MR for the source branch; project defaultmaster, squashdefaultoff. CI contains test jobs only: firstbranchpush skips automaticjobs, laternginxchanges canrun molecule-nginx; MR mayofferoptionalmanualmolecule-nomad. Noautomaticruntime deploy.
+
+Prior syntax/YAML/render/scoped-diff checks and all runtime controller/agent/publicHTTPS/API checks passed. Final independent package review reports no material issues. Publication approval summary must be shown before staging/commit/push/MR creation under the supervised workflow. No state-changing Git operation occurred at this checkpoint.
+
+## Publication approval and scope correction (October 11)
+
+User confirmed the proposed publication with one task-specific exclusion: do not include inventories/yandex/jenkins-recovery.ini. Final approved package contains five tracked files (all proposed paths except the recovery inventory). Branch/target, commit message and MR title remain unchanged. MR body corrected before execution to omit the inventory claim. Approval covers staging these five explicit paths, committing, pushing the approved branch and creating/updating its MR; no merge/deployment. Recovery inventory stays local/untracked, unrelated user changes remain excluded. This exception is specific to DevOps-890 and does not change general Git policy.
+
+## Publication result (2026-10-11)
+
+User-approved publication completed on `DevOps-890-update-jenkins-images` targeting `master`. Commit `3ad647f0ff6ed5b8d17e14f42401b0577a5ede21` (`restore jenkins on recovered vms`) contains exactly five approved paths: `inventories/yandex/group_vars/jenkins-yandex`, `inventories/yandex/group_vars/balancers_test`, `roles/jenkins/tasks/install-jenkins-agent.yml`, `roles/jenkins/templates/docker-compose-agent.j2`, and `roles/nginx/templates/vhost/build.youdo.sg.j2`.
+
+Published [MR !1368](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1368), title `DevOps-890 Restore Jenkins on recovered VMs`; source/target/SHA matched read-only API verification. Squash is disabled and source-branch removal is enabled. Pipeline `140550` is skipped, as expected from first-branch-push rules; CI has no automatic deployment. MR description was corrected before publication to omit the excluded inventory.
+
+The user specifically excluded `inventories/yandex/jenkins-recovery.ini`; it remains local/untracked. This task-specific exclusion grants no broader policy change. Staged index is empty; unrelated Terraform backend and runner edits were neither staged nor changed. No merge, deployment or new runtime action followed publication. Functional workflows, backup adaptation and monitoring remain open in `~/ai/TODO.md`.
+
+## Local inventory cleanup (October 11)
+
+User explicitly requested removal of inventories/yandex/jenkins-recovery.ini after its exclusion from publication. Verified it was untracked, deleted the local file and verified absence. No commit/push or runtime change required. Historical recovery commands reference the deleted temporary inventory; recreate an explicit two-host inventory before reusing those commands or local apply helpers. Published commit/MR are unchanged.

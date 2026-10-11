@@ -1,12 +1,12 @@
 ---
 system: youtrack
 status: verified
-checked: 2026-09-01
+checked: 2026-10-11
 tags: [youtrack, api, knowledge-base, articles, access]
 ---
 # YouTrack YouDo: access to the API and the knowledge base
 
-Last checked: 2026-09-01 (Europe/Moscow).
+Last checked: 2026-10-11 (Europe/Moscow).
 
 ## Access
 
@@ -28,3 +28,10 @@ Last checked: 2026-09-01 (Europe/Moscow).
 ## Safe basic check
 
 For reading, request only the necessary fields, for example `id,idReadable,summary,updated`. Before updating, fetch the current `content` so as not to overwrite parallel changes. Do not print the token value to the console and do not copy it into Markdown or scripts.
+
+## Recovery access verification (2026-10-11)
+
+- The user reported YouTrack was restored. Existing `YOUTRACK_TOKEN` returns HTTP200 from `GET /api/users/me`, login `a.solonenko`, ID `25-546`; no tooling-token rotation/loss is established.
+- `GET /api/admin/integrations/vcsHostingProcessors` returns HTTP200 and 14 integrations. Automation-services integration `230-3` is enabled, server `155-1` (`GitLabServer`), Site project `66-0`.
+- GitLab hook-specific credentials may differ from the tooling token. Historical hook 72 HTTP401 therefore does not prove the working API token changed. After explicit approval ("Да, отправить тест #109"), one GitLab hook 109 Push-test POST returned HTTP201. Database delivery log confirms HTTP204 at `2026-10-11T15:45:58.390632Z`, duration `0.052193`; prior entry also HTTP204 at `15:45:43.857373Z`. Hook `recent_failures=0`, `disabled_until=NULL`. Current webhook delivery/authentication works after recovery; issue updates and linkage were not verified end to end. Historical hook 56 HTTP404 and hook 72 HTTP401 remain legacy-cleanup findings.
+- Related evidence: [GitLab recovery audit](../log/2026-10-11-gitlab-restored-server-verification.md).
