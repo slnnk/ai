@@ -1,7 +1,7 @@
 ---
 system: nexus
 status: verified
-checked: 2026-10-11
+checked: 2026-10-12
 tags: [nexus, recovery, ansible]
 ---
 # Nexus server and recovery state
@@ -115,3 +115,17 @@ User clarified that no read-only consumers need a separate Maven read role. Root
 Read-only autotest-core CI inspection confirms `.gitlab-ci.yml` runs `gradle :jar` first without `-PnexusUser`/`-PnexusPassword`; only the second publishing command receives those properties. A future authorized credential-based Maven download change must cover both the dependency repository credentials (same project properties as publishing) and credentials available to the first jar command, or supply appropriate external Gradle properties. Merely adding a credentials block would not make CI work. No repository edits were authorized or made.
 
 Latest public endpoint checks: HTTPS `nexus.youdo.com/service/rest/v1/status` quickly returned404; the exact previously cached Jivo2.6.0 POM URL timed out after10s/HTTP000. Internal authenticated Maven reads returned200 earlier. Public availability remains unresolved; the404 alone does not establish that artifact downloads work or that the service is down.
+
+## Public LB route preflight (2026-10-12; deployment pending)
+
+User approved reuse of automation-services branch `DevOps-890-update-jenkins-images` and the Nexus backend change. Root edited only the shared Nexus vhost template and public-balancer inventory variable to target `10.18.24.233`; these local edits are not yet deployed or published. User independently reloaded nginx. Live public LB `root@172.28.0.141` / `sc-lb-pub01.youdo.corp` / public92.53.80.147 previously logged old upstream10.16.24.23 although current hostname lookup resolves10.18.24.233. After user reload, route to10.18.24.233 still selects public gateway92.53.80.145 viaeth1 with source92.53.80.147; TCP80/8081/3000 and public POM timeout remain unresolved. No route/firewall change was performed.
+
+Read-only VPN inspection at `youdo@10.18.20.3` confirms gre_selectel address10.0.30.2/32, underlay local10.18.20.3, remote5.188.184.67, peer route10.0.30.1; routes for172.28.0/24,172.24/24,172.29/24 and172.31/16 use the tunnel. Older team topology docs identify peer5.188.184.67 as FortiGate ne1260 with LAN172.24.0.1; historical GRE10.0.24 endpoints are not current. They show sc-gateway2(172.28.0.200) reaching FortiGate via172.28.0.4→172.24.0.203→172.24.0.1, and identify its own GRE as KZ-only. No evidence establishes172.28.0.1 as the same FortiGate device. Route next-hop and persistence must follow verified LB private-network topology; blindly routing via sc-gateway2 is not justified.
+
+## Verified private gateway and temporary host-route proposal (2026-10-12)
+
+Root read-only verification on `root@172.28.0.200` / sc-gateway2 shows Nexus10.18.24.233 routed via172.28.0.1 deveth0 with source172.28.0.200. TCP80 connects and REST status GET returns200. Live gateway GRE is `gre_gcp`, local10.0.34.1, peer10.0.34.2, remote34.179.163.161; no Selectel GRE is present there. Repository gateway configuration remains historically different, so it is not an authoritative live-tunnel map.
+
+Local `/home/slnnk/ai-data/nexus-recovery/public-lb-route-plan.json` proposes one temporary host route on public LB172.28.0.141: `10.18.24.233/32 via172.28.0.1 deveth0`. Not applied; persistent configuration remains to be selected after verifying the existing LB network manager and successful reachability. Two approved automation-services backend edits are local only: public-balancer variable targets10.18.24.233 and shared template renders all six proxy destinations with preserved hostname fallback for other groups. Render and `git diff --check` passed. No deployment, commit or publication has occurred.
+
+Daily ai-sync retry for2026-10-12 failed at pull/rebase because KB changes are unstaged; root informed the user. No manual git mutation, stash or commit was used to bypass it.
