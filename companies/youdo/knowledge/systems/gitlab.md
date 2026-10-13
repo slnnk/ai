@@ -1,7 +1,7 @@
 ---
 system: gitlab
 status: verified
-checked: 2026-10-11
+checked: 2026-10-12
 tags: [gitlab, recovery, registry]
 ---
 # GitLab server and recovery state
@@ -9,9 +9,16 @@ tags: [gitlab, recovery, registry]
 ## Summary
 
 - GitLab CE 17.9.8 at `https://gitlab.youdo.sg`, recovered on `138.16.203.174`; root SSH available. Core services, health endpoints, API, repository HTTP reads and main checks pass on 2026-10-11.
-- Registry enabled after explicit user approval on 2026-10-11; DNS is `138.16.203.174`, JWT authentication and authenticated `/v2/` checks pass. Base-images recovery later launched54pipelines:42succeeded,12failed;51completed/seed version/latest targets are independently verified, including Terraform1.7.5. Two tags remain blocked by parents. Missing backed-up artifacts and images are expected by the user. See the batch rebuild section for remaining image blockers.
+- Registry recovered after explicit approval; DNS/JWT/authentication verified. Inspected image recovery complete2026-10-12: base-images56successful tags/3seeds/1excluded placeholder, nofailed/blocked/active entries. Final reconciliation passed69/69registry targets. Nomad, Ansible, AWX, Fastlane and Android Gradle extra-project releases also digest-verified. Last nomad-n-tools1.1/latest release and pulled runtime verified. DevOps-891 closed by the user after the recovery handoff comment was published. See [final recovery result](../log/2026-10-12-gitlab-devops-891-final-nomad-tools.md); earlier batch sections are historical.
 - Silent Mode was disabled with explicit user approval on 2026-10-11; API mutation returned HTTP200/false. Independent GET and database reads confirmed persisted false at approximately 15:36–15:37 UTC. Generic webhook-disabled banners could arise solely from the former Silent Mode.
 - Evidence and detailed limits: [restore verification](../log/2026-10-11-gitlab-restored-server-verification.md). Live follow-ups are in `~/ai/TODO.md`.
+
+## iOS runner DNS reachability
+
+- **Recovered at 21:32 MSK:** user-approved Ethernet DNS `172.28.0.200` applied and verified. Default resolution and HTTPS GitLab HTTP 200 pass; GitLab GET runner 93 confirms `online: true`, last contact `2026-10-12T21:32:15.149+03:00`. No runner restart needed. Earlier bullets below describe incident history.
+- At 21:30 MSK, direct DNS queries from `idcn-10` to `172.28.0.200` succeeded over UDP/TCP and resolved GitLab to `138.16.203.174`; independent public domain resolution also succeeded. Ethernet remains set to `10.18.20.3`; switching to this alternative requires user authorization.
+- Follow-up at 19:46 MSK: user approved changing Ethernet DNS to `10.18.20.3`; `networksetup` and `scutil` confirm it applied. New DNS also timed out, and ordinary HTTPS still failed resolving GitLab. Runner recovery remains unverified.
+- On 2026-10-12 at 19:43–19:44 MSK, `idcn-10` (`192.168.30.144`, runner ID 93) was running but job polling failed on DNS lookup timeout. Its sole Ethernet DNS `10.16.20.3` did not answer UDP/TCP queries; public DNS resolved GitLab and HTTPS to the recovered IP with DNS bypass returned HTTP 200. DNS server outage versus network-path failure remains undetermined; no remote changes performed. See [diagnostic evidence](../log/2026-10-12-ios-ci-runner-offline-dns-unreachable.md).
 
 ## Access and storage
 

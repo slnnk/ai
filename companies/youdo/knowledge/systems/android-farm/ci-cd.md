@@ -113,12 +113,14 @@ android-youdo4 feature/regression/hotfix build
 
 ## fastlane-docker publication image
 
+2026-10-12 recovery verified: Fastlane MR6 merged,0.0.9/latest published with Fastlane2.241.0, Huawei1.1.3 and RuStore1.1.0 using frozen Bundler dependencies and provenance opt-out. Direct/bundled plugin loading passed, no release activation warnings; manifest digests match job3218403. Android Gradle18/latest also recovered and digest-verified. Store upload lanes were not executed during validation. See [final DevOps-891 evidence](../../log/2026-10-12-gitlab-devops-891-fastlane-upgrade-legacy-archive.md).
+
 - GitLab project: `sysadmins/devops-tools/mobile/fastlane-docker`, project ID `503`, default branch `master`.
 - Local clone: `/home/slnnk/git/fastlane-docker`.
 - Registry: `registry.youdo.sg/sysadmins/devops-tools/mobile/fastlane-docker`.
 - Verified registry tags include `0.0.3` through `0.0.9`, development branch tags, and `latest`.
 - Current release tag `0.0.9` corresponds to the repository tag/HEAD that added Google Play publication.
-- Image base and tooling at `0.0.9` source: Ruby `3.4.4-bullseye`, Fastlane `2.227.2`, Huawei plugin `1.0.30`, and RuStore plugin `1.0.6`.
+- Image base and tooling at `0.0.9` source: Ruby `3.4.4-bullseye`, Fastlane `2.241.0`, Huawei plugin `1.1.3`, and RuStore plugin `1.1.0`.
 
 ### fastlane-docker image pipeline
 

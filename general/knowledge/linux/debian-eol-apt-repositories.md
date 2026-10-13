@@ -1,7 +1,7 @@
 ---
 system: linux
 status: verified
-checked: 2026-09-08
+checked: 2026-10-12
 tags: [apt, debian, eol, lts, valid-until, archive.debian.org, Check-Valid-Until, docker, dotnet]
 ---
 # apt fails for a Debian release after its LTS ended: expired Release file, then 404
@@ -73,7 +73,7 @@ RUN sed -i -e 's|deb.debian.org/debian-security|archive.debian.org/debian-securi
  && rm -rf /var/lib/apt/lists/*
 ```
 
-`<codename>-updates` does not exist on the archive; delete that line. Images that use
+Check each `<codename>-updates` suite before removing it: availability varies; Bullseye updates Release returned HTTP 200 on 2026-10-12. Images that use
 `/etc/apt/sources.list.d/debian.sources` (deb822) need the same substitution in that file.
 Verify with a plain `docker build`; the build must complete and the image must contain the
 packages you added.
@@ -89,3 +89,11 @@ packages you added.
   rate-limited and slow for builds.
 - Package versions on the archive are frozen; upgrades (for example to a newer
   `ca-certificates`) are not available through it.
+
+## 2026-10-12: Bullseye security package pool moved
+
+Bullseye LTS ended on 2026-08-31 ([Debian announcement](https://www.debian.org/News/2026/20260831)). Normal security InRelease still returns 200, but individual referenced `.deb` URLs can return 404. Compare an exact failing package path against `https://archive.debian.org/debian-security/`: ucf, curl, dirmngr and libexpat1 Bullseye security artifacts responded there on this date. Archive Bullseye security InRelease is now available, dated 2026-09-12, without Valid-Until. The earlier September archive404 observation is historical. Switching the affected security source to the archive is a candidate recovery for retained legacy images; validate the full package installation. For compatible .NET6 images, explicit Bookworm variants avoid Bullseye package dependencies.
+
+## Build validation and cache
+
+A successful cached Docker build does not verify that the APT repositories still provide their packages. For a repository-recovery change, run a complete build with --no-cache and check actual update/package fetch output before declaring recovery. Reusing the base-image download is acceptable; reusing the APT RUN layer hides the failure. Runtime checks alone also cannot establish current package availability.

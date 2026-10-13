@@ -1,7 +1,7 @@
 ---
 system: rabbitmq
 status: verified
-checked: 2026-10-07
+checked: 2026-10-12
 tags: [rabbitmq, masstransit, test-stands, test5]
 ---
 # test5: validateemailcode slow due to youdo.user.signin exchange auto_delete mismatch
@@ -52,8 +52,6 @@ Resolved 2026-10-07 by the team: the RabbitMQ object in vhost `test5` was delete
 and the publisher redeclared the exchange. Re-probe confirmed `youdo.user.signin` in `test5` is now
 `durable=true, auto_delete=true`, same as test1.
 
-## Open items
+## Follow-up status checked 2026-10-12
 
-- Delete exchange `youdo.user.signin` in vhost `test5` with a management/admin account (needs user
-  approval); check its bindings first and that the bound queues' consumers survive the rebind.
-- Check other exchanges in `test5` for the same mismatch (other "Unable to publish" errors).
+The signin exchange correction was completed and verified on 2026-10-07, as recorded above and in [the central backlog](~/ai/TODO.md). The former deletion instruction is superseded. Checking other exchanges for similar mismatches is an unapproved follow-up proposal; its applicability is tracked in the central backlog.

@@ -1,7 +1,7 @@
 ---
 system: youdo-business
 status: verified
-checked: 2026-10-01
+checked: 2026-10-12
 tags: [nomad, hangfire, graceful-shutdown, DevOps-872]
 ---
 # youdo-business worker: hard kill on stop and Hangfire lock timeout on start
@@ -57,11 +57,9 @@ Assess Greptile review on MR 3818 and the user's hypothesis that bad shutdown ca
   SIGINT -> same; child exit 143 passed through; crash exit 3 -> exit 3 after `sleep 10`.
 - `v2/files/entrypoint.sh` not changed: v2 is unused.
 
-## Open items
-- Done: signal forwarding in `v3/files/dotnet.entrypoint.sh` (master `7fabb47`); applies to images built after the merge.
-- `v2/files/entrypoint.sh` has the same pattern but v2 is not used (per user, 2026-10-01); no fix needed.
-- Shutdown timeouts left at defaults (.NET host 30 s): user decided on 2026-10-01 that 30 s is enough once SIGTERM is delivered.
-- Make recurring-job registration at startup tolerant to lock timeouts.
+## Follow-up status checked 2026-10-12
+
+Signal forwarding was merged as `7fabb47`; v2 is unused and the user accepted the default shutdown timeout on 2026-10-01. The Hangfire startup-lock follow-up was closed without separate action on 2026-10-01; reopen only if lock errors recur. Current status is recorded in [the central backlog](~/ai/TODO.md).
 
 ## Portable lesson
 [Bash entrypoint as PID 1 does not forward SIGTERM](~/ai/general/knowledge/docker/bash-pid1-no-sigterm-forward.md)

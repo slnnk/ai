@@ -1,7 +1,7 @@
 ---
 system: rp
 status: verified
-checked: 2026-09-30
+checked: 2026-10-12
 tags: [rp, mattermost, youtrack]
 ---
 # rp skill moved into ~/ai, data into ~/ai-data
@@ -59,8 +59,9 @@ directory. Its `.git` is broken (not a working clone).
   `До цели спринта`; the user creates and closes YouTrack issues personally, the skill
   only proposes.
 
-## Open items
-- `~/mygit/youdo-ai` can be deleted by the user; everything is copied.
+## Follow-up status checked 2026-10-12
+
+Deleting the obsolete `~/mygit/youdo-ai` copy is an optional proposal, not an authorized deletion. The decision is tracked in [the central backlog](~/ai/TODO.md).
 
 ## Portable lesson
 

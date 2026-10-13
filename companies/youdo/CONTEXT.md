@@ -40,6 +40,12 @@ and diagnostics.
 
 ## Conventions
 
+- Nomad Docker auth (user, 2026-10-12): Nexus credentials belong in the common role configuration for all hosts whose Docker auth file is generated. Do not limit this setting to incident hosts through host_vars. Password must remain an external secret.
+
+- Nexus Docker roles (user, 2026-10-12): reuse `nx-docker` for Docker service accounts; its content permissions include deletion. Do not introduce a separate full-access role without a specific need.
+
+- Nexus library recovery (user, 2026-10-12): retry requested publish jobs first, investigate actual failures; verify published versions through Nexus metadata only, without downloading packages.
+
 - Yandex Cloud naming: new resources in zone a use prefix `yc-a-` (user, 2026-10-09); recovery cluster `yc-a-k8s-dev`. Do not infer other-zone prefixes or rename unrelated existing resources.
 
 - Environment names carry meaning: `prod`/`production` is sensitive, `test` and `dev`

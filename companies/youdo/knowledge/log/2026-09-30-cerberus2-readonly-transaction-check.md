@@ -1,7 +1,7 @@
 ---
 system: cerberus2
 status: verified
-checked: 2026-09-30
+checked: 2026-10-12
 tags: [postgres, selectel, cerberus2, readonly]
 ---
 # Cerberus2: 25006 read-only transaction on user ban insert
@@ -52,9 +52,9 @@ Explain `Npgsql.PostgresException 25006: cannot execute INSERT in a read-only tr
 
 None on the server. Local helper script only in the session scratchpad.
 
-## Open items
+## Follow-up status checked 2026-10-12
 
-- Match Exceptional timestamps of 25006 errors with 2026-09-29 21:07-21:17; if errors continue after that, check the Vault connection string matches `devops/.env` and ask Selectel about read-only events.
+The user stopped further cerberus2 work on 2026-10-01. The earlier proposal to correlate errors and continue DB diagnostics is superseded by that decision; see [the central backlog](~/ai/TODO.md).
 
 ## Portable lesson
 

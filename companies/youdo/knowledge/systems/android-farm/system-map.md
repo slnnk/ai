@@ -1,13 +1,14 @@
 ---
 system: android-farm
 status: verified
-checked: 2026-09-08
+checked: 2026-10-12
 tags: [android, appium, selenium-grid, adb, emulator, zabbix, loki, alloy, ansible, system-map]
 ---
 # YouDo Android: system map
 
 ## Summary
 
+- DNS updated with user approval on 2026-10-12: `M-K0056`/`.30` (`enp1s0`), `M-K0057`/`.31` and `M-K0058`/`.32` (`eno1`) now use `172.28.0.200`. Saved in Netplan with DHCP DNS disabled and applied through resolvectl without network restart. Default GitLab/Loki resolution and GitLab HTTPS HTTP 200 verified on all three; `.local` routing domains retained. See [change and evidence](../../log/2026-10-12-android-farm-dns-172-28-0-200.md).
 - What: map of YouDo Android delivery (build, store publish) and the Kazan office Android/Appium autotest farm (`192.168.30.0/24`); CI/CD detail in `~/ai/current/knowledge/systems/android-farm/ci-cd.md`.
 - Repos under `/home/slnnk/git`: `android-youdo4`, `gradle`, `fastlane-docker`, `youdo-android-testing`, `automation-services` (role `roles/adb_devices`), `android-docker-image`, `android-exporter`, `mstatic-android`.
 - Build: GitLab runner tag `gitlab-runner-android-dind01-runner` (`172.28.0.175`; live `concurrent=6` on 2026-09-16, earlier recorded 3); Google, Huawei, RuStore variants; test APK to Nexus `raw-private` under `android/`.
@@ -19,7 +20,7 @@ tags: [android, appium, selenium-grid, adb, emulator, zabbix, loki, alloy, ansib
 - Where to read: section names below; `Monitoring` includes `Dynamic Android-dig inventory` and `Alloy/Loki delivery incident`.
 - RESOLVED 2026-10-01: farm logs were missing in Loki 2026-09-14..2026-10-01 because the Kazan router `Gate_K` (`192.168.30.1`) DNATed client DNS for `youdo.corp`/`youdo.test`/`youdo.local`/`consul` to decommissioned Moscow srv0 `192.168.60.10`. The DNAT rules and static entries were disabled; the router now answers from upstream `10.16.20.3`, and `M-K0057`/`M-K0058` streams arrive in Loki. See log `2026-10-01-android-farm-kazan-gate-k-dns-forward-to-decommissioned-srv0.md`. SSH addresses: use the inventory (`.31`/`.32`), not `.147`/`.148`.
 
-- Last checked: 2026-09-08 (matches frontmatter; sections carry own dates)
+- Last checked: 2026-10-12 (DNS change; sections carry own dates)
 - Scope: infrastructure-first overview of application delivery, CI/CD, UI autotests, and the office Android/Appium farm.
 - Evidence: local Git worktrees and notes under `~/ai/current/knowledge/log`.
 - Detailed CI/CD map: `~/ai/current/knowledge/systems/android-farm/ci-cd.md`.

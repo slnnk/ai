@@ -8,7 +8,7 @@ tags: [nexus, recovery, ansible]
 
 ## Summary
 
-Fresh Nexus3.96.4 deployed on `10.18.24.233` after explicit user approval, using existing automation-services roles and a preexisting separate `/data` disk. Service, UI and REST status checks pass; Docker hosted/group connectors, blob stores and gitlab CI user now initialized after explicit approval; internal Docker endpoint/CI credential authentication succeeds; public HTTPS read timeout remains a separate limitation. Evidence: [recovery plan and deployment](../log/2026-10-11-nexus-fresh-recovery-plan.md). Live actions are tracked in `~/ai/TODO.md`.
+Fresh Nexus3.96.4 deployed on `10.18.24.233` after explicit approval using existing automation-services roles and separate `/data`. Docker, Maven and NuGet repositories and compatible service identities are restored; public HTTPS reads were verified. NuGet recovery now confirms all 143 required package/version pairs across 52 package IDs through public metadataHTTP200, using historical CI retries and separately approved exact-source fallback uploads. Service restore and exhaustive transitive checks are deferred. Temporary anonymous access remains enabled by user request; disabling it and remaining npm/other recovery work are tracked in `~/ai/TODO.md`. Evidence: [deployment](../log/2026-10-11-nexus-fresh-recovery-plan.md), [NuGet publication recovery](../log/2026-10-12-nexus-next-library-recovery.md).
 
 ## Host, access and storage
 
@@ -129,3 +129,172 @@ Root read-only verification on `root@172.28.0.200` / sc-gateway2 shows Nexus10.1
 Local `/home/slnnk/ai-data/nexus-recovery/public-lb-route-plan.json` proposes one temporary host route on public LB172.28.0.141: `10.18.24.233/32 via172.28.0.1 deveth0`. Not applied; persistent configuration remains to be selected after verifying the existing LB network manager and successful reachability. Two approved automation-services backend edits are local only: public-balancer variable targets10.18.24.233 and shared template renders all six proxy destinations with preserved hostname fallback for other groups. Render and `git diff --check` passed. No deployment, commit or publication has occurred.
 
 Daily ai-sync retry for2026-10-12 failed at pull/rebase because KB changes are unstaged; root informed the user. No manual git mutation, stash or commit was used to bypass it.
+
+## Current public LB route and DHCP delivery (2026-10-12)
+
+Read-only recheck supersedes the earlier missing-route finding: sc-lb-pub01172.28.0.141 routes10.18.24.233 via172.28.0.1 deveth0, with destination10.18.24.0/24 installed. Latest DHCP lease from172.28.0.3 includes this route via RFC3442 option121. eth0 uses DHCP/ifupdown; no local manual persistence found in inspected configuration. Direct Nexus REST status returns200; public unauthenticated cached Maven POM now returns401 rather than timeout, while public status still404. Authenticated public download remains unverified. No remote changes made; earlier temporary /32 proposal is unnecessary for current connectivity.
+
+User corrected the earlier statement:172.24.0.0/24 is current for physical production servers; lb pub uses172.28.0.0/24. Hardware inventory172.24.0.22/.23 is not obsolete. Verified hardware Netplan route via172.24.0.1 is specific to that network and must not be copied to lb pub. No repository route management found for either group. Prefer the existing DHCP route; if local enforcement is requested, propose a separate ifupdown hook using the current private gateway rather than changing cloud-init-generated interfaces or introducing Netplan. [Evidence and proposal](../log/2026-10-12-nexus-public-lb-route-verification.md).
+
+Public nginx Maven routing verified with `nginx -T`: `/etc/nginx/conf.d/nexus.youdo.com.conf` has HTTPS prefix location `/repository/maven` forwarding unchanged URI to `http://msk3-nexus.youdo.corp`; this covers public/releases/snapshots repositories. No location-level nginx authentication or access restriction found. The vhost does not proxy `/service/rest/`, explaining public status404 independently of Maven connectivity.
+
+## Authenticated public Maven verification
+
+Read-only `/home/slnnk/ai-data/nexus-recovery/verify_public_maven.py` exited0. Existing GitLab group34 Maven credentials were used in memory only, with normal HTTPS certificate validation and no redirects followed. Public `https://nexus.youdo.com/repository/maven-public/` returned200 for Jivo2.6.0 POM (8839 bytes,0.14s), Jivo2.6.0 AAR (2187102 bytes,1.11s), and Google AGP8.13.2 POM (11773 bytes,0.10s). Both POMs parsed as XML project documents; AAR ZIP integrity and AndroidManifest.xml verified. Anonymous Jivo POM returns401 as expected. Selected public artifacts verified; full Gradle build/transitive dependencies and Cyberity remain unverified. No credential values printed or persisted.
+
+## Local explicit-backend proposal withdrawn
+
+User explicitly requested reverting the two prepared Nexus backend edits. Restored only `inventories/prod_selectel/group_vars/balancers_public` and `roles/nginx/templates/vhost/nexus.youdo.com.j2` to HEAD after verifying their exact diffs consisted solely of the known Nexus proposal. Scoped `git diff` is empty. Unrelated runner/Terraform local edits remain. No state-changing git commands or remote changes executed. Public nginx continues using `msk3-nexus.youdo.corp`; authenticated public Maven reads already passed with that configuration. Earlier statements that these two edits remain pending are superseded.
+
+## Temporary anonymous access enabled (2026-10-12)
+
+User explicitly requested enabling anonymous to prioritize recovery. Anonymous GET/PUT verification confirms enabled=true, userId=anonymous, realmName=NexusAuthorizingRealm. Existing nx-anonymous role unchanged: wildcard repository read/browse plus search/healthcheck read; no write privileges. Anonymous public Maven reads for Jivo2.6.0 and AGP8.13.2 POM both return200 and valid XML. This supersedes earlier anonymous-disabled/unapproved statements. Disable after recovery and consumer credentials setup; tracked in ~/ai/TODO.md. [Authorization, execution and scope](../log/2026-10-12-nexus-temporary-anonymous-access.md).
+
+## NuGet recovery inspection and plan (2026-10-12)
+
+Live master NuGet.Config in youdo.business and youdo/youdo requires legacy public nuget/nuget-private feeds and username nuget; password present in private source files, values not recorded. Nexus lacks that user and repository names: only three verified-empty defaults exist on default blob store. Public static indexes200 point to group nuget paths currently404. Prepared plan separates nuget-hosted/nuget-cache storage, restores hosted nuget-private + proxy nuget.org-proxy + group nuget, and creates one nx-nuget role/user with existing credentials. Private packages require separate recovery and youdo/youdo also references BaGet. No mutations performed. [Inspection and proposed steps](../log/2026-10-12-nexus-nuget-recovery-plan.md).
+
+## NuGet recovery steps 1-4 completed (2026-10-12)
+
+User approved steps1-4. Created separate nuget-hosted/nuget-cache File stores; replaced three rechecked-empty defaults with hosted nuget-private, NuGet.org V3 proxy nuget.org-proxy, group nuget (private then proxy). GET-verified settings. Created active user nuget with existing matching consumer password and sole nx-nuget role: wildcard NuGet browse/read plus add/edit only nuget-private. No admin/delete.
+
+Public indexes, versions and registration metadata HTTP200; Newtonsoft.Json13.0.3 package2441966 bytes downloaded and ZIP/nuspec verified. Request log confirms nuget principal for authenticated metadata GET. No nginx changes needed for current read endpoints; both existing static aliases resolve via group nuget. API-key publishing not verified or changed. Anonymous remains enabled; private hosted contents and full service restores remain to recover/check. [Execution and evidence](../log/2026-10-12-nexus-nuget-recovery-applied.md).
+
+## NuGet master-wide recovery inventory (2026-10-12)
+
+Scanned157live master snapshots among164unique ~/git repos;62NuGet consumers,3198references,387IDs/1131version expressions.52private/custom library IDs143requested versions absent from nuget.org/current Nexus. CSV lists consumers and source candidates from30-project youdo/Lib catalog plus service-owned library projects; two historical mappings are hypotheses. BaGet timeout and missing committed lock/assets files prevent complete transitive availability claims. Three public version gaps are separate from private restore. No packages restored or repositories modified. [Full list, methodology and limits](../log/2026-10-12-nexus-nuget-master-inventory.md).
+
+## Library publication retry-first recovery (2026-10-12)
+
+User requested publish retries before dependency checks. Coworking1.0.7/1.3.3 retries fail unavailable SDK2.1 image;1.3.4 fails missingRabbitHole. User explicitly approved adding nx-nuget to publisher gitlab (preserved nx-docker), after RabbitHole1.4.2 retry failed403. Repeated RabbitHole1.4.2 publication job3218670 succeeded; public .nupkg78097bytes downloaded and ZIP/nuspec verified. RabbitHole1.4.1 retry3218622 pending completion;1.4.3 retry3218623 fails emptyNuGetVersion, currenttag absent. No repo/tag/CI variable changes performed. [Approvals, jobs and evidence](../log/2026-10-12-nexus-library-publish-retries.md).
+
+## RabbitHole and Coworking restored; fast verification convention (2026-10-12)
+
+RabbitHole1.4.1/1.4.2/1.4.3 and Coworking1.0.7/1.3.3/1.3.4 now present in Nexus. CI restoredRabbitHole1.4.2(job3218670),1.4.3(pipeline140646/job3218762),Coworking1.3.4(job3218902). Explicitly approved local historical-source rebuild/uploads on SDK6 recovered RabbitHole1.4.1 and Coworking1.0.7/1.3.3. Explicitly approved stalled RabbitHole1.4.1 job cancellation. Publication uses Basic credentials and works without NuGetApiKey realm. Publishergitlab now has nx-docker+nx-nuget after explicit approval; dedicatednuget used for manual uploads.
+
+User recovery preference: retry requested library publish jobs first; investigate actual failures rather than pre-audit all dependencies. Post-publication verification should only confirm package/version metadata in Nexus, without downloading the nupkg. Applied after user correction; local artifacts can be validated before explicit upload approval. Original master inventory52IDs143pairs remains evidence; two libraryIDs/sixpairs completed,50IDs137pairs pending. [Approvals, outcomes and provenance](../log/2026-10-12-nexus-library-publish-retries.md).
+
+## npm recovery inventory and plan (2026-10-12)
+
+Read-only npm inspection finds no npm repositories, npm stores or npm service user on the recovered instance. All-client audit covers164local checkouts and identifies legacy group `npm`, hosted publication `npm-private`, public/internal endpoints, and four private library packages from `youdo-core-frontend-tools`. Business origin/master locks require UI0.39.0/eslint2.1.0/prettier0.0.1/cursor-extension0.0.3; Business landings needs UI0.17.5/eslint1.2.5. Extra local Business refs require UI0.30.1/0.34.0. Proposed separation: npm-hosted/npm-cache File stores, npm-private hosted, npmjs-proxy public proxy, npm group. Live GitLab master verifies Business/landings requested versions and four library npmjs metadata404s; producer master is newer (UI0.40.1/cursor1.0.0), so historical source/original tarball recovery is necessary. Existing NPM_TOKEN auth identity still needs verification; no npm writes or publication performed. Details: [npm recovery plan](../log/2026-10-12-nexus-npm-recovery-plan.md).
+
+## npm steps1-3 applied (2026-10-12)
+
+User-approved npm-hosted/npm-cache File stores, npm-private hosted, npmjs-proxy and npm group created; nx-npm/active npm user created, NpmToken enabled alongside existing realms. New token internal whoami200 identifies npm; internal lodash metadata200, no tarball download. Actual publisher uses _authToken; old project496 NPM_TOKEN401 requires replacement. Public npm404 is explained by absent /repository/npm location in live production LB vhost. GitLab/LB writes and libraries/CI retries remain unperformed. [Applied evidence](../log/2026-10-12-nexus-npm-recovery-applied.md).
+
+## npm producer CI credential updated (2026-10-12)
+
+After explicit user approval, project496 youdo-core-frontend-tools NPM_TOKEN was replaced with the verified npm Bearer credential. PUT200 and GET value/unchanged-metadata checks passed. No CI retry or library publication. Public npm nginx location still pending. [Evidence](../log/2026-10-12-nexus-npm-recovery-applied.md).
+
+## SORM Docker runner authentication diagnosis (2026-10-12)
+
+Public Docker manifest for SORM migrations0.0.22 returns200 with current CI gitlab credentials,401 BASIC anonymously. Both Docker repositories have forceBasicAuth=true despite global anonymous enabled. Runner105 on172.28.0.171 config.toml DOCKER_AUTH_CONFIG contains only registry.youdo.sg user technical; no Nexus entry or Docker config.json in inspected root/runner locations. Job3219124 fails before scripts with no basic auth credentials. No new Nexus user required; no runtime changes performed. [Evidence and limits](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+## npm library CI restoration proposal (2026-10-12)
+
+Existing deploy lib jobs mapped to exact source versions: manual2640279 for UI0.17.5/eslint1.2.5; retry2775626 for cursor0.0.3; retry3197313 for UI0.39/eslint2.1/prettier0.0.1. publish job is Storybook S3 and excluded. Selected jobs publish sibling workspace versions; old auth/duplicate ALLOW_ONCE handling needs actual failure review. No retry/play performed. [Concrete proposal](../log/2026-10-12-nexus-npm-library-retry-plan.md).
+
+## Runner Nexus pull credentials applied (2026-10-12)
+
+After explicit user request, added nexus.youdo.com/gitlab to existing DOCKER_AUTH_CONFIG in /etc/gitlab-runner/config.toml on172.28.0.171 (four runner entries) and172.28.0.172 (three). registry.youdo.sg/technical preserved. Both services active and automatically reloaded config; read-back and unchanged second preflight verified, mode0600 preserved. No CI retry. Runtime-only change; configuration-management persistence remains separate. [Approval and checks](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+User subsequently retried the affected SORM job and reported success after adding runner Nexus credentials; retry ID not supplied. [Result](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+## npm approved job execution results (2026-10-12)
+
+All3approved launches completed:2640279 failedENEEDAUTH after successful build; retries3219284/3219285 succeeded and restored UI0.23.3/0.39.0 metadata. Correction: historical deploy lib runs publish from packages/ui, so only UI is published; earlier whole-workspace assumption was incorrect. Other5requested pairs remain absent. No package downloads. [Results and diagnosis](../log/2026-10-12-nexus-npm-library-retry-plan.md).
+
+Nomad follow-up:172.24.0.12/msk3-nomad02 Docker plugin in /etc/nomad.d/client.hcl uses /root/.docker/config.json, containing only registry.youdo.sg user nomad; Nexus entry absent. Read-only inspection only; task-level auth uninspected. [Evidence](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+## NuGet recovery continuation 2026-10-12
+
+Historical publication retries and separately approved exact-source fallback uploads completed for all 143 required NuGet pairs, public metadataHTTP200 verified. All requested Fluent versions, DocXToPdfConverter1.1.0-youdo, Kaiena1.0.8 and Serilog exceptional sink versions are metadata-verified. Existing runner/SDK/BaGet failures are diagnosed only after retry; CQRS archived project retry403 uses a separately approved local fallback. Current evidence and limits: [recovery log](../log/2026-10-12-nexus-next-library-recovery.md). No package download verification or repository/CI configuration edits.
+
+## Dedicated Docker pull user created (2026-10-12)
+
+After explicit user request, active docker now has sole role nx-docker-read (ID/name), four direct browse/read privileges for docker group and docker-hosted, no write rights. Password location current/.env NEXUS_DOCKER_PASSWORD. GET verification and public authenticated /v2/ plus SORM service0.0.22 manifest HEAD200 passed. Existing gitlab/nx-docker unchanged; no client config/job changes. [Authorization and checks](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+## Current Docker role after user correction (2026-10-12)
+
+User docker now has sole nx-docker, superseding earlier read-only assignment. Existing nx-docker has eight direct privileges: docker group browse/read/delete and docker-hosted browse/read/add/edit/delete. gitlab retains nx-nuget+nx-docker and also gains Docker deletion rights. nx-docker-full created during the earlier approach was unused and removed; nx-docker-read remains unused. Exact GET configuration and unchanged-password manifest HEAD200 verified. User preference is to modify/reuse nx-docker rather than create a separate full-access role. [Correction and checks](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+## Nomad172.24.0.12 Nexus credentials applied (2026-10-12)
+
+User-authorized change added nexus.youdo.com/docker to /root/.docker/config.json on172.24.0.12/msk3-nomad02. Existing registry.youdo.sg/nomad and mode0640 preserved; Docker plugin already references that file. Node-side authenticated SORM service0.0.22 manifest HEAD200 with saved credentials verified. No service/allocation/job restart, image pull or other-node changes. Runtime-only; configuration-management persistence separate. [Approval and verification](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+After explicit user request, the same Nexus Docker auth applied to172.24.0.11/msk3-nomad01 and172.24.0.13/msk3-nomad03. All requested clients11/12/13 use nexus.youdo.com/docker in /root/.docker/config.json, preserve registry.youdo.sg/nomad and mode0640; saved-credential node-side service0.0.22 manifest HEAD200 verified on each. Runtime-only, no restarts. [Checks](../log/2026-10-12-nexus-sorm-runner-image-auth.md).
+
+## All requested npm library versions published (2026-10-12)
+
+CI UI17.5/ESLint2.1/Prettier0.0.1 and local ESLint1.2.5/cursor0.0.3 publications completed; UI39 already restored. Hosted metadata confirms all6pairs. Four pairs differ from old lock integrity; ESLint2.1/Prettier match. UI latest is17.5; tag API and npmCLI400. Exact-byte39republish with temporary ALLOW policy prepared but requires separate approval, not executed. Public npmLB route still pending. [Publication evidence and limitations](../log/2026-10-12-nexus-npm-library-restoration.md).
+
+## npm UI latest restored (2026-10-12)
+
+After explicit approval, temporary npm-private ALLOW and identical-byte UI0.39 republish restored latest0.39.0. ALLOW_ONCE returned and GET-verified; UI39integrity unchanged and all prior UI versions preserved. No other repository policy change. [Evidence](../log/2026-10-12-nexus-npm-library-restoration.md).
+
+Final NuGet recovery cleanup: all143/143required pairs were independently metadata-verified (HTTP200), central publication backlog closed, and26 redundant own retries canceled after explicit approval; fresh job GETs confirm26canceled. Service restore/transitive checks remain deferred; Mailer prerelease Contract>=1.9.3 resolves1.9.4. See the [recovery log](../log/2026-10-12-nexus-next-library-recovery.md).
+
+## Local Ansible persistence prepared (2026-10-12)
+
+Approved local automation-services changes add optional Nexus entry plus nonempty secret guard/no_log and host_vars for Nomad11/12/13, excluding14. Password env lookup NEXUS_DOCKER_PASSWORD requires controller export; no value in git. Inventory/render/guard/syntax/scoped whitespace and read-only review passed; Molecule unavailable locally. No commit/push/apply. Source branch/localHEAD absent on current GitLab; old MR1368 now a different MR and fetch blocked by changed SSH key. Future publication requires source/base re-evaluation. [Design, approval, checks and limitation](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+## Ansible publication and scope correction (2026-10-12)
+
+Initial three-client change published as2c251767 onDevOps-890-nexus-docker-auth, [MR1371](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1371), pipeline140662skipped. User subsequently requested common Docker auth for all consumers of Nomad role. Local correction moves Nexus identity/envpassword into role defaults, removes three host_vars and aligns guard with config-writing condition. Target diff nowthree role files; render/guard/actual skipped-role/syntax/review checks passed. Corrected commit/push/MR metadata pending approval; subsequentpush will run molecule-nomad. Runtime clients11/12/13 unchanged; no others deployed. [Training and validation](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+
+## Business autotest Maven dependency cycle (2026-10-12)
+
+Project480 `youdo-business-tests` build3219500 and verify-modules3219502 fail resolving TKB/Sber snapshots. TKB project536 build3219485 and Sber project578 build3219490 require the missing main suite snapshot, forming a circular bootstrap dependency. `verify-modules` compiles/builds API/UI modules with `-x test`; it neither runs tests nor publishes libraries. Main-suite `publish-maven` is master-only, and master retains the cycle. Diagnosis used GET requests only; no retries or edits. [Evidence](../log/2026-10-12-nexus-youdo-business-tests-maven-recovery-diagnosis.md).
+
+## Common Nomad auth correction published (2026-10-12)
+
+User approved corrective publication. Commit5c623f52 onDevOps-890-nexus-docker-auth published in [MR1371](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1371), title updated for Nomad hosts. Final MR has only three role files; Nexus config now common to all consumers writing Docker auth, envpassword required. Push pipeline140665/molecule-nomad3219595 running at initialcheck; MRpipeline140666skipped/manualtest. No merge/deploy. [Approvals/checks](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+Final CI result for common Nomad auth correction: push pipeline140665/job3219595 failed before tests because registry.youdo.sg/sysadmins/ansible-molecule-toolset:latest manifest missing in restored registry. Local checks pass; Molecule unexecuted, image recovery remains separate. [Failure evidence](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+Image recovery investigation confirms project437 build3219476 fails at archived Debian Buster APT Release404. Approved correction redirects APT sources in both Dockerfile stages and removes redundant forced Galaxy installation, preserving original packages and versions. Local build passed;81f3a8e published in [MR1](https://gitlab.youdo.sg/sysadmins/ansible-molecule-toolset/-/merge_requests/1). [Master pipeline140669](https://gitlab.youdo.sg/sysadmins/ansible-molecule-toolset/-/pipelines/140669) on aad593fd succeeded with build3219854/latest3219855, confirming master/latest publication. Requested DevOps-891 comment74-124638 update GET-verified. Automation-services Molecule retry remains pending. [Approvals and validation](../log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md).
+
+Verified GitLab dependency history dates the TKB cycle to2024-09-30 (main-suite MR!193) and Sber cycle to2026-02-12 (MR!238); both dependency directions include `implementation` and `testImplementation`. These predate recovery/DevOps-832. See the diagnosis log above for exact commits; cached artifacts masking bootstrap failure remains an inference.
+
+Local bootstrap preparation now passed:11 common Java sources from main-suite0da09367 produce13 class files; TKB71ead24 and Sbercaab397 main-only `:jar` validations passed using the isolated bootstrap dependency. No Nexus upload or CI retry performed; external publication approval remains pending. The partial snapshot is recovery-only. See the diagnosis log for checksum, provenance and reviewed command.
+
+## CI-discovered NuGet requirements after master inventory
+
+Job3219724 (youdo.business MR3843, sourceSHAa14de776a544ee3b833d5a9f37f22e2d7daee9d0) fails NU1102 on YouDo.ServiceCore.Logging1.0.16 and YouDo.ServiceCore.Metrics1.0.16. Fresh Nexus version metadata HTTP200 confirms both absent (nearest1.0.15). Neither version was in the restored143 direct master inventory pairs; pinned business master referenced1.0.14. The user subsequently published both extra1.0.16 versions from CI; fresh public metadataHTTP200 confirms both present. Publication backlog closed; the user subsequently confirmed the business build succeeded, so its follow-up verification backlog is also closed. No agent publication or retry performed. [Evidence](../log/2026-10-12-nexus-business-job-3219724-nuget.md).
+
+Bootstrap publication was explicitly approved and succeeded (Gradle8s). GET metadata through hosted/group confirms main-suite snapshot1.0.0-20261012.151934-1; incomplete bootstrap is live, full replacement pending. TKB remote6ae621a has the same tree as validated71ead24. No TKB/Sber CI retry has been authorized or performed; approval is separate. Earlier pending-bootstrap-publication statements are superseded.
+
+First TKB/Sber publications were separately approved and succeeded (3219856/3219857); hosted/public metadata confirms TKB1.0.0-20261012.152716-1 and Sber1.0-20261012.152806-1. Separately conditionally approved full main-suite publication is pending in3219858. Bootstrap stays live until that succeeds; recovery TODO remains open. Additional publications/builds still need approval.
+
+Full main-suite publication3219858 succeeded; hosted/public metadata confirms1.0.0-20261012.153418-2, replacing the incomplete bootstrap as latest. Separately approved second TKB/Sber publications3219859/3219860 and builds3219861/3219862 are running. Final business build/publication are conditionally approved but not performed. Overall verification remains open; this is one bounded final pass.
+
+## Business/TKB/Sber Maven recovery completed (2026-10-12)
+
+All three master pipelines137380/139740/133551 are green; final publication/build jobs and explicitly approved latest updates succeeded. Current full snapshots: business1.0.0-20261012.154307-3, TKB1.0.0-20261012.153739-2, Sber1.0-20261012.153623-2. Hosted/group metadata agrees; registry latest digests equal fresh pipeline tags master-2686/master-98/master-18. Read-only final verification passed without package/image downloads. Source cycles remain; no deployment or tests run. Earlier pending statuses above are superseded. [Evidence](../log/2026-10-12-nexus-youdo-business-tests-maven-recovery-diagnosis.md).
+
+User rebuilt the missing Molecule toolset image; latest tag metadata HTTP200/digest verified. Job3219595 remains failed until separately authorized retry. [Verification](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+Approved retry3219868 successfully pulled restored toolset but failed before Molecule: client Docker API1.39 below daemon minimum1.40. Toolset uses docker.io from Debian Buster; CI uses floating docker:dind. Image missing block resolved; compatibility fix remains separate. [Retry result](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+## Raw mobile repository recovery prepared (2026-10-12)
+
+Live Nexus lacks raw/raw-private, raw-hosted store and raw identity. Four live GitLab projects79/65/69/154 use matching NEXUS_CREDS username raw. Android publishes to raw-private and Appium reads via raw; iOS fixed ZIP/version paths require overwrite and iOS Appium currently uses an anonymous internal raw-private URL. Prepared OpenAPI-validated File blob raw-hosted, raw-private hosted ALLOW, raw group over raw-private, nx-raw read/browse+hosted add/edit and raw user reusing credentials. Existing public nginx routes need no change. Read-only dry run passed; external creates await approval. Application artifacts not restored. [Plan, checks and scope](../log/2026-10-12-nexus-raw-recovery-plan.md).
+
+## Raw mobile configuration restored (2026-10-12)
+
+After explicit approval all five creates completed: File blob raw-hosted, raw-private hosted with ALLOW and ATTACHMENT, raw group with raw-private member, nx-raw role (read/browse all raw, add/edit raw-private), active raw user with the existing matching four-project credential. GET settings and raw authentication verified (asset list200, invalid password401). Missing-object404 verified at internal/public/iOS Appium hosts with authenticated and anonymous requests. Actual APK/ZIP downloads remain unverified because repositories are empty; no CI or publication triggered. Existing nginx and anonymous policy preserved. [Approval, execution corrections and verification](../log/2026-10-12-nexus-raw-recovery-plan.md).
+
+## Molecule compatibility fix prepared in same MR
+
+User requested minimal DinD pin in MR1371. Local .gitlab-ci.yml now pins docker:28.5.2-dind for allthree Moleculejobs; official API range1.24-1.51 covers client1.39, publictag verified, CI syntaxvalid. Commit/push/MRmetadata approval pending. New manualjob with compiledupdatedconfig needed afterward; old retry retains floatingservice. [Checks and scope](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+## Recovery status communicated (2026-10-12)
+
+User-requested DevOps-890 comment74-124640 published and exact text GET-verified. Fresh inventory19repos/10File stores/8active users, completed work and explicit limitations included. [Publication record](../log/2026-10-12-nexus-recovery-status-comment.md).
+
+## DinD pin publication completed (2026-10-12)
+
+Approved commitf4018c2b pins docker:28.5.2-dind for allthree Moleculejobs in MR1371, title updated to cover common Nomad Nexus auth and DinD. Final MRfourfiles verified. New pipelines140672/140673skipped by rules, molecule-nomad manualjobs3219872/3219873; full validation pending separate manualstart authorization. No merge/deploy. [Publication](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+User declined manualMoleculejob3219872 start after DinD pin publication; it was not played. Latest common-auth/DinD MR1371 remains published with static validation only, fullMolecule not run. [Decision](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).

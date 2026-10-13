@@ -118,6 +118,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### ios-ci
 
+- [x] Restore DNS reachability for `idcn-10`: user-approved Ethernet DNS `172.28.0.200` applied; default GitLab resolution/HTTPS pass, runner 93 online confirmed by GitLab GET at 21:32 MSK (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-ios-ci-runner-offline-dns-unreachable.md)
 - [ ] YouDoApp fastlane (DevOps-880): move `build_release` `testflight` from Apple-ID session to App Store Connect API key; key setup per https://developer.apple.com/documentation/appstoreconnectapi/creating-api-keys-for-app-store-connect-api (no `app_store_connect_api_key` in `develop` Fastfile; fastlane `2.240.0` pinned in `Gemfile` and installed on `idcn-10` by the user; checked 2026-10-05; 2026-10-06: `ASC_KEY_ID`/`ASC_ISSUER_ID`/`ASC_KEY_CONTENT` (base64 .p8, masked, not protected — no protected tags) added in GitLab; branch `IOS-5054`: `testflight` uses `app_store_connect_api_key`, all three `sigh download_all` CI calls use `--api_key_path`; 2026-10-07: MR !3273 merged (`bf7d07f089`), `Build beta ad-hoc` and `Build development` pass with API key; remaining: the first release job (`testflight` with API key), then drop `APPLE_DEVELOPER_USER`/`FASTLANE_SESSION` if unused) (2026-09-14) — [src](companies/youdo/knowledge/log/2026-09-14-ios-ci-fastlane-spaceauth-service-key.md)
 
 ### android-farm
@@ -148,22 +149,68 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### Nexus recovery
 
+- [ ] Configure regular Nexus backups (database, configuration and blob stores) and verify restoration (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-recovery-status-comment.md)
+
+- [ ] Republish required mobile APK/ZIP into restored raw-private through approved CI jobs; verify Android/iOS Appium downloads (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-raw-recovery-plan.md)
+
+- [x] Restore raw/raw-private blob/repositories/role/raw identity; configuration/auth verified, done2026-10-12 (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-raw-recovery-plan.md)
+
+- [ ] Review/merge MR1371 common Nomad Nexus Docker auth and DinD28.5.2; user declined manual CI, controller must provide NEXUS_DOCKER_PASSWORD (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-automation-services-nomad-docker-auth.md)
+
+- [x] Recover circular Maven bootstrap dependencies between youdo-business-tests and TKB/Sber test snapshots; full snapshots, builds and approved latest tags verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-youdo-business-tests-maven-recovery-diagnosis.md)
+
+- [x] Restored UI latest0.39.0 after explicit approval: identical-byte republish, integrity unchanged and ALLOW_ONCE restored/verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-npm-library-restoration.md)
+
+- [x] Publish user scope correction to common Nomad Nexus Docker auth in MR1371 after approval;5c623f52 published, role defaults common, three host_vars removed, static checks/review pass (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-sorm-runner-image-auth.md)
+
+- [x] Configure Nexus docker account on requested Nomad clients172.24.0.11/.12/.13; saved config and node-side service manifest200 verified on all, no restart (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-sorm-runner-image-auth.md)
+
+- [ ] Persist approved runtime Nexus DOCKER_AUTH_CONFIG entries for171/172 in configuration management after separate repository approval (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-sorm-runner-image-auth.md)
+
+- [x] Add Nexus image-pull auth to all runner entries on172.28.0.171/.172; files and automatic reload verified, no CI retry (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-sorm-runner-image-auth.md)
+
+- [x] Nexus npm steps1-3: separate stores, npm-private/npmjs-proxy/npm group, nx-npm/npm user and NpmToken applied; internal principal/metadata verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-npm-recovery-applied.md)
+- [x] Replaced project496 NPM_TOKEN after explicit approval; GET verified exact value and preserved metadata; no CI retry; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-npm-recovery-applied.md)
+- [ ] Add public Nexus npm nginx location after branch/remote approval; current LB lacks /repository/npm and returns404 (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-npm-recovery-applied.md)
+- [x] Published all6requested private npm pairs; CI3219467/3219468/3213529 and local ESLint1.2.5/cursor0.0.3 metadata verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-npm-library-restoration.md)
+- [ ] Review npm consumer lock integrity: UI0.17.5/0.39.0, ESLint1.2.5 and cursor0.0.3 metadata differs from existing locks; ESLint2.1/Prettier match, no full install compatibility claimed (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-npm-library-restoration.md)
+
+- [x] Restore RabbitHole1.4.1/1.4.2/1.4.3 and Coworking1.0.7/1.3.3/1.3.4; CI/manual historical rebuild publications approved and version presence verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-library-publish-retries.md)
+
+- [x] NuGet recovery steps1-4: separate stores, legacy endpoints, nuget user/nx-nuget role applied and GET-verified; public package/metadata reads200 and authenticated principal verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-nuget-recovery-applied.md)
+- [x] Restore all143required private/custom NuGet version pairs across52package IDs; final public metadataHTTP200 verified after historical retries and separately approved fallback uploads; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-next-library-recovery.md)
+- [x] Restore YouDo.ServiceCore.Logging1.0.16 and YouDo.ServiceCore.Metrics1.0.16: user published from CI, both public Nexus metadata HTTP200 verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-business-job-3219724-nuget.md)
+- [x] Verify youdo.business MR3843 build after Logging/Metrics1.0.16 publication: user confirmed success; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-business-job-3219724-nuget.md)
+- [ ] Check representative service NuGet restore and transitive/version gaps after publication recovery; deferred by user to prioritize restoration. Mailer prerelease keeps Contract>=1.9.3 and currently resolves1.9.4 (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-next-library-recovery.md)
+
+- [ ] Disable temporary Nexus anonymous access after recovery and configuring credentials for Android/autotest-core; current nx-anonymous permits read/browse of all repositories, including hosted/private content (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-temporary-anonymous-access.md)
+
 - [x] Applied approved Maven storage/proxy/group configuration; GET settings verified and five representative upstream POMs fetched through public group with admin auth; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
 - [x] Created approved Maven CI user `maven` and sole consolidated role `nx-maven`, GET-verified exact privileges and CI credential POM200; anonymous remains disabled; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
-- [ ] Decide Maven dependency authentication for Android and autotest-core, whose download blocks have no credentials; autotest-core first `gradle :jar` also lacks Nexus property flags, so cover repository auth and that command together; earlier anonymous Maven-read proposal is outdated and unapproved, current unauthenticated GET401 (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [ ] Configure Maven credentials for Android and autotest-core before disabling temporary anonymous access; dependency blocks lack credentials and autotest-core first `gradle :jar` lacks Nexus property flags, so cover both repository auth and the first command. Anonymous temporarily enabled by user request; public POM200 verified (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-temporary-anonymous-access.md)
 - [ ] Resolve Cyberity Maven upstream connection timeout from workstation and Nexus host; proxy configured, artifact availability unverified (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
 
 - [x] Fresh Nexus3.96.4 deployed on `10.18.24.233` after explicit approval; apply exit0 and local/external REST/UI HTTP200, separate data storage verified; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
 - [x] Nexus Docker hosted/group repositories, blob stores, DockerToken realm and gitlab CI user initialized after approval excluding Docker Hub proxy; GET-verified configuration, no CI retry; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
 - [x] Nexus internal Docker `/v2/` existing GitLab CI credentials HTTP200 verified; Basic challenge compatible, DockerToken active; no Docker CLI/CI retry claimed; done2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
-- [ ] Check public Nexus HTTPS availability: `nexus.youdo.com` latest status endpoint404 and cached Maven POM10-second timeout (earlier15-second redirect/read timeout); internal CI endpoint already verified (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
+- [x] Public Nexus Maven authenticated reads verified: Jivo2.6.0 POM/AAR and AGP8.13.2 POM HTTP200, XML/ZIP validated; anonymous401 expected; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-public-lb-route-verification.md)
+- [x] Verify public Nexus Docker access through nexus.youdo.com: CI credentials /v2/ and SORM migrations0.0.22 manifest HEAD200, anonymous401 due forceBasicAuth (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-public-lb-route-verification.md)
 - [ ] Review cleaner client stale credentials/rate-limit429 separately from working gitlab CI user (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-nexus-fresh-recovery-plan.md)
 
 ### GitLab recovery
 
+- [x] Manual Molecule job3219872 start declined by user after f4018c2b DinD28.5.2 publication in MR1371; not run, no CI-success claim (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-automation-services-nomad-docker-auth.md)
+
+- [x] Publish reviewed ansible-molecule-toolset Dockerfile recovery after approval;81f3a8e/[MR1](https://gitlab.youdo.sg/sysadmins/ansible-molecule-toolset/-/merge_requests/1) published, remote SHA/MR verified, local build passed (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md)
+- [x] Restore ansible-molecule-toolset master/latest through master release; user-supplied pipeline140669/jobs3219854/3219855 GET-verified successful, existing DevOps-891 comment updated as requested (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md)
+- [ ] Retry automation-services molecule-nomad after authorization; previous job3219595 failed before tests because image was missing, toolset master/latest now published (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md)
+
 - [x] GitLab registry enabled/reconfigured after explicit approval; user DNS update to `138.16.203.174`, JWT and authenticated `/v2/` HTTP200 verified; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
 - [x] Bootstrap `youdo/base-images/docker:git` and `docker:dind` built/pushed after explicit approval; authenticated manifest/config hashes and container checks pass; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
-- [ ] Base-images recovery follow-up: all54eligible pipelines launched; 42 successful/12 failed, none running;51registry targets verified. Resolve Debian HTTP10.255.0.50 path and failed legacy Dockerfiles; recover external Nomad/Nexus ARM64 parents; retry ASP.NET8 then its LibreOffice child (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-base-images-rebuild.md)
+- [x] DevOps-891 inspected image recovery complete: final nomad-n-tools pipeline140629/job3218418 succeeded;1.1/latest digests match and pulled-image runtime passed. Task closed by user2026-10-12; handoff comment published. Final registry reconciliation69/69; inventory56success/3seeds/1excluded placeholder, noneactive/failed/blocked (done2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-devops-891-final-nomad-tools.md)
+- [x] DevOps-891 Fastlane image: MR6 merged, Fastlane2.241.0/Huawei1.1.3/RuStore1.1.0/frozen dependencies and manifest publication fix; version0.0.9/latest release digests and absence of plugin activation errors verified (done2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-devops-891-fastlane-upgrade-legacy-archive.md)
+- [x] Fastlane Ruby3.4 bundled startup: latestFastlane declares abbrev, Faraday2 aligns RuStore1.1.0; direct/bundled startup and explicit plugin loading passed without network (done2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-devops-891-fastlane-upgrade-legacy-archive.md)
+- [x] DevOps-891 Nomad/AWX release: MRs merged, Nomad master/latest, AWX24.6.1 and ansible-playbook master/latest successful; authenticated digests match traces (done2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-devops-891-official-hashicorp-releases.md)
 - [ ] After separate task-branch approval, fix base-images `docker/git/Dockerfile` to keep curl/libcurl versions coherent; task-run temporary `--upgrade curl libcurl` build passed, repository unchanged (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
 - [x] GitLab Silent Mode disabled after explicit user approval; settings PUT returned HTTP200/false, independent GET and database reads confirmed persisted false; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
 - [ ] Review historical webhook 56 HTTP404 and webhook 72 HTTP401; current hook 109 delivery/authentication verified HTTP204 by approved test, legacy cleanup requires explicit permission (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
@@ -179,6 +226,9 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [x] Infrastructure and production launch completed; pipelines 140457/140458 successful. User closed DevOps scope on 2026-10-09; functional verification belongs to developers. Additional inferred operational checks and shared-template improvements were not requested and are not completion blockers — [src](companies/youdo/knowledge/log/2026-10-09-youdo-chat-agent-prod-deploy.md)
 
 ### Other systems
+
+- [ ] Decide whether to remove the obsolete local `~/mygit/youdo-ai` copy; optional proposal only, no deletion authorized (2026-10-12) — [src](companies/youdo/knowledge/log/2026-09-30-rp-rp-skill-consolidation.md)
+- [ ] Decide whether a broader read-only check of other test5 RabbitMQ exchanges is still needed after the signin fix; optional proposal (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-07-rabbitmq-test5-signin-exchange-auto-delete-mismatch.md)
 
 - [x] nomad-test / gitlab-ci dynamic_inventory: dnsmasq port 53 proxy restored by the user's temporary playbook on `10.16.28.11-13`; verified 2026-10-10 15:51:31 MSK, both runners resolve through Windows `.8`/`.9` with `NOERROR` and Nomad leader GET succeeds — [src](companies/youdo/knowledge/log/2026-10-10-gitlab-ci-dynamic-inventory-consul-dns.md)
 - [ ] yandex-tf AP-2347: integrate recovery module `recovery_hosts` into Terraform Ansible inventory instead of legacy `nomad_master_ips`/old `10.16.26.x` resources; proposed branch `AP-2347-recovery-ansible-inventory` from `origin/master` explicitly deferred by the user, temporary three-master inventory prepared locally (2026-10-10) — [src](companies/youdo/knowledge/log/2026-10-10-gitlab-ci-dynamic-inventory-consul-dns.md)
@@ -210,10 +260,9 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 ## Knowledge base
 
 - [ ] Monthly staleness review 2026-11: first review; offer on the first agent session in November, not necessarily November 1; refresh the due-note count with `general/scripts/build_index.py --stale 30`; wait for user agreement (rescheduled by user 2026-10-09) — [src](personal/knowledge/log/2026-10-09-knowledge-base-monthly-review-first-session.md)
-- [ ] due 2026-10-12: Observe agent behaviour for two weeks (from 2026-09-28): do daily sync commits have a non-empty
-      "Work recorded by agents" section when "Files" is non-empty? Do agents add new open
-      items here instead of only in notes? If not, tighten AGENTS.md or move the rule into
-      a skill. (proposed 2026-09-23, extended 2026-09-28)
+- [ ] Decide whether to enforce a final note-to-TODO reconciliation check: the two-week audit found stale note lists and two untracked proposals (2026-10-12) — [src](personal/knowledge/log/2026-10-12-knowledge-base-agent-behaviour-two-week-review.md)
+- [ ] Decide whether to shorten sync work summaries and exclude generated `__pycache__` files; keep audit details in task logs (2026-10-12) — [src](personal/knowledge/log/2026-10-12-knowledge-base-agent-behaviour-two-week-review.md)
+- [ ] Fix `ai-sync.sh --dry-run` semantics in a separate task: existing code rebuilds indexes and changes the git index despite promising no changes; defect identified by inspection (2026-10-12) — [src](personal/knowledge/log/2026-10-12-knowledge-base-agent-behaviour-two-week-review.md)
 
 ### Token cost optimization (proposed 2026-09-23)
 
@@ -224,6 +273,8 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 ---
 
 ## Done
+
+- [x] Two-week agent behaviour review for 2026-09-28 through 2026-10-11: all 11 sync commits have substantive work records; stale note follow-ups reconciled, two optional proposals moved to the central backlog; done 2026-10-12 — [src](personal/knowledge/log/2026-10-12-knowledge-base-agent-behaviour-two-week-review.md)
 
 - [x] Elasticsearch msk3-elastic-cls02: analyze heap dump, heap/GC alerts, upgrade planning — closed without action, done 2026-10-09: no longer relevant by user decision — [src](companies/youdo/knowledge/log/2026-07-31-elasticsearch-msk3-elastic-cls02-restart.md)
 - [x] sc-mta-01 postfix: mass-mailing bursts and SMTP egress/NAT limits — closed without action, done 2026-10-09: no longer relevant by user decision — [src](companies/youdo/knowledge/systems/mail/sc-mta-01-postfix.md)
