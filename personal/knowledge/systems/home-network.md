@@ -1,7 +1,7 @@
 ---
 system: home-network
 status: hypothesis
-checked: 2026-09-26
+checked: 2026-10-13
 tags: [home, router, openwrt, trusttunnel]
 ---
 # Home network
@@ -90,3 +90,7 @@ Verified corporate OpenVPN endpoint `msk-vpn.youdo.sg:1194` UDP resolves45.159.2
 After user reconnected corporate VPN, simultaneous route checks show public corporate endpoint45.159.210.228 directly viaWiFi192.168.192.1; Nexus10.18.24.233 via172.30.63.1 devtun1 source172.30.63.6; public1.1.1.1 viaTrustTunnel tun0/table880 source172.16.219.2. Interface names changed with reconnect; roles are identified by routes, not names.
 
 Identical6000-byte-header HTTP test now passes with default MSS: HTTP200,591 bytes,0.06s (previously7s timeout/0 bytes). MSS1100 comparison also HTTP200/0.05s. Nexus UI GET `http://10.18.24.233/` returns HTTP200. Local endpoint exclusion fixes the reproduced transport failure with both VPNs active; no firewall/MSS or remote-network changes were applied. User should refresh the browser and confirm its UI symptom is gone; browser-session behavior itself is not yet independently verified. Nexus repository/realm/CI-user initialization remains separate pending work.
+
+## Jenkins public route exclusion prepared (October13)
+
+Public Jenkins138.16.201.238 works via corporate OpenVPN, while ordinary requests route through TrustTunnel table880 and time out. Exactly138.16.201.238/32 was added to [listener.tun].excluded_routes in /home/slnnk/trusttunnel/trusttunnel_client.toml; Python3.12 tomllib and unique-route checks passed. Restart was not authorized or executed; the exclusion is inactive and ordinary requests still fail. See [local exclusion log](../log/2026-10-13-trusttunnel-client-jenkins-public-exclusion.md).

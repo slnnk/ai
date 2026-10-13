@@ -1,10 +1,14 @@
 ---
 system: jenkins
 status: verified
-checked: 2026-10-11
+checked: 2026-10-13
 tags: [recovery, runbook, ansible, backup, publication]
 ---
 # DevOps-890: recovery runbook and automation proposals
+
+## Ticket correction (2026-10-13)
+
+Read-only YouTrack API verification confirmed that the Jenkins recovery issue is [DevOps-892](https://youtrack.youdo.com/youtrack/issue/DevOps-892), summary `[Recovery] Восстановить Jenkins`. DevOps-890 is `[Recovery] Восстановить Nexus`. Historical DevOps-890 references in the Jenkins recovery notes, branch names and comment receipt must not be used as the Jenkins issue identifier. The historical comment destination has not been rechecked or changed.
 
 ## Task
 

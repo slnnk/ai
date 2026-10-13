@@ -43,6 +43,10 @@ The user is a DevOps engineer. `~/ai` is the shared knowledge base for every AI 
   note. Mark hypotheses in the text; `status: outdated` instead of deleting. English;
   hostnames, jobs, variables and commands verbatim.
 - Keep `knowledge/repos.md` current (path, origin URL without credentials, purpose, date).
+- For VK Cloud only, maintain `~/ai/current/service-addresses.env`: whenever a new or
+  changed service address is discovered, add or update it in the relevant datacenter
+  section. Keep credentials in `.env`; record the observation date and known verification
+  status in comments. Updating the map does not require extra infrastructure checks.
 - Run `kb_lint.py` and fix what it reports, then `build_index.py` (both in `general/scripts/`).
 - `echo "- <system>: <what changed and why>" >> ~/ai/.sync-notes`. Do not commit `~/ai`
   yourself; `ai-sync.sh` does it.
