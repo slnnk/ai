@@ -1,7 +1,7 @@
 ---
 system: dev-deployment
 status: verified
-checked: 2026-10-07
+checked: 2026-10-14
 tags: [b2b, ephemeral-dev, jenkins, gitlab-ci, helm, kubernetes, yandex-dev, roadmap]
 ---
 # B2B dev deployment: authoritative system map and roadmap
@@ -33,6 +33,10 @@ This is the authoritative local knowledge source for the B2B ephemeral developme
 Deploy a B2B service under development, together with its catalog dependencies, into an ephemeral task-specific Kubernetes namespace in the Yandex dev cluster, driven from a GitLab merge-request pipeline through a Jenkins job and shared Helm charts, and run the service's existing autotests against that environment.
 
 ## Current status
+
+### VK Kubernetes access for BuildAPI (2026-10-14)
+
+BuildAPI recovery now targets existing `vk-ms1-k8s-test`, API `https://10.18.26.57:6443`, separately from the historical Yandex B2B pipeline described below. Two workers and required Traefik/VSO platform deployments are ready. Terraform CI identity from `vkcloud-tf` project 625 has working cluster reads; private exec kubeconfig was prepared and tested. This does not imply B2B workloads or BuildAPI have been deployed. Corrected master-based kubectl image pipeline 140923 and scoped project-77 `KUBECONFIG_DEV` file upload are verified. BuildAPI MR !39 merged after explicitly approved removal of legacy Nomad/Terraform CI; master lint/kustomize/build passed. Four VK manifest changes passed client dry-run, while manifest publication and backend Vault/Nomad access apply await approval. No BuildAPI Kubernetes deployment has occurred. CI image update and approvals are documented in the [BuildAPI access log](../../log/2026-10-14-dev-deployment-devops-898-buildapi-vk-kubeconfig.md).
 
 - On 2026-09-07 TKB pipeline `138093` / deploy job `3120707` / Jenkins build `159` runtime-proved the initial TKB post-deploy path. Automatic smoke `3120789` and manual regression `3120790` reached all three task endpoints and published reports. Each ran 183 tests with two identical incoming-payment failures; GitLab imported 174 with 172 passed and 2 failed. Infrastructure is healthy, but `mock-api` reached roughly 97.8% and `worker-mock` roughly 69% of their 256Mi limits. Published commit `aa4d083` raises both to 512Mi request / 1Gi limit; pipeline `138096` is waiting for manual deploy `3120801` (superseded 2026-09-07/2026-09-29: job `3120801` ran, see TODO Done and `post-deploy-autotests.md`). See `~/ai/current/knowledge/log/2026-09-07-dev-deployment-tkb-pipeline-138093.md`.
 - On 2026-09-04 Billing pipeline `137991` / service commit `1b6ed25` runtime-proved the second post-deploy autotest integration. Deploy job `3114239` triggered Jenkins build `155`, which loaded `jenkins-pipelines/master` commit `20b9d78`, created fresh namespace `dev-devops-832`, deployed Billing as primary plus the 12 catalog dependencies, and automatically started `smoke tests` job `3114321`. The job used test image `youdo-business-billing-service-tests:devops-832-dev-autotests`, derived `TARGET_ENV_SUFFIX=-devops-832`, reached the task-specific Billing ingress, and published Allure/JUnit. GitLab reports 545 cases: 542 passed and 3 failed; the job and pipeline are green only because the existing QA suite uses `ignoreFailures=true` and the CI job is allowed to fail. The failures are test/data/application-level, not deployment connectivity failures. `regression tests` job `3114322` remains manual.

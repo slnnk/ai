@@ -1,7 +1,7 @@
 ---
 system: gitlab-ci
 status: verified
-checked: 2026-10-08
+checked: 2026-10-14
 tags: [agents, gitlab, training, workflow]
 ---
 # GitLab: supervised agent workflow and training
@@ -73,6 +73,14 @@ No merge/auto-merge, direct target/protected branch push, force push, immediate 
 deletion, tags, history rewriting or tracker closure API call is authorized by training gates.
 Source deletion on merge is a GitLab setting for a later user-approved merge, not permission
 to delete now. Do not stash/reset/discard user changes or rewrite identity.
+
+## Manual-mode release source selection
+
+User correction, DevOps-898, 2026-10-14: for projects using `DEPLOY_PROD_MODE=manual`, prefer a fresh release tag at the merged commit when a new pipeline needs updated HCL. Inspect the standard tag rules first. Do not automatically switch delivery to master or add unrequested production-manual overrides to create a pipeline. Creating a tag still requires explicit authorization covering its release/build effects; deployment remains a separate action. Textvalidation tag `1.0.4` was explicitly requested after twelve proposed local rule lines were cancelled without publication.
+
+## Base-images release tags must use master
+
+User correction, DevOps-898, 2026-10-14: `youdo/base-images` release tags must point to commits on `master`, after the reviewed MR is merged. The initial `kubectl/1.35.6` tag incorrectly targeted unmerged feature SHA `18c0ed83`; the agent acknowledged the mistake. User explicitly requested merging MR !41 and recreating that tag, authorizing this concrete merge/tag replacement/rebuild sequence. Do not infer general permission to merge, replace tags, or rebuild unrelated images. Verify the resulting master SHA and rebuilt image before claiming release completion.
 
 ## Learning records and rule updates
 Each task work-log entry must include a Training record with:

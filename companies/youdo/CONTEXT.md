@@ -40,6 +40,16 @@ and diagnostics.
 
 ## Conventions
 
+- Base-images release source (user correction, 2026-10-14): release tags in `youdo/base-images` must point to commits on `master`, after the reviewed MR is merged. Do not release from an unmerged feature branch. Tag creation/replacement and rebuild still require explicit user authorization; this rule does not grant standing permission for external writes.
+
+- Jenkins shared credentials (user, 2026-10-14): use stable service/environment IDs without task prefixes. Created IDs: `vk-test-nomad`, `vk-test-consul`, `vk-test-cloud`; use these in the ES test Pipeline. This naming correction does not authorize renaming existing unrelated credentials.
+
+- Nomad deployment credentials (user, 2026-10-14): use the common `nomad_token` variable for ES and other roles. Read it from externally injected `VK_TEST_NOMAD_TOKEN`; do not introduce an ES-only token alias or store a new token literal in the repository. Jenkins bindings must cover every role that consumes it.
+
+- Recovery task ownership (user, 2026-10-14): Python libraries/PyPI → DevOps-890; Nomad periodic/cron workload images → DevOps-895; base images including data/dockers → DevOps-891. Historical approved Git branch/MR names are preserved; classification changes do not authorize renaming/history rewriting.
+- DevOps-896 dynamic inventory recovery was closed by the user on2026-10-14. Treat the recovered VK service as accepted complete; retain SQL mapping, repeated-refresh and consumer-cutover verification limits without reopening the task or claiming those actions completed. Further work needs a separate user request.
+- DevOps-895 cron image restoration was closed by the user on2026-10-14. Treat image availability recovery as accepted complete; retain runtime audit limitations without reopening the task or claiming all23jobs used new bytes. Further runtime investigation needs a separate user request.
+
 - Nomad Docker auth (user, 2026-10-12): Nexus credentials belong in the common role configuration for all hosts whose Docker auth file is generated. Do not limit this setting to incident hosts through host_vars. Password must remain an external secret.
 
 - Nexus Docker roles (user, 2026-10-12): reuse `nx-docker` for Docker service accounts; its content permissions include deletion. Do not introduce a separate full-access role without a specific need.

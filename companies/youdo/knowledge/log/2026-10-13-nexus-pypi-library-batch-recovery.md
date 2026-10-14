@@ -1,16 +1,16 @@
 ---
 system: nexus
 status: verified
-checked: 2026-10-13
+checked: 2026-10-14
 tags: [nexus, pypi, python, gitlab, nomad, recovery]
 ---
 # PyPI exact-version library batch recovery and Nomad cron image inventory
 
 ## Summary
 
-All 32 required canonical package versions are published to Nexus and independently checksum-verified through component GET metadata. The first 26 versions were recovered without changing their consumer locks; the final six rebuilt versions require reviewed replacement hashes. This includes five modern versions with both wheel and source archive matching locked hashes, eleven older Poetry versions with matching wheels only, and ten setuptools releases rebuilt from exact source for requirements-only consumers without retained artifact hashes. No claim of byte identity is made for that last group. Seven assets for the six previously hash-blocked versions were subsequently published after explicit approval. Their new hashes do not match the original consumer locks; five repair branches are now committed/pushed with GET-verified MRs after stage-two approval, while CI and consumer runtime recovery are not yet complete. Eventum1.0.1 is now published with its exact original wheel hash verified through Nexus metadata. Final verification confirms all five repair MRs and exact hash-only commits, clean local checkouts and enabled shared runners; final CI snapshot has ab-pipeline140778 and rowers-ranker140779 fully successful. Task-quality-control140781 failed on a Docker cgroup infrastructure error before package installation; recommended-tasks-generator140780 timed out during image push and daily-compilations140782 timed out pulling its base image. These three CI infrastructure failures remain separate open work.
+All32required canonical PyPI versions are published and Nexus component checksums verified. Five modern versions have exact locked wheel/sdist bytes; eleven older Poetry versions have exact wheels only; ten requirements-only setuptools releases were rebuilt from exact source without historical-byte proof. The final six rebuilt versions required reviewed replacement hashes, now included in all five explicitly approved/merged consumer MRs. All five post-merge master pipelines succeeded; the earlier cgroup failures and timeout attempts are historical checkpoints superseded by approved Docker29.9.0 corrections/retries and successful CI. Daily pipelines are build-only with no automated test job. No remaining package/build/MR completion blocker is recorded for this audited scope.
 
-Nomad read-only inventory covers160jobs,23periodic parent jobs and eight unique runtime image references. Final GET-only registry verification at2026-10-13T20:18:27Z confirms all8manifests available for the23original periodic jobs. Seven current configs match the images published during this recovery; cashflow:master was subsequently replaced by a newer successful CI build from another actor and was not overwritten. All32required PyPI versions are present, with five hash-repair MRs published; recommended MR78 was subsequently merged after explicit approval, while the other four remain unmerged. Recommended master pipeline140796 is pending. No allocation health, deployment or periodic/application execution is claimed.
+Nomad read-only inventory covers160jobs,23periodic parent jobs and eight unique runtime image references. Final GET-only registry verification at2026-10-13T20:18:27Z confirms all8manifests available for the23original periodic jobs. Seven current configs match the images published during this recovery; cashflow:master was subsequently replaced by a newer successful CI build from another actor and was not overwritten. All32required PyPI versions are present, with five hash-repair MRs published; all five MRs (recommended78, task-quality57, daily8, ab50 and rowers79) were subsequently merged after explicit approvals. Ab master140800 succeeded including build/tests/lints; the user subsequently ran productiondeploy3223291 and its success was verified by GET (allocation/application health unverified). Rowers master140801 also succeeded with build/test/Nomad lint; all five merged consumer master pipelines are successful. Recommended master140796 and task-quality master140797 post-merge CI succeeded. Daily correction140798 build-only CI also succeeded; approved MR8 merge created master140799, which succeeded in its build-only CI. All three prior infrastructure-failing consumers now have successful master CI. No allocation/application health or periodic execution is claimed. The agent performed no deployment; the later user-executed ab production deploy was verified through GitLab job status.
 
 ## Task, authorization and actions
 
@@ -186,6 +186,92 @@ The user explicitly approved merging recommended-tasks-generator MR78 into `mast
 
 Independent GET confirms MR78 merged at `2026-10-13T23:58:17.875+03:00`, merge commit/new master `1fa2457d0fdbc6f3f020c0a8b112b4b4baeba010`, previously `55c20d0e9e80269c9a37a5fad2ab8178206884ba`. Master [pipeline140796](https://gitlab.youdo.sg/data/recommended-tasks-generator/-/pipelines/140796) was created; its completion remains pending. Evidence is `recommended-mr-78-merge.json`. This separate approval covers only MR78 merge; other MRs were untouched, and no tag, manual deployment or periodic job action was performed.
 
+## Task-quality DinD correction passes full CI
+
+Independent GET at `2026-10-13T21:03:48Z` (October14 Moscow time) confirms task-quality-control build3223277 succeeded, finished `2026-10-13T23:59:44+03:00`, and pipeline140795 fully succeeded including test3223278. The trace records successful branch/`latest` manifests digest `sha256:b1f0871a6792b87be67e20b6b0d3c28a7b76c6ef6b7388b0a1eb45ff836af36f`; the earlier cgroup mountpoint error is absent. Evidence is `task-quality-dind-build-final.json`. The matching Docker29.9.0 client/DinD edit is verified by successful CI; this does not establish the host cgroup version or the exact original incompatibility mechanism.
+
+MR57 remains unmerged and any merge needs explicit user authorization. Recommended master pipeline140796/build3223279 is still running with its test created, and the separate daily-compilations timeout remains open. No merge, deployment or additional retry was performed for this read-only verification.
+
+## Explicitly approved task-quality MR57 merge
+
+The user explicitly approved merging task-quality-control MR57 into `master` after successful head pipeline140795. Prechecks verified mergeability, non-draft status and all discussions resolved. The scoped merge PUT used expected SHA `1459a1f89e79388b8ac4d090badd04b221e81fe0`, without squash override or project/MR settings changes.
+
+Independent GET verifies merged at `2026-10-14T00:04:57.139+03:00`, merge commit/current master `a51285b3d4493556a79a923065a6950b0904135f`, previously `ade4028556aff35224999671b411565e5af1cb91`. New [master pipeline140797](https://gitlab.youdo.sg/data/task-quality-control/-/pipelines/140797) was created and its completion remains pending. Evidence is `task-quality-mr-57-merge.json`. Other MRs were untouched; no tag, manual deployment or periodic job action was performed.
+
+## Explicit daily-compilations retry
+
+The user explicitly requested retrying the third failed build, daily-compilations3223113. The authorized POST `/projects/204/jobs/3223113/retry` created [job3223283](https://gitlab.youdo.sg/data/daily-compilations/-/jobs/3223283). Independent GET verifies pending status, unchanged pipeline140782 and source SHA `a6592bb2959fd66cf7e54eb124372ab06c20fa02`. Evidence is `daily-ci-retry.json`. No source or runner change accompanied this retry; the previous downloaded-base pull-finalization timeout remains historical evidence with unproven root cause. Retry success is not yet claimed.
+
+## Daily retry reveals first-RUN cgroup failure
+
+Fresh GET verifies daily-compilations retry3223283 failed with `script_failure`, finished October14 at00:07:14MSK; pipeline140782 remains failed. Evidence is `daily-ci-retry-current.json`. The retry passed its base-image pull, then failed launching the first `RUN` container at Dockerfile step3/7, `pip install pipenv==2020.11.15`, with `cgroups: cgroup mountpoint does not exist: unknown`. The trace confirms Docker CLI/service19.03.12. The absent `latest` cache warning was ignored by the existing `|| true` command and is not this failure; no push digest was recorded.
+
+The proposed next minimal correction matches task-quality-control's successful client/DinD29.9.0 update, scoped to daily's build-job overrides while preserving inherited release references. Existing branch `DevOps-891-restore-python-package-hashes`, base `master`, MR8 requires explicit supervised reuse approval before repository editing; that approval is not yet requested/obtained at this checkpoint. No fix, source edit or additional retry was performed. The first attempt's base-pull timeout root cause remains unproven; this retry supplies a separate concrete container-launch failure.
+
+## Recommended post-merge master CI succeeded
+
+Independent GET verifies recommended-tasks-generator master pipeline140796 succeeded at merge SHA `1fa2457d0fdbc6f3f020c0a8b112b4b4baeba010`, finished October14 at00:08:12MSK. Build3223279 and test3223280 succeeded. Evidence is `recommended-master-ci-status.json`. This completes post-merge CI validation for the explicitly approved MR78 merge, without further source or remote changes.
+
+## Approved daily branch reuse and local build overrides
+
+The user approved reusing `DevOps-891-restore-python-package-hashes`, base `master`, in daily-compilations/MR8 for the minimal29.9.0 build fix. The precheck checkout was clean at `a6592bb2959fd66cf7e54eb124372ab06c20fa02`. Exactly three YAML lines were added in `.gitlab-ci.yml`: build-job image `docker:29.9.0-cli` and services list containing `docker:29.9.0-dind`. Existing global old Docker references remain unchanged, preserving release-job inheritance/behavior.
+
+PyYAML parsing passes; deep comparison after removing the two added build fields equals HEAD, `git diff --check` passes and the index is empty. Evidence is `daily-dind-actual.patch` and `daily-dind-approved.gitlab-ci.yml`. MR8 GET verifies open, expected SHAa6592bb2, existing settings squash disabled and source-branch removal enabled. No commit, push or MR update occurred yet.
+
+Stage-two publication approval remains pending: commit `update docker cli and dind`, MR title `DevOps-891 restore python builds`, existing source branch to `master`, body `daily-dind-mr-description.txt` containing one short Russian paragraph and task link. Push CI automatically publishes branch/`latest` images; this daily pipeline has no test job and feature branches do not deploy. The local approval does not authorize publication, merge or deployment.
+
+## Approved daily Docker override publication
+
+The user approved stage-two daily publication, including automatic branch-image/`latest` CI effects. `publish_daily_dind.py` prechecks verified the exact reviewed three-line YAML diff, empty index, remote source SHAa6592bb2 and open MR8. Commit `6e5c72a477b6340899c1435e5777d73e4922ef75` (`update docker cli and dind`) was pushed to the approved existing branch; MR8 title is now `DevOps-891 restore python builds` with the approved Russian paragraph and task link.
+
+Independent GET verifies remote SHA, title/body after terminal-newline normalization, source/target and preserved squash disabled, source-branch removal enabled and unchanged assignee. The local checkout is clean. Evidence is `daily-dind-publication.json`. New [pipeline140798](https://gitlab.youdo.sg/data/daily-compilations/-/pipelines/140798) was created; completion remains pending. No merge or deployment was performed.
+
+## Task-quality master and daily correction CI succeeded
+
+Fresh independent GETs confirm task-quality-control master pipeline140797 succeeded, finished October14 at00:14:41MSK, with build3223281 and test3223282 successful. Master/`latest` trace digest is `sha256:48f271a4dc56e0c71c061cd70d33d08efebb737cf68e6aeecd42c053d04361d6`; evidence is `task-quality-master-ci-status.json`. This completes post-merge CI validation for MR57.
+
+Daily-compilations correction pipeline140798 succeeded, finished00:16:24MSK. Build3223284 is the only job in this pipeline; there is no automated test job, so build success does not claim application-test coverage. Branch/`latest` trace digest is `sha256:851d4a7fdd77090b985e56ae543a548293032c63d14dc2a085ae587516d0287d`; evidence is `daily-dind-ci-status.json`. The matching Docker29.9.0 build overrides pass CI and the prior first-RUN cgroup symptom is resolved for this run; exact old host-level mechanism remains unproven.
+
+Daily MR8 remains unmerged pending explicit user approval. Ab-pipeline and rowers-ranker MRs also remain unmerged. No merge, deployment, manual job or further retry was performed for these read-only confirmations.
+
+## Explicitly approved daily MR8 merge
+
+The user explicitly approved daily-compilations MR8 merge into `master`. Initial GET returned mergeability checking and caused no mutation; a fresh GET then confirmed mergeable, successful head pipeline140798, all discussions resolved and no draft state. The merge PUT used expected SHA `6e5c72a477b6340899c1435e5777d73e4922ef75` with no squash override.
+
+Independent GET confirms merged October14 at00:18:57.787MSK, merge commit/new master `39b7fd86c433deeb70f442225d4d57278401867a`, previously `55200335572b9b5c46def629d5dc99d35e627237`. [Master pipeline140799](https://gitlab.youdo.sg/data/daily-compilations/-/pipelines/140799) was created; completion remains pending. Evidence is `daily-mr-8-merge.json`. Ab-pipeline and rowers-ranker MRs were untouched; no manual deployment or tag action occurred.
+
+## Daily post-merge master CI succeeded
+
+Independent GET at `2026-10-13T21:20:41Z` confirms daily-compilations master140799 succeeded at merge SHA `39b7fd86c433deeb70f442225d4d57278401867a`, finished October14 at00:20:13MSK. Build3223285 succeeded and is the sole job; no automated tests are present. The trace records final master/`latest` digest `sha256:0dd8eb937a52c68c053b0af4148340d5791a004fc67b3fc813d3741bdbde9b47`. Evidence is `daily-master-ci-status.json`.
+
+All three consumers with earlier CI infrastructure failures are now separately approved/merged and verified by successful master CI: recommended140796, task-quality140797 and daily140799. Original timeout/cgroup evidence remains historical; exact timeout and host cgroup mechanisms are unproven. Ab-pipeline and rowers-ranker MRs remain unmerged. No further merge, deployment, tag or retry action was performed for this verification.
+
+## Explicitly approved ab-pipeline and rowers merges
+
+The user explicitly approved both ab-pipeline MR50 and rowers-ranker MR79 merges into `master`. Prechecks verified each expected source SHA, successful head CI, mergeable/non-draft status and resolved discussions; squash remained disabled. Each scoped merge PUT supplied its expected SHA and preserved MR settings.
+
+Independent GET confirms ab MR50 merged October14 at00:22:15MSK, master `7a430478ce27a5c7528d952722aec7f27061cc4b` from prior `ddc7bc422dc160e82301653ac12b9302acbd53dd`; rowers MR79 merged00:22:17MSK, master `f754bce4a91036ceff74d1423f60f6d39574ac68` from prior `3fa21fcb4f8b39e68e1b55313791a5ba719b634f`. Evidence is `ab-rowers-mr-merges.json`. New master [ab pipeline140800](https://gitlab.youdo.sg/data/ab-pipeline/-/pipelines/140800) and [rowers pipeline140801](https://gitlab.youdo.sg/data/rowers-ranker/-/pipelines/140801) are running.
+
+All five consumer MRs are now merged after explicit approvals. Three master pipelines already succeeded; these last two remain under verification. No manual deployment, Git tag action or periodic job execution occurred.
+
+## Ab-pipeline post-merge master CI succeeded
+
+Independent GET at `2026-10-13T21:24:48Z` confirms ab-pipeline master140800 succeeded, finished October14 at00:24:14MSK. Build3223286, test3223290, Nomad lint3223289, Ruff3223287 and mypy3223288 all succeeded; master/`latest` trace digest is `sha256:85eaaadbcf976304b0cb90bdc11d7a2a7758f6ef88300403e0d3795fd701d445`. Production deployment3223291 remains manual and untouched; successful CI does not authorize or imply deployment.
+
+Rowers master140801 is still running: build3223292 running, test3223293 and lint3223294 created. Evidence is `ab-rowers-master-ci-status.json`. Four master pipelines are now successful, with only rowers completion pending. No manual deployment or additional retry was performed.
+
+## User-executed ab production deployment verified
+
+The user reported manually executing ab-pipeline production deployment. Read-only GitLab GET confirms `deploy:production`3223291 succeeded, started October14 at00:25:48MSK and finished00:25:53MSK; pipeline140800 remains successful. Evidence is `ab-user-production-deployment.json`. This deployment was executed by the user; the agent only verified its job status and performed no deployment mutation.
+
+Earlier statements that this job remained manual/untouched describe the prior checkpoint and are superseded by the user action. Job success does not independently verify Nomad allocations or application health; those were not checked. Rowers master140801 remains running, build3223292 running with test/lint created. No additional agent deployment or retry occurred.
+
+## Final rowers master CI succeeded
+
+Independent GET confirms rowers-ranker master140801 succeeded at merge SHA `f754bce4a91036ceff74d1423f60f6d39574ac68`, finished October14 at00:29:58.275MSK. Build3223292, test3223293 and Nomad lint3223294 succeeded; master/`latest` trace digest is `sha256:7dbf90e3719d2133849b73c1b0d4f981f8df397cd720292f710dd4631a42b7b1`. Evidence is `rowers-master-ci-status.json`.
+
+All five consumer MRs are explicitly approved/merged and all five post-merge master pipelines are successful. Thirty-two required PyPI versions and all eight audited cron runtime references were restored/available in the prior metadata verification. This does not infer actual cron/allocation/application health; only the user-executed ab production deployment CI-job success was separately verified. No agent deployment, additional merge, tag action or retry was performed for this final GET confirmation.
+
 ## Changes and risks
 
 The user subsequently replied "Да" to the final explicit publication proposal for exactly three runtime image tags: `registry.youdo.sg/data/ab-pipeline:master`, `registry.youdo.sg/data/rowers-ranker:0.19.3` and `registry.youdo.sg/data/recommended-tasks-generator:1.16.24`. This authorizes those three registry pushes only, with no other aliases, job/deployment execution, merge or Git tag change. The publication batch subsequently completed; independent manifest/config verification for all three is recorded above.
@@ -197,3 +283,7 @@ Artifact restoration is partial despite32of32 version availability: version entr
 ## Portable lesson
 
 [Recover exact locked Python distribution hashes](../../../../general/knowledge/python/reproducible-wheel-recovery.md).
+
+## Later runtime audit
+
+[October14 read-only runtime audit](2026-10-14-nexus-nomad-cron-runtime-audit.md) verifies four non-cleaner parents with post-restoration runs, eighteen without retained detailed runtime records and actual worker image IDs blocked by SSH authentication. Cleaner is explicitly ignored per user. Artifact availability does not imply all23periodic tasks ran new image bytes.

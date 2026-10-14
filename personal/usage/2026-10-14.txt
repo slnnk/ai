@@ -1,0 +1,20 @@
+Token usage, last 7 days (since 2026-10-06)
+agent   project                            model                sess   fresh  c.read c.write     out
+codex   ~                                  gpt-6.1-sol           129   15.1M  815.0M       0    3.0M
+claude  ~                                  claude-opus-5-5         5     510   25.5M    443k    163k
+codex   ~                                  gpt-5.6-sol             1     67k    2.0M       0     15k
+codex   ~                                  gpt-6-astra             1     25k    193k       0      1k
+total                                                            136   15.2M  842.7M    443k    3.2M
+
+Top 0 sessions by input (fresh + cache read + cache write):
+
+Knowledge-base access (heuristic, see --help):
+agent   sess  kb_find   search    index     full  partial  full KB
+claude     5        6       47        0        1       20       10
+codex    104      244      277        4       18      317      589
+Most read in full:
+    3x log/2026-10-13-nexus-pypi-library-batch-recovery.md
+    2x repos.md
+    2x systems/nexus.md
+    2x log/2026-10-12-nexus-library-publish-retries.md
+    1x log/2026-10-07-dev-deployment-devops-886-ttl-controller.md

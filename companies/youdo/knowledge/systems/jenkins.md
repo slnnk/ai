@@ -1,7 +1,7 @@
 ---
 system: jenkins
 status: verified
-checked: 2026-10-13
+checked: 2026-10-14
 tags: [jenkins, recovery, vkcloud]
 ---
 
@@ -73,3 +73,11 @@ New containercc6f744294ff77471b765d30e543883ea738dc3108e0abb2b23734dc8a7758c4 us
 ## Tracker result synchronization
 
 DevOps-891 existing recovery comment74-124638 was updated after explicit user request with the merged source fix, successful fixed-image pipeline/digest and recreation acceptance. Exact text was GET-verified after POST, updated1791910089885. The comment retains other recovery results and states the pending Ansible pin synchronization.
+
+## Recovery comment reconciliation (2026-10-14)
+
+The existing DevOps-892 comment `74-124647` omits late October 13 acceptance results and contains obsolete pending items. The reconciled replacement was published after explicit user approval and exact text was verified via GET. See [reconciliation log](../log/2026-10-14-jenkins-devops-892-comment-reconciliation.md).
+
+## dynamic_deploy Restore review (2026-10-14)
+
+User clarified Restore means the job stage. Live GET confirmed playbooks and inventory selectors. User narrowed scope to old yandex-test addresses and minimal deployment changes. Normal test5 Restore has no newly found address-edit requirement; live inventory targets are VK. Thick test/test1/test6 still have old SQL names in origin/master, with local unpublished VK replacements. General hardening is outside current scope; special autotest inventories remain old. No reset/clear task executed or repository changed. See [review](../log/2026-10-14-jenkins-restore-playbooks-review.md).
