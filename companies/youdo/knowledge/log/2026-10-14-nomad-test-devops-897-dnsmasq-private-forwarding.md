@@ -1,7 +1,7 @@
 ---
 system: nomad-test
 status: verified
-checked: 2026-10-14
+checked: 2026-10-15
 tags: [dnsmasq, dns, vk-cloud, ansible]
 ---
 # DevOps-897: repair Nomad client private DNS forwarding
@@ -63,3 +63,7 @@ Manual fix is now persisted in merged master. Direct cloud DNS networking and ot
 ## Portable lesson
 
 none
+
+### Gateway forwarding verified live, 2026-10-15
+
+Read-only SSH to `youdo@10.18.20.3` (`ipsec-vm`) confirmed `/etc/bind/named.conf.local` and `named-checkconf -p` both define `zone "mcs.local"` with `type forward`, `forward only`, and sole upstream `10.18.20.65`. A direct UDP query from the gateway to that upstream returned authoritative `NOERROR`, `vk-ms1-sql-test.mcs.local A 10.18.26.17`, TTL86400. This verifies current gateway-to-cloud DNS reachability, beyond the earlier cache-only possibility. No configuration changed. Runner-origin queries through `10.18.20.3` succeed, while Windows DNS `.8`/`.9` still return `NXDOMAIN`.

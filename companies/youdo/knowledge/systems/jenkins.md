@@ -1,7 +1,7 @@
 ---
 system: jenkins
 status: verified
-checked: 2026-10-14
+checked: 2026-10-15
 tags: [jenkins, recovery, vkcloud]
 ---
 
@@ -10,6 +10,8 @@ tags: [jenkins, recovery, vkcloud]
 ## Summary
 
 Jenkins controller and AutoTest agent restored on VK hosts on 2026-10-13 under [DevOps-892](https://youtrack.youdo.com/youtrack/issue/DevOps-892). Controller is accessible internally at http://10.18.26.8/. Authorized checkout-only test-git build4 succeeded on the controller; quiet mode was restored after explicit user approval and API confirmed quietingDown=true. Persistent controller image Git correction was merged, published and verified after approved recreation; stored-credential branch lookup returns205/master. AutoTest actual checkout and downstream workflows remain untested. Later that day the user supplied replacement balancer 10.18.20.97: its existing Nginx route to the VK controller returned HTTPS 200 with normal certificate validation using a forced address. Public HTTPS at138.16.201.238 is verified through corporate OpenVPN. After the local TrustTunnel exclusion was prepared, the user supplied a screenshot confirming the authenticated Jenkins UI opens at https://build.youdo.sg; the screenshot does not independently establish the active client route. WebSocket forwarding remains unverified. Historical Jenkins notes incorrectly use DevOps-890, which is the Nexus task; do not carry their completion status into DevOps-892.
+
+Latest acceptance: dynamic_deploy5826 completed SUCCESS on test5 on2026-10-15 with Restore, Elasticsearch, monolith/static, buildsinfo and Suggestions reindex enabled. B2B Elasticsearch/microservices were disabled. Four ignored Ansible failures including HTTP401 remain; successful status does not verify Rabbit cleanup. See [5826 reconciliation](../log/2026-10-15-jenkins-build5826-plan-reconciliation.md). Earlier quiet-mode and failed-build checkpoints below are historical.
 
 ## Hosts and access
 
@@ -24,7 +26,7 @@ Bootstrap access is youdo with passwordless sudo. User authorized adding .ssh/id
 
 Both hosts have Docker 29.9.0 and Compose installed through existing docker-compose -> docker Ansible roles. Docker and containerd data reside on the verified /data filesystems via guarded symlinks. Controller /dev/vdb is 150 GB, UUID 937fca4e-18b8-4bc1-a1a2-5b4d1e5931f4, approximately 131 GB free after deployment. Agent /dev/vdb is 10 GB, UUID b1457393-253d-4960-9278-b9b6ad40161a, approximately 7.8 GB free after image deployment. User approved current agent disk; cold-build workspace/cache growth remains untested.
 
-Controller host JENKINS_HOME is /data/jenkins/data/jenkins. Recovery quiet hook is /data/jenkins/data/jenkins/init.groovy.d/devops-892-recovery-quiet.groovy, mode 0600; it will reapply quiet mode after a restart until explicitly removed. No restored queue items, timers/SCM triggers, unfinished build.xml records, home startup hooks or image reference startup hooks were found before first startup.
+Controller host JENKINS_HOME is /data/jenkins/data/jenkins. Recovery quiet hook was removed from init.groovy.d on2026-10-15 at the user's explicit request. Original file retained at /data/jenkins-recovery/disabled-hooks/devops-892-recovery-quiet.groovy, mode0600/root; independent read confirms startup path absent and API quietingDown=false. No restart performed. Earlier hook-presence statements below are historical. No restored queue items, timers/SCM triggers, unfinished build.xml records, home startup hooks or image reference startup hooks were found before first startup.
 
 ## Images and credentials
 
@@ -81,3 +83,95 @@ The existing DevOps-892 comment `74-124647` omits late October 13 acceptance res
 ## dynamic_deploy Restore review (2026-10-14)
 
 User clarified Restore means the job stage. Live GET confirmed playbooks and inventory selectors. User narrowed scope to old yandex-test addresses and minimal deployment changes. Normal test5 Restore has no newly found address-edit requirement; live inventory targets are VK. Thick test/test1/test6 still have old SQL names in origin/master, with local unpublished VK replacements. General hardening is outside current scope; special autotest inventories remain old. No reset/clear task executed or repository changed. See [review](../log/2026-10-14-jenkins-restore-playbooks-review.md).
+
+## test5 monolith deployment attempt (2026-10-14/15)
+
+User-authorized dynamic_deploy5819 used latest-release pipeline139914 after all20 numeric image tags were verified published. All Restore enabled except B2B elastic; suggestions enabled; static/microservices disabled. Build failed on PG SSH host-key trust and balancer root SSH access; Rabbit purge also returned401 but was ignored. Deploy monolith and Post update were skipped. No retry performed. See [execution](../log/2026-10-14-jenkins-test5-release-deploy.md).
+
+## test5 SSH credential alignment (2026-10-15)
+
+User-requested public key of credential ssh installed for root on PostgreSQL10.18.26.39 and balancer10.18.20.97; existing keys preserved. Controller-origin SSH using that exact credential verified rootLogin/status0 on both. Restore PG DB now explicitly uses credentialsId ssh and hostKeyChecking false matching Nginx, exact script approved. No job retry or sshd setting change. Rabbit401 remains unresolved. See [access change](../log/2026-10-15-jenkins-ssh-credential-vk-access.md).
+
+## PostgreSQL host-key flag correction after build5820
+
+Repeated authorized build5820 failed on PG host-key verification despite applying credential ssh. Legacy hostKeyChecking=false is a no-op in installed Ansible plugin635.v34b_48e979c86. PostgreSQL now uses disableHostKeyChecking=true, exact updated script approved; no subsequent build yet. Nginx already sets env.ANSIBLE_HOST_KEY_CHECKING=False and reached cleanup successfully. Rabbit401 remains. See [repeat and correction](../log/2026-10-15-jenkins-test5-deploy-retry.md).
+
+## test5 PG peer-authentication checkpoint
+
+Third authorized build5821 passed PG SSH and failed local psql peer authentication because the reset task ran as root with -U postgres. Active PG16 pg_hba local rule118 requires peer; read-only command as Unix postgres succeeds. SQL-user execution adaptation remains pending branch approval; pg_hba unchanged. Monolith/suggestions have still not deployed. See [attempts and verification](../log/2026-10-15-jenkins-test5-deploy-retry.md).
+
+## youdo.static VK migration audit
+
+Jenkins Deploy static launches GitLab deploy_yandex_test stand job, which invokes SSR/Nomad and S3 delivery. SSR INTERNAL_URL/BuildAPI settings and inherited group8 Nomad endpoint still point to yandex-test; minimal adaptations needed before enabling WEB_STATIC. Current build5822 leaves WEB_STATIC false. See [static audit](../log/2026-10-15-jenkins-static-vk-deploy-audit.md).
+
+## Build5822 final cause and static MR publication
+
+Build5822 passed PG resets but failed monolith config upload at old buildapi.yandex-test.youdo.local/upload HTTP404; rescue notify timeout secondary. Monolith Nomad rollout/Post update/suggestions skipped. Static address commitf424127 published in [MR108](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/108) after explicit approval; shared BuildAPI correction covers observed stale URL. MR108 subsequently merged asf916ad19; project278 VK_TEST_NOMAD_TOKEN configured; build5823 passed BuildAPI upload and reached Nomad rollout, where service startup is blocked by mixed MessageBus assembly identities. See [logs](../log/2026-10-15-jenkins-test5-deploy-retry.md) and [static changes](../log/2026-10-15-jenkins-static-vk-deploy-audit.md).
+
+## Monolith release assembly compatibility
+
+Pipeline139914 selects MessageBus1.9.1 (DLL assembly1.0.0.0) with MassTransit1.8.1 (reference1.8.1.0). Exact consumed package hashes verified from build3225571. Build success does not establish runtime binding compatibility. Matching1.9.1 packages have consistent assembly references; no package/source changes authorized yet. See [diagnosis](../log/2026-10-15-jenkins-monolith-messagebus-assembly-mismatch.md).
+
+## Static rollout and library correction (2026-10-15)
+
+Static release139593 build chain succeeded; image master-2.917.139593 registry metadata verified. User-authorized test5 static deploy job3226694 succeeded157.5s. Monolith5823 endedFAILURE940155ms on DLL startup; corrected historical MassTransit1.8.1 package subsequently replaced in Nexus with binding probe/checksum verification. Monolith subsequently rebuilt through jobs3226699/3226700 with corrected package hash verified; direct test5 Nomad version3 deployment successful, both groups healthy and19service tasks running without restarts. No Jenkins deployment/Restore rerun; source changes forbidden. See [publication](../log/2026-10-15-nexus-messagebus-181-assembly-repair.md).
+
+## Direct monolith startup accepted (2026-10-15)
+
+User-authorized fresh release139914 rebuild cleared onlyproject18runnercache, artifact3226699success andDocker3226700success. All20numericimage digests changed. Direct Nomadjobyoudo-test5 version3 uses20verifieddigestrefs across21tasks; deployment9ee77925 successful, web/svc healthy1each,19service tasks running/restarts0. Representative MessageBus startup error absent. See [execution](../log/2026-10-15-jenkins-monolith-rebuild-nomad-restart.md).
+
+## Full Jenkins deployment started (2026-10-15)
+
+User-authorized dynamic_deploy5824 running with rebuiltmonolith139914/static139593, WEB_STATICtrue, priorRestoreselections retained, B2B/MICROSERVICESfalse andsuggestionstrue. Parametersmatch GETverified. Numericimagecache absent onall8eligibleclients, no cache mutation needed. FinalFAILURE onPostupdateAuthandgetcookies timeout to test5.youdo.sg/api/users/signin/; monolithNomadversion6 andstaticGitLab3226701/NomadSSR deployed successfully with healthytasks/restarts0. See [launch](../log/2026-10-15-jenkins-test5-full-deploy-with-static.md).
+
+## Build5826 ignored errors and quiet-hook removal (2026-10-15)
+
+Three Rabbit cleanup errors: queue listing401, list-construction type error, undefined queues_name at purge. Queue cleanup did not complete. Fourth ignored failure is nginx cache grep with no operands for xargs rm (rc123), not PostgreSQL. Recovery quiet hook moved outside startup with preserved hash/mode; quietingDown=false. See [diagnosis and execution](../log/2026-10-15-jenkins-build5826-errors-and-disable-quiet-hook.md).
+
+Local Rabbit follow-up: user-authorized test5 clear.yml run using current local group_vars/all.yml succeeded with ok3/failed0/ignored0 and no401; queue listing and purge completed. Jenkins was not rerun, so Jenkins-specific effective variables remain unverified. See the diagnosis/execution log above.
+
+## BuildAPI metadata gap after build5826 (2026-10-15)
+
+Update buildsinfo still uses hardcoded buildapi.yandex-test.youdo.local URLs;404 is masked by curl without --fail. New BuildAPI /builds is empty and test5 missing. Ansible upload/static success does not create a current builds row. Build5826 SUCCESS therefore confirms deployment, not result publication. See [diagnosis](../log/2026-10-15-jenkins-buildapi-test5-missing-row.md).
+
+## BuildAPI publication corrected (2026-10-15)
+
+Update buildsinfo four base URLs now point to buildapi.dev.youdo.corp, curl has --fail --show-error and shell set -e. Exact script hash185031f5… and approval independently verified. Restored test5 current/history metadata from5826; GET and authenticated home HTML confirm test5/139914/139593. No build/deploy rerun. Full job XML byte equivalence after Jenkins serialization was not established; script equality was verified. See [execution](../log/2026-10-15-jenkins-buildapi-publication-fix.md). Earlier stale-URL findings are historical.
+
+## Monolith-dependent microservices VK audit (2026-10-15)
+
+Nine local/remote-master Monolith services inventoried; user excluded unused youdo.form, leaving8selected services. Required: docvalidation DNS typo, escrow router dc interpolation, shared v3 per-stand CI VK mapping and peer-compatible PG delegated tasks. Legacy Form CI/selector changes are outside scope. Fresh BuildAPI microservice catalog has only static; bootstrap via new service GitLab deployments before Jenkins recreate. Existing global VK Nomad Jenkins binding is present. Research only; no rebuild/deploy approved or performed. See [audit and inventory](../log/2026-10-15-jenkins-monolith-microservices-vk-audit.md).
+
+## DevOps-899 implementation and rebuild checkpoint (2026-10-15)
+
+User assigned per-stand microservice delivery to DevOps-899, approved all four branch/publication proposals (including corrected task names), merges, escrow release, fresh builds and automatic production deployments. Runtime preflight explicitly skipped. Initial30component builds succeeded. All eight services accepted through saved BuildAPI metadata, live Nomad source/image tags and rendered test5 rows. Follow-up Ansible110 fixes oldAnsible/remotePython compatibility; escrow51 permanently moves the shared router CI job toVK. Shared router13.8.12 runs healthy count1. Antifraud145 changes three runtime PG ports5433→5432; approved release23.8.7 at merged masterfb11521 completed pipeline140965 builds/tests and deploy3228068 successfully. Escrow13.8.12 recovered through Ansible111 routing-domain correction and four live monolith Host tags; deploy3228097 succeeded. Config master/preprod audited without DNS edits. No PgBouncer configuration or runner DNS settings were changed. See [execution and approvals](../log/2026-10-15-jenkins-devops-899-monolith-microservice-recovery.md).
+
+## Per-stand microservice catalog seeded (2026-10-15)
+
+DevOps-899: accepted eight-service test5 releases copied into BuildAPI deployment catalogs for test,test1-test7,test10-test15. Thirteen other stands received104CI records plus104links to their exact manual deploy jobs from the same source pipelines; source test5 unchanged. BuildAPI GET verification passed. These are prepared sources for future Jenkins recreate_microservices; seeding does not start deployments or populate live Nomad/Consul state. See [seeding evidence](../log/2026-10-15-jenkins-devops-899-monolith-microservice-recovery.md#other-stand-catalog-seeding-2026-10-15).
+
+First-launch check for this seeded catalog: actual recreate_microservices playbook passed a local Ansible2.15.13 mock execution for all104manual jobs/13stands using /play, with no /retry/unexpected mutation. Absent Nomad jobs are tolerated; absent DBs are created. PG DocValidation clone source exists and had0activeconnections. Normal firstplays follow service DB recreation flags (no one-off skipdropdb variable). Real104deployments were not started by the check; exact Jenkins Ansible version remains unverified.
+
+## Next per-stand iteration scope (2026-10-15)
+
+From DevOps-A-33 excluding B2B/completed deployments and user-excluded MiniSape/Form: broadcast, cerberus2, escrow.walletone, featuretoggle, youdo.content, youdo.landings, youdo.trackingpixel and YouDo.Socket. Socket's accepted per-stand MR82 supersedes the article dynamic label. Separate frontend entry youdo-moderation uses its own CI/S3. Scope only; no implementation/deployment authorized by this list. See [candidate evidence](../log/2026-10-15-jenkins-next-per-stand-service-iteration.md).
+
+Next-iteration scope corrected by user: add youdo.help, exclude escrow.walletone (alongside MiniSape/Form/B2B). Fresh current-master analysis identifies mandatory Content custom VK CI migration and Cerberus custom PG/absent-template blocker; six other service repos need no confirmed adaptations. See [test5 analysis](../log/2026-10-15-jenkins-next-test5-service-deployment-analysis.md). No builds/deploys triggered.
+
+Next rollout execution: Content MR63 merged9714ed5/release2.5.12/pipeline140980; six unchanged releases plus moderation build pipelines140972-140978 launched. Cerberus excluded by user. Seven unrelated test4jobs blocked runners due psql pager under raw/become; exact cancellations approved and completed requests, then Ansible MR112 merged620607f disables pager in five invocations. Newtest5firstdeploys follow normal DB creation/recreation. See [rollout evidence](../log/2026-10-15-jenkins-next-test5-service-rollout.md).
+
+## DevOps-899 next test5 iteration accepted (2026-10-15)
+
+Seven selected Nomad services deployed: broadcast1.2.11, featuretoggle1.0.11, Content2.5.13, Landings1.3.35, trackingpixel1.0.5, Socket1.2.9, Help1.0.14. Moderation1.0.45 assets published to S3 with explicit prefix replacement approval. Current BuildAPI source/version metadata verified; Landings HTML absent by existing webEx_check=false design, Socket version-cell mapping absent, APIs correct. Broadcast finaldeploy3228256 healthy after localdevdocker/postgres:latest recovery; ContentMR64fixedcredentialaliases. Cerberus/MiniSape/WalletOne/Form/B2B excluded. See [execution log](../log/2026-10-15-jenkins-next-test5-service-rollout.md).
+
+Recovery task comments updated and exact-GET verified on2026-10-15: Jenkins892/ES894 and per-stand899 reflect5826/5827 and acceptedtest5services. See [comment publication record](../log/2026-10-15-recovery-task-comment-updates.md). Issue states were not changed.
+
+### Four additional stand deployments (2026-10-15)
+
+User-authorized full dynamic_deploy builds test2 #5828, test3 #5829, test7 #5830, test8 #5831 launched with #5827 parameters; all observed running and parameters verified. Completion not yet established. [Launch evidence](../log/2026-10-15-jenkins-four-stand-full-deploy.md).
+
+### Obsolete test8 removed (2026-10-15)
+
+After5831, user cancelled test8: four stand-specific Nomad jobs and dedicated5GiBESvolume deleted; no matching jobs/activeallocations remain. Subsequent cleanup explicitly limited to BuildAPI: exact test8 documents removed from builds/allbuilds/ms_builds; shared resources and remaining data retained. [Evidence](../log/2026-10-15-jenkins-test8-cleanup.md).
+
+Jenkins dynamic_deploy5832 FAILURE2026-10-15 for test/RESTOREtrue: master381391de5d8c21b58ea73f928b5b52c6a63d68b3 still uses old thick MSSQL endpoint, causing controller TCP1433 timeout to sql-test.ru-central1.internal in restartMSSQLSERVER; snapshot Restore never invoked. Controller DNS/TCP1433 succeeds for all3VK names/addresses. User-approved three-variable endpoint publication completed as cdb11b5522ec6c30fae9cd5086898ff70f2cd2ba / [MR113](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/113), source DevOps-897-point-large-mssql-to-vk to master; effective inventory and syntax/YAML/diff checks passed, pipelines[]. User explicitly authorized MR113 merge; fresh GET confirms merged cf88e42259787a8c6350771d17726bd4fcff3e30 and master SQL fields point at VK for all3stands. User subsequently reported successful playbook execution after the endpoint merge; endpoint fix accepted on that report, no independent new build/log verification. No local Git merge/switch; full workflow publication remains separate/pending. [Diagnosis and separate errors](../log/2026-10-15-jenkins-build5832-mssql-old-endpoint.md).

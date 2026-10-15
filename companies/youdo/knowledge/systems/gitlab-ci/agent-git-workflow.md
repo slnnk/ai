@@ -83,6 +83,10 @@ User correction, DevOps-898, 2026-10-14: for projects using `DEPLOY_PROD_MODE=ma
 User correction, DevOps-898, 2026-10-14: `youdo/base-images` release tags must point to commits on `master`, after the reviewed MR is merged. The initial `kubectl/1.35.6` tag incorrectly targeted unmerged feature SHA `18c0ed83`; the agent acknowledged the mistake. User explicitly requested merging MR !41 and recreating that tag, authorizing this concrete merge/tag replacement/rebuild sequence. Do not infer general permission to merge, replace tags, or rebuild unrelated images. Verify the resulting master SHA and rebuilt image before claiming release completion.
 
 ## Learning records and rule updates
+
+Kitcut correction2026-10-15 under DevOps-898: user rejected the proposed recreate_db=false→true change. Ordinary deployment must retain service-specific DB behavior unless explicitly changed; create-if-absent in shared Ansible is independent of recreate_db and migrations still run. Selecting ordinary jobs does not authorize overriding this service setting or imply such a source edit is necessary. Proposed branch was not approved/created. [Evidence](../../log/2026-10-15-nomad-test-devops-898-kitcut-preflight.md).
+
+DevOps-898 stand recovery correction2026-10-15: use ordinary deployment jobs with database recreation for the stand rollout; do not choose keep-db as an agent preference. Acceptance requested by the user is GitLab and Nomad job statuses only. This determines job selection/check scope, not standing permission for unrequested external mutations. Keep-db templates are fixed independently for correctness. [Evidence](../../log/2026-10-15-gitlab-ci-devops-898-keep-db-vk-routing.md).
 Each task work-log entry must include a Training record with:
 - Date, task, repo; proposed/final branch, commit message, MR title and source/target.
 - Stage 1 and stage 2 approval evidence: a concise non-sensitive quote or session reference;

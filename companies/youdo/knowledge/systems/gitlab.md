@@ -94,3 +94,11 @@ Approved branch DevOps-896-migrate-inventory-to-vk now contains VK-only Identity
 ## DevOps-896 VK inventory deployed (2026-10-14)
 
 After individually approved Consul/Vault/CI configuration, MR26 merge and release-0.56.4, pipeline140830 built/pushed images with pipeline-only BUILDX_NO_DEFAULT_ATTESTATIONS=1; initial140829 failed API OCI manifest publication. Approved deployment3224500 succeeded. API/updater running in vk-test; DNS/direct GET200 returns16stands/64Nomad aliases/0SQL. User closed DevOps-896 on2026-10-14 and accepted the recovered VK service as complete. Historical verification limits: consumer cutover was not performed, live SQL mapping was not verified, and repeated refresh was unconfirmed because Nomad logs were empty and bounded SSH timed out. These do not reopen the closed task; further work requires a separate user request. [Evidence](../log/2026-10-13-gitlab-ci-dynamic-inventory-vk-migration-plan.md).
+
+## Devdocker internal builder images (2026-10-15)
+
+devdocker project63 CI now uses registry.youdo.sg/youdo/base-images/docker:git and docker:dind (client/server20.10.17), explicit daemon alias docker. MR55 merged1f0c0d5 under DevOps-899. This removes external CI executor image pulls; runtime image bases remain unchanged. Six-image master rebuild pending; no claim yet that PostgreSQL latest was restored. See [rollout log](../log/2026-10-15-jenkins-next-test5-service-rollout.md).
+
+## Shared monitoring kubectl image (2026-10-15)
+
+gitlab-ci-templates MR90 merged master7bd1578: v3/.monitoring.yml deploy-monitoring uses registry.youdo.sg/youdo/base-images/kubectl:1.35.6 instead of externalBitnamilatest. Rules/scripts unchanged. Newconsumerpipelinesadopt; oldjob3228652snapshot unchanged. No newSMS pipeline or monitoringdeployment performed. See [publication record](../log/2026-10-15-gitlab-ci-monitoring-internal-kubectl.md).

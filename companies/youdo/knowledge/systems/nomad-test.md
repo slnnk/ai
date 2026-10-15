@@ -1,10 +1,12 @@
 ---
 system: nomad-test
 status: verified
-checked: 2026-10-14
+checked: 2026-10-15
 tags: [nomad, consul, terraform, vk-cloud, recovery]
 ---
 # Nomad test platform and VK recovery
+
+DevOps-898 TKB master-267 rollout blocked: all six Nomad jobs dead; worker Hangfire startup fails PG authentication on B2B PgBouncer5433. Empty authfile/database mappings confirmed on10.18.26.44; ordinary migrations use direct5432 and complete. No repository fix needed. User-approved sixDB/user configuration applied with reload only/PID43719 unchanged; all6DB SELECT1 pass on5432+5433 using actualworkercredentials. User-approved ordinary retries3230094–3230099 completed all6SUCCESS on test10–test15; Nomad master-267 running/healthy/restarts0 at2026-10-15 21:06UTC. [Evidence](../log/2026-10-15-postgresql-devops-898-tkb-pgbouncer-auth-failure.md).
 
 ## Summary
 
@@ -24,7 +26,7 @@ tags: [nomad, consul, terraform, vk-cloud, recovery]
 
 ## BuildAPI Kubernetes recovery follow-up (2026-10-14)
 
-User requested BuildAPI restoration in VK Kubernetes rather than the historical Nomad CSI job. Existing cluster access and private Terraform-identity CI kubeconfig are verified; no BuildAPI deployment has occurred at this checkpoint. See [BuildAPI access and CI image preparation](../log/2026-10-14-dev-deployment-devops-898-buildapi-vk-kubeconfig.md).
+User requested BuildAPI restoration in VK Kubernetes rather than the historical Nomad CSI job. Existing cluster access, published CI image and scoped Terraform-identity CI kubeconfig are verified. Approved Vault backend role/token endpoint change passed using existing VK token, with no Nomad writes. Four-manifest MR !40 merged; release pipeline 140932/manual Kubernetes deploy 3226672 passed. Five workloads ready, MongoDB PVC Bound, primary BuildAPI route HTTP 200, pod Nomad jobs GET 200 and Redis SRV checks passed. User declined optional VK alias DNS work; no DNS changes were made and BuildAPI recovery is complete. See [BuildAPI access and CI image preparation](../log/2026-10-14-dev-deployment-devops-898-buildapi-vk-kubeconfig.md).
 
 ## DevOps-898 final approved launch completed (2026-10-14)
 
@@ -79,6 +81,50 @@ DevOps-897 covers adapting automation-test-yandex large MSSQL refresh to VK Clou
 DevOps-897 user naming decision2026-10-14: use vk-ms1 for VM/disk/image names: vk-ms1-sql-base and vk-ms1-sql-test/test1/test6; prepared output image vk-ms1-sql-base. User reports an existing VK image named yc-sql-base (not independently checked); its current name is distinct from the selected output name. No resource rename or implementation is implied. [Decision evidence](../log/2026-10-14-nomad-test-devops-897-large-mssql-legacy-workflow.md).
 
 ## Purpose
+
+DevOps-898 Billing user rollout accepted2026-10-15 20:31UTC: master-707/pipeline141010/source55fc06b, builds3229763/3229766SUCCESS; ordinary test10–test15 jobs3229810,3229812,3229813,3229816,3229818,3229819allSUCCESS. Nomad all6running/healthy/restarts0. User deployed; parent agent verified read-only. Parent pipeline still running for independent production/release stages. Remaining user order4: Landings→TKB→Tochka→Business. [Evidence](../log/2026-10-15-nomad-test-devops-898-billing-user-rollout.md).
+
+DevOps-898 Mobile ID user rollout accepted2026-10-15 20:26UTC: master-58/pipeline141008 SUCCESS/build-webSUCCESS, ordinary test10–test15 jobs3229736–3229741 all SUCCESS, Nomad all6running/healthy/restarts0. User performed deployment; agent verified read-only. Remaining user order4: Landings→TKB→Tochka→Business. [Evidence](../log/2026-10-15-nomad-test-devops-898-mobile-id-user-rollout.md).
+
+DevOps-8984fresh B2B master pipelines created2026-10-15 20:10UTC under explicit user approval: Billing141010/IID707,MobileID141008/IID58,TKB141009/IID267,Tochka141011/IID1767. Source SHAs matched prior audited masters, initial status allrunning/prep active/builds created. Auto production/release effects disclosed, no stand deploys played/source edits. [Evidence](../log/2026-10-15-nomad-test-devops-898-four-b2b-repositories-preflight.md).
+
+DevOps-8984service repo audit2026-10-15: Billing master-705,MobileIDmaster-57,TKBmaster-264,Tochkamaster-1764 all latest builds success, targetVKjobs absent. No mandatory source changes found; current shared templates support their PG/migrations/external workloads. Fresh master pipelines recommended because old compiled pipelines predate VK adaptation, all include automatic production/release effects requiring approval. User order afterLandings remains Billing→MobileID→TKB→Tochka→Business. [Evidence](../log/2026-10-15-nomad-test-devops-898-four-b2b-repositories-preflight.md).
+
+DevOps-898 B2B Landings accepted2026-10-16 00:08:46MSK: pipeline141019/master-109/source0d17499 builds3230136/3230137SUCCESS; user-approved ordinary parallel jobs3230150–3230155 allSUCCESS. Nomad test10–test15 allrunning/healthy/restarts0, IMAGE_TAGmaster-109. MR19 nginx port80 plus preserved8080 fixes earlier health failure. Checks only GitLab/Nomad; no HTTP/Consul probes in final monitor. Independent master production/release pipeline still running. [Evidence](../log/2026-10-16-nomad-test-devops-898-landings-b2b-rollout.md).
+
+DevOps-898 B2B Landings stand-port fix published2026-10-16MSK: MR18 merged, pipeline141017/master-107 builds SUCCESS; ordinary jobs3230082–3230087 blocked waiting Nomad health because nginx listens8080 while stand template maps80. Six running allocations had zero restarts; API checks pass, web checks fail. User approved local additive listen80 plus publication and separately cancellation; commit172a557/MR19→master opened, syntax/review passed, MR pipeline141018 running. All6old deploy jobs terminal canceled00:00:49–53MSK; Nomad workloads not stopped/repaired by cancellation. Subsequently user explicitly approved merge and MR-pipeline stop: MR19 merged0d17499/noSquash, MR pipeline141018 terminal canceled00:02:43MSK. Automatic master push pipeline141019/IID109 running, expected master-109; web3230136running/API3230137pending. Stand jobs3230150–3230155 created, not approved/played. [Evidence](../log/2026-10-15-nomad-test-devops-898-landings-stand-port-fix.md).
+
+DevOps-898 B2B Landings build repair published2026-10-15: pipeline141007 web3229694 failed npm EINTEGRITY; API3229695 succeeded, deployments skipped. User approved branch and publication; commit ee64ce0/MR18→master refreshes four integrity fields for unchanged private package versions and selects existing internal Node24 image. Full local Docker build and CI Lint passed; MR pipeline141016 created, checkout clean. No base-images changes, merge or stand deployment. [Evidence](../log/2026-10-15-nomad-test-devops-898-landings-build-integrity.md).
+
+DevOps-898 B2B Landings readiness2026-10-15: latest master-104/pipeline139691/current master2f6e82ec success2images, no VK jobs. Stand config web/API only, no DB/migrations or per-stand PG/Rabbit/Redis. No required stand config edits found; fresh master pipeline recommended for merged VK templates, includes auto production canary/update/release. Build Node/lockfile engine mismatch noted, no upgrade without actual need. [Evidence](../log/2026-10-15-nomad-test-devops-898-landings-preflight.md).
+
+DevOps-898 Kitcut accepted2026-10-15: master-103/pipeline141005 ordinary parallel test10–test15 jobs3229673–3229678 all SUCCESS, Nomad all6running/healthy/restarts0. recreate_db=false preserved; no service changes/reset override. Next user-ordered service Landings;6remain Landings→Billing→MobileID→TKB→Tochka→Business. [Evidence](../log/2026-10-15-nomad-test-devops-898-kitcut-b2b-rollout.md).
+
+DevOps-898 Kitcut fresh build2026-10-15: user approved new master pipeline141005/IID103 on e3ac817c without service config changes; expected master-103. Initial prep jobs running,3image builds/tests created, production bridge created. Ordinary jobs3229673–3229678 not played; preserve recreate_db=false/create-if-absent. [Evidence](../log/2026-10-15-nomad-test-devops-898-kitcut-preflight.md).
+
+DevOps-898 remaining order corrected by user2026-10-15: Kitcut→Landings→Billing→MobileID→TKB→Tochka→Business. Kitcut latest master-102/pipeline139611 success3images, no target VK jobs. No source edits needed: user rejected changing recreate_db=false; verified Ansible creates absent PostgreSQL DB independently, then migrations run. Proposed branch not created. Fresh master pipeline still needed for current VK templates, auto-production effects need approval. [Evidence](../log/2026-10-15-nomad-test-devops-898-kitcut-preflight.md).
+
+DevOps-898 notifications accepted2026-10-15: master-190/pipeline141003 ordinary parallel test10–test15 jobs3229634–3229639 all SUCCESS, Nomad all6running/healthy/restarts0. No source changes/retries. Remaining catalog7: business,billing,landings,mobile-id,TKB,Tochka,Kitcut; shared doc-generator reused, common SMS/Fns/DocValidation and B2B auth/notifications complete. [Evidence](../log/2026-10-15-nomad-test-devops-898-notifications-b2b-rollout.md).
+
+DevOps-898 notifications fresh build2026-10-15: user approved master pipeline including disclosed auto-production/release effects. Created141003/IID190 once on80051dad; initial3image builds/tests running, production bridge/release created. Expected master-190; ordinary test10–test15 jobs3229634–3229639 not played. [Evidence](../log/2026-10-15-nomad-test-devops-898-notifications-preflight.md).
+
+DevOps-898 notifications readiness2026-10-15: current master80051dad/latest master-189/pipeline137494 success3images, no target VK jobs. No mandatory source changes; recommend fresh master pipeline to capture current VK templates, with auto-production child/release effects explicitly approved before launch. Worker retains existing external integrations. No pipeline/deploy run. [Evidence](../log/2026-10-15-nomad-test-devops-898-notifications-preflight.md).
+
+DevOps-898 auth-service accepted2026-10-15: master-168/pipeline141000 deployed to test10–test15 by ordinary jobs with DB recreation. Initial6jobs failed from B2B PG capacity; after approved PG/PgBouncer1000 limits, approved retries3229609/3229612/3229610/3229614/3229613/3229611 all SUCCESS, Nomad all6running/healthy/restarts0. No source changes. Production downstream141002 last scheduled, not claimed successful. Next proposed service notifications. [Evidence](../log/2026-10-15-nomad-test-devops-898-auth-service-b2b-rollout.md).
+
+B2B PG capacity2026-10-15: auth ordinary jobs3229573–3229578 failed before SQL changes with too many clients. User requested limits matching C2C. Applied10.18.26.44 PostgreSQL max_connections100->1000 with2.405srestart, runtime1000/no pending restart; PgBouncer max_client_conn100->1000, softnofile1024->2048/hard524288 retained, reload/PID43719unchanged, auth/pool settings preserved. Auth retries not yet approved. [Evidence](../log/2026-10-15-postgresql-b2b-connection-limits-1000.md).
+
+DevOps-898 auth fresh build2026-10-15: user approved new master pipeline after auto-production/NuGet effects disclosed. Pipeline141000/IID168 created once on f0d4a2f; initial status running,3image builds/build-libs/tests running, production bridge created/no downstream yet. Ordinary test10–test15 jobs3229573–3229578 not played. [Evidence](../log/2026-10-15-nomad-test-devops-898-auth-service-preflight.md).
+
+DevOps-898 auth-service readiness2026-10-15: no mandatory repo changes; latest master-167/pipeline139444 success/builds3of3, masterf0d4a2f. VK target jobs absent. Existing pipeline predates VK template adaptation; recommend fresh master pipeline, but DEPLOY_PROD_MODE=auto enables production child/migrations and conditional build-libs may publish3NuGet packages. No new pipeline/deploy authorized or run. [Evidence](../log/2026-10-15-nomad-test-devops-898-auth-service-preflight.md).
+
+DevOps-898 DocValidation expansion complete2026-10-15: master-757 deployed in parallel with DB recreation to test10–test15 via jobs3227436–3227441, all6GitLab SUCCESS/Nomad running/healthy. Restartstest12=1/test14=1, others0. Combined with accepted C2C8status, current release present on all14target stands. Common SMS/Fns/DocValidation rollout complete; next proposed B2B service auth. [Evidence](../log/2026-10-15-nomad-test-devops-898-docvalidation-b2b-rollout.md).
+
+DevOps-898 DocValidation readiness2026-10-15: latest master-757/pipeline140949 successful, builds4/4; all8C2Cjobs running/healthy/restarts0. test10–test15 absent with ordinary manual jobs3227436–3227441 available. No code/config changes needed; current ordinary C2C jobs prove cloning from DocValidation template on common PG. No new deployment yet. [Evidence](../log/2026-10-15-nomad-test-devops-898-docvalidation-preflight.md).
+
+DevOps-898 Fns expansion2026-10-15: no repository changes needed; latest master-598/pipeline140951 deployed via ordinary jobs3227508–3227513 to test10–test15 in parallel with DB recreation. All6GitLab SUCCESS/Nomad running/healthy/restarts0, C2C8already verified on same release; all14target stands current. Fns intentionally uses common PostgreSQL with per-stand DBfns-{{instance}}, RabbitMQ and matching DocValidation endpoints. [Evidence](../log/2026-10-15-nomad-test-devops-898-fns-preflight.md).
+
+B2B deployment to test10–test15 was scoped on 2026-10-15 to the 13-service active Jenkins Groovy catalog, continuing DevOps-898. Reuse doc-generator already deployed as a shared service under that task; six new instances are not required. SMS, DocValidation and Fns are also needed on C2C stands. Custom business deployment recreates main/mock databases, so data policy must be explicit before execution. No rollout performed during planning. See [planning evidence](../log/2026-10-15-nomad-test-b2b-test10-15-deployment-plan.md).
 
 Nomad test platform services, Consul configuration and telemetry managed by `sysadmins/terraform`. VK recovery under DevOps-893 permits fresh empty data. This map records verified source behavior; proposed VK runtime details are explicitly unverified.
 
@@ -308,3 +354,133 @@ DevOps-897 small MSSQL fleet2026-10-14 20:04UTC: deployedmissing10test2-4/test7/
 DevOps-897 user explicitly launched onlystage4today2026-10-14: Cinder uploadstoppedbase bootdisk accepted, preparedimagevk-ms1-sql-base pending; Ansible18374will clean temporarybase resources afteractiveimage. No stages5-7 launched and originalyc-sql-base retained. [Evidence](../log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md).
 
 DevOps-897 stage5 explicitly executed2026-10-14: all3exactmanagedstand names andnameddisks/ports absent, so no deletions; Ansiblefailed0. Stage6/7notlaunched. [Evidence](../log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md).
+
+DevOps-897 stage4 completed andverified2026-10-15: preparedimageb204affb-cf20-473c-816e-09cb03d76421 active400GiB; Ansiblefailed0; temporarybaseVM/port/disk deleted, freshAPI noVM/volume. Stage5done/noexistingtargets; stage6/7notstarted. [Evidence](../log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md).
+
+## Test5 monolith internal routing recovery (2026-10-15)
+
+Ansible automation-test-yandex group_vars/all.yml formerly hardcoded traefik_domain=yandex-test.youdo.local while dc=vk-test. DevOps-899 MR111 merged342b1d5 derives the routing suffix fromdc. Live youdo-test5 had exactly four internal Host tags corrected (API, SSR, moderation-tickets, moderator-boris), preserving images/config templates/data; CAS8381→8948, evaluation completed, both allocations healthy. API /api/v1/state changed404→200 through the VK hostname. Escrow13.8.12 health checks now pass and its saved/live/rendered BuildAPI data matches. Config master/preprod is a base input overwritten by Ansible; no config-repo DNS changes were needed. See [execution evidence](../log/2026-10-15-jenkins-devops-899-monolith-microservice-recovery.md).
+
+## DevOps-899 next test5 iteration accepted (2026-10-15)
+
+Seven selected Nomad services deployed: broadcast1.2.11, featuretoggle1.0.11, Content2.5.13, Landings1.3.35, trackingpixel1.0.5, Socket1.2.9, Help1.0.14. Moderation1.0.45 assets published to S3 with explicit prefix replacement approval. Current BuildAPI source/version metadata verified; Landings HTML absent by existing webEx_check=false design, Socket version-cell mapping absent, APIs correct. Broadcast finaldeploy3228256 healthy after localdevdocker/postgres:latest recovery; ContentMR64fixedcredentialaliases. Cerberus/MiniSape/WalletOne/Form/B2B excluded. See [execution log](../log/2026-10-15-jenkins-next-test5-service-rollout.md).
+
+## Featuretoggle test5 seed preflight (2026-10-15)
+
+Restored PostgreSQL source `featuretoggle` at `10.18.26.39` contains149features/293history rows; `featuretoggle-test5` has empty data tables and matching columns/migration versions. User-approved copy completed: destination149features/293history, ordered data hashes match source; ID sequences350/521 with is_called=true. Source and VersionInfo unchanged. [Work log](../log/2026-10-15-nomad-test-featuretoggle-test5-seed.md).
+
+Production CSV reconciliation (2026-10-15): user-approved49missing feature keys inserted into featuretoggle-test5, IDs351–399. Total198keys now matches production CSV;149existing rows preserved exactly. New values38enabled/11disabled match supplied CSV; existing31enabled differences retained. See seed work log above.
+
+Featuretoggle UI auth blocker (2026-10-15): API returns500 with old Npgsql Authentication method not supported/code10; test PG16 shared youdo role and HBA use SCRAM. Selectel production C2C challenge verified MD5/code5 for youdo/featuretoggle on5432and5433, no password/SQL sent. No auth changes made; shared-role scope versus dedicated featuretoggle role requires user decision. See featuretoggle seed work log.
+
+Featuretoggle auth fixed (2026-10-15): final user-approved MD5 scope is role youdo only on10.18.26.39, including role-specific loopback rules; other generic/replication rules and default password_encryption remain SCRAM. Password unchanged; grafana_test unchanged. Initial authorized broad MD5 apply was immediately narrowed at user correction. Reload only. Final API GET /api/v1/features HTTP200/198features; direct protocol MD5 verified. Browser not directly tested. Backups and exact actions in featuretoggle seed work log.
+
+DevOps-897 stage6 launched2026-10-15 at user request for only vk-ms1-sql-test/test1/test6 with scoped high-iops disk override,400GiB, explicit Cinder/Nova MS1. Prepared image b204affb-cf20-473c-816e-09cb03d76421 active400GiB; high-iops supports MS1 and compute/volume MS1 available. Syntax/diff checks passed; live Ansible session96718 progressing, completion not yet verified; stage7 not launched. Existing DevOps-899-fix-microservice-postgres-auth checkout/prior edits preserved, no Git publication. This supersedes earlier stage6-not-started observations. [Evidence](../log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md).
+
+DevOps-897 stage6 parallel continuation2026-10-15: user requested concurrent creation. First disk vk-ms1-sql-test/599ef47e-db00-4d17-ad10-7a54c4a0c480 was downloading400GiB/high-iops/MS1, no VM yet. Local sequential controller96718 stopped(SIGINT/exit99), disk preserved. Generated runner gained stage6-only --stand singleton selection; syntax passed, no new repository edit. Three independent controllers launched: test43477,test1 51636,test6 43232; all retain high-iops/MS1, completion pending, stage7 not launched. Supersedes prior sequential-run status. [Evidence](../log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md).
+
+SMS service test5 accepted2026-10-15: master-191 fromcurrentmaster21060f7, pipeline140987, deploy3228662SUCCESS. Threeimagesand188tests passed; TestcontainersPostgreSQL11.5 preloadedonlyrunner171, matchingC2CCIpublickey addedB2BPG44root withbackup. Migrationscomplete, webapp/workerhealthy0restarts, Consulpassing, webappheartbeat200, BuildAPImetadata/live/HTMLaccepted. No servicerepository/Ansible changes or realSMSsend. See [SMS deployment record](../log/2026-10-15-nomad-test-sms-service-test5-deployment-analysis.md).
+
+Featuretoggle stand clones preflight (2026-10-15): source featuretoggle-test5 now198features/301history after user configuration; all13requested target DBs absent. User-approved one-snapshot clones completed for test,test1–4,test6–7,test10–15, owneryoudo. All13verified:198features/301history/fourVersionInfo, table hashes and sequences match; source unchanged. No stand service deploy/restart or UI verification. [Work log](../log/2026-10-15-nomad-test-featuretoggle-stand-clones.md).
+
+Main featuretoggle template refreshed from configured test5 after explicit user approval (2026-10-15):198features/301history/fourVersionInfo, all ordered table hashes and ID sequences399/529match test5. Protected full pre-refresh backup under /var/tmp/featuretoggle-before-test5-refresh-20261015T144416Z-2gy3p95c.dump on10.18.26.39; source unchanged. Exact execution in stand-clones work log.
+
+### C2C PostgreSQL connection budget (2026-10-15)
+
+Read-only audit: PG39 max_connections100,95/97clientbackends idle at snapshot; youdo superuser91connections/34DBs. PgBouncer1.22on5433 onlyconfiguredforGrafana, missingyoudoauth/mappings and implicit sessionmode. Proposed bounded transactionpool for compatibleappclients, directmigrations/Userinsurance sessionlocks. Nothing applied. [Audit](../log/2026-10-15-postgresql-c2c-pgbouncer-capacity-audit.md).
+
+### Minimal Antifraud PgBouncer authorization applied (2026-10-15)
+
+PG39PgBouncer5433 now accepts youdo and fiveexplicitAntifraudtest2/3/4/5/7mappings; SELECTtest4/5verified. No poolmode/limitchange. AntifraudMR146merged,23.8.8pipeline140992 all4images/tests passed; user selected build-only, newversionnotdeployed. [Evidence](../log/2026-10-15-postgresql-antifraud-pgbouncer-minimal-setup.md).
+
+### Antifraud transaction pools applied (2026-10-15)
+
+PG39 PgBouncer now has14active-stand Antifraud mappings with transaction mode, pool2/maxdb2/min0/reserve0, aggregate youdo cap10, idle backend timeout30s. All five Antifraud jobs stopped by user request; pilot test5 restarted with23.8.8/recreation and is healthy without restarts, both migrations exit0 and logs clean. Other four remain stopped. CIjob3229011 still waiting inside nomad run despite completed deployment; BuildAPI publication pending. [Evidence](../log/2026-10-15-postgresql-antifraud-transaction-pool-test5.md).
+
+DevOps-897 stage6 completed2026-10-15: all three parallel controllers exit0/failed0/unreachable0 and WinRM wait passed. Fresh API confirms test10.18.26.17, test1 10.18.26.121, test6 10.18.26.9 all Nova ACTIVE/MS1 and boot disks in-use400GiB/high-iops/MS1. Address map updated; old base10.18.26.9 now belongs to test6. SQL contents unverified, stage7 not run, Git publication pending. Supersedes earlier stage6-in-progress observations. [Evidence and resource IDs](../log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md).
+
+### C2C PostgreSQL connection capacity500 (2026-10-15)
+
+User-authorized PG39 max_connections100→500 applied in /etc/postgresql/16/main/postgresql.conf; cluster16/main restart2.831s, runtime500/pending_restartfalse verified. PgBouncer unchanged; SQL through5433 and Antifraudtest5 Consul checks pass. Other Antifraud stands remain stopped. [Evidence](../log/2026-10-15-postgresql-c2c-max-connections-500.md).
+
+DevOps-897 stage7 completed2026-10-15 on explicit user request: run_workflow.py --stage step_7/session12238 exit0, all3VMs ok7/changed6/failed0/unreachable0/ignored0. Windows names sql-test/sql-test1/sql-test6, rename reboots, VBS/Zabbix FQDN updates, sqlcmd -b sp_CorrectServerName and final reboots passed. Seven-stage runtime run complete; Git publication/review and future stage1 prepared-image default remain pending. Application, SQL schema/contents and monitoring ingestion not verified. Supersedes stage7-pending observations. [Evidence](../log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md).
+
+Jenkins dynamic_deploy5832 FAILURE2026-10-15 for test/RESTOREtrue: master381391de5d8c21b58ea73f928b5b52c6a63d68b3 still uses old thick MSSQL endpoint, causing controller TCP1433 timeout to sql-test.ru-central1.internal in restartMSSQLSERVER; snapshot Restore never invoked. Controller DNS/TCP1433 succeeds for all3VK names/addresses. User-approved three-variable endpoint publication completed as cdb11b5522ec6c30fae9cd5086898ff70f2cd2ba / [MR113](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/113), source DevOps-897-point-large-mssql-to-vk to master; effective inventory and syntax/YAML/diff checks passed, pipelines[]. User explicitly authorized MR113 merge; fresh GET confirms merged cf88e42259787a8c6350771d17726bd4fcff3e30 and master SQL fields point at VK for all3stands. User subsequently reported successful playbook execution after the endpoint merge; endpoint fix accepted on that report, no independent new build/log verification. No local Git merge/switch; full workflow publication remains separate/pending. [Diagnosis and separate errors](../log/2026-10-15-jenkins-build5832-mssql-old-endpoint.md).
+
+### Five-stand Antifraud acceptance after user rollout (2026-10-15)
+
+All five test2/3/4/5/7 Antifraud23.8.8 jobs3229391–3229395 succeeded; current allocations healthy and BuildAPI matching. Four zero restarts, test7 one startup restart from transient PgBouncer max_client_conn100 saturation. All five use10 PostgreSQL backends total (2perDB), PG500 capacity retained. Raising PgBouncer client cap500 proposed, not applied. [Evidence](../log/2026-10-15-postgresql-antifraud-five-stand-acceptance.md).
+
+### PgBouncer client capacity500 (2026-10-15)
+
+PG39 /etc/pgbouncer/pgbouncer.ini max_client_conn500 applied via reload and confirmed by live SHOW CONFIG; process PID unchanged. Existing soft nofile1024 sufficient; auth/mappings/backend cap10peruser/2perDB unchanged. PostgreSQL max_connections already500. [Evidence](../log/2026-10-15-postgresql-pgbouncer-client-limit-500.md).
+
+### Broadcast accepted on test/test1-test7 (2026-10-15)
+
+Broadcast1.2.11 pipeline140972 accepted on all eight stands. Seven new jobs3228251/252/253/254/255/257/258 succeeded; test5job3228256 retained. Every current allocation healthy/zero restarts; all16migrationtasks exit0; BuildAPI metadata matches. Runtime PostgreSQLdirect5432. [Evidence](../log/2026-10-15-jenkins-broadcast-eight-stand-rollout.md).
+
+### FeatureToggle accepted on test/test1-test7 (2026-10-15)
+
+FeatureToggle1.0.11 pipeline140973 deployed in parallel on all eight stands. Jobs3228285–3228289/3229418/3228291/3228292 succeeded in39–56s. Nomad all running/healthy/zero restarts. Release recreate_db=false retained; user limited checks to GitLab/Nomad statuses, no data/API/BuildAPI validation. [Evidence](../log/2026-10-15-jenkins-featuretoggle-eight-stand-rollout.md).
+
+### Landings accepted on test/test1-test7 (2026-10-15)
+
+Landings1.3.35 pipeline140974 deployed concurrently to all eight stands. Jobs3228315-3228319/3229437/3228321/3228322 all succeeded in22-41seconds. Nomad `youdo-front-landings-<stand>` all running/healthy/zero restarts. User-requested checks limited to GitLab/Nomad statuses; existing recreate_db=false retained. [Evidence](../log/2026-10-15-jenkins-landings-eight-stand-rollout.md).
+
+### Socket rollout on test/test1-test7 (2026-10-15)
+
+Socket1.2.9 pipeline140976: seven jobs3228379-3228383/3228385/3228386 succeeded; test5 retry3229440 failed7.07s. All eight `socketChat-<stand>` jobs remain running, two healthy allocations each, zero restarts; existing test5 retained. Checks limited to GitLab/Nomad statuses; failure not diagnosed or retried. TrackingPixel excluded by user from current rollout sequence. [Evidence](../log/2026-10-15-jenkins-socket-eight-stand-rollout.md).
+
+### Socket retry accepted and Help accepted (2026-10-15)
+
+User-requested Socket test5 retry3229442 succeeded32.88s; now all eight Socket jobs successful, all16allocations running/healthy0restarts. Initial test5failure was Nomad CLI `Error fetching deployment` after successful submission. [Socket evidence](../log/2026-10-15-jenkins-socket-eight-stand-rollout.md).
+
+Help1.0.14 pipeline140977 deployed concurrently on test/test1-test7, jobs3228407-3228411/3229441/3228413/3228414 all successful31-39s, all eight jobs/allocations running/healthy0restarts. Verification limited to GitLab/Nomad statuses. [Help evidence](../log/2026-10-15-jenkins-help-eight-stand-rollout.md).
+
+### Content accepted on test/test1-test7 (2026-10-15)
+
+Content2.5.13 pipeline140983 deployed concurrently to all eight stands: jobs3228565-3228569/3229459/3228571/3228572 all SUCCESS35-78s. Nomad `youdo-content-<stand>` all running/healthy/zero restarts. GitLab/Nomad statuses only, as user requested. [Evidence](../log/2026-10-15-jenkins-content-eight-stand-rollout.md).
+
+### SMS accepted on test/test1-test7 (2026-10-15)
+
+DevOps-898 expansion completed2026-10-15 18:39UTC: ordinary jobs3228623–3228628 deployed master-191 to test10–test15 in parallel with DB recreation, all6GitLab SUCCESS/Nomad running/healthy/restarts0. Latest release now healthy on all14target stands. User acceptance is GitLab/Nomad job statuses only; remaining stand rollout uses ordinary jobs with DB recreation. Keep-db routing fix published in MR91, merge pending. [Final rollout](../log/2026-10-15-nomad-test-devops-898-sms-b2b-rollout.md).
+
+Live audit2026-10-15 18:28UTC confirms latest SMS release master-191/current master21060f7 on all8C2C stands, running/healthy with passing webapp+worker Consul checks and zero restarts. SMS absent on all6B2B stands test10–test15 (also excluded test8/test9). Latest pipeline140987 has successful image builds but aggregate failed due deploy-monitoring3228652 runner_system_failure. [Audit](../log/2026-10-15-nomad-test-devops-898-sms-all-stands-audit.md).
+
+SMS master-191 pipeline140987 deployed concurrently to all eight stands: jobs3228613-3228617/3229460/3228619/3228620 all SUCCESS101-114s. Nomad `youdo-sms-service-<stand>` all running/healthy/zero restarts. GitLab/Nomad statuses only as requested. [Evidence](../log/2026-10-15-jenkins-sms-eight-stand-rollout.md).
+
+### Moderation static publication complete (2026-10-15)
+
+Moderation1.0.45 pipeline140978 published in parallel to test/test1-test4/test6/test7; jobs3228432-3228436/3228438/3228439 all SUCCESS150-173s. Existing test5job3228437 retained. Static only, no Nomad deployment; GitLab statuses checked as requested. Selected rollout sequence now complete: Broadcast, FeatureToggle, Landings, Socket, Help, Content, SMS and Moderation on test/test1-test7; TrackingPixel excluded, Cerberus2 postponed. [Evidence](../log/2026-10-15-jenkins-moderation-seven-stand-publication.md).
+
+### Cerberus empty-DB adaptation prepared (2026-10-15)
+
+User reopened Cerberus2 and explicitly selected empty databases for all stands. Approved branch `DevOps-899-create-empty-cerberus-databases` from mastercf88e422; local cerberus2.yml+5/-19 removes template clone/stand conditions and uses raw/become postgres/pager off. Syntax/YAML/diff checks pass; unrelated16MSSQL paths retained. Publication pending, no build/deploy. [Evidence](../log/2026-10-15-jenkins-cerberus-empty-databases.md).
+
+Cerberus follow-up: approved patch published as13a23b1/[MR114](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/114), explicitly approved merge completed master248bf03e. Remote master matches reviewed file; all16unrelated MSSQL paths preserved. Build/deploy not yet triggered.
+
+### C2C connection capacity1000 effective (2026-10-15)
+
+User-requested PostgreSQL max_connections500->1000 applied on10.18.26.39, postgresql@16-main restart4.362s, SQL confirms1000/no pending restart. PgBouncer max_client_conn500->1000 effective via reload/PID unchanged; softnofile2048 runtime+persistent, hard524288 retained. Auth/pool mode/backend limits unchanged. Cerberus rollout capacity failures led to change; five jobs needed recovery after PG restart. [Evidence](../log/2026-10-15-postgresql-c2c-connection-limits-1000.md).
+
+### Cerberus1.0.9 rollout status snapshot; runtime acceptance superseded (2026-10-15)
+
+Cerberus1.0.9 pipeline140997 accepted on test/test1-test7/test10-test15: all14GitLab deploy jobs SUCCESS, all14Nomad jobs running/healthy. Original raw folding bug fixed via Ansible MR115/masterd2c5b9b. Capacity failures resolved with user-requested PG/PgBouncer1000; user explicitly chose normal redeploy with DB recreation for five runtimes lost after PG restart. Final jobs3229541/3229545/3229546/3229547/3229542/3229548/3229534/3229537/3229503/3229504/3229549/3229506/3229507/3229543 by stand order. Status-only verification; historical restarts test6/test7=3,test11=2, currently healthy. [Evidence](../log/2026-10-15-jenkins-cerberus-eight-stand-rollout.md).
+
+.NET2.1 SDK/runtime mirror recipes base-imagesMR42/masterab4e5860 published/tagged. Direct registry push explicitly authorized after CI BuildKit external pull delay; SDKCI3229538 canceled, runtimeCI3229539 succeeded. Both registry manifests match checked local images. Cerberus CI consumer refs explicitly deferred. [Mirror evidence](../log/2026-10-15-base-images-dotnet21-mirrors.md).
+
+### Cerberus runtime restart investigation (2026-10-15)
+
+MR117 merge verified on2026-10-16localdate after user report: merged_at2026-10-15T23:58:44.928+03, master078c906b24fb5883395a2b76bd3964fbc4598d84, no squash. Fetched origin/master template exactly matches approved461bb053source. Source persistence complete; remaining13standrollout and sustained readiness stillpending. User merge report is not deployment authorization; no deploy/currentbranchswitch/localmerge performed. [Merge evidence](../log/2026-10-15-nomad-test-cerberus-pgbouncer-source-capacity20.md).
+
+Follow-up source publication and capacity applied: [MR117](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/117)/461bb053 on DevOps-899-use-pgbouncer-for-cerberus, one template +8/-4 for4runtime5433/No Reset On Close=true and kill_timeout30s; migrations direct5432, notmerged/pipelinesempty/noordinarydeploy. Approved PgBouncer capacity:14existingCerberusDBpools/max10,14priorAntifraudroutes/max2preserved(8actualDBs), Grafanasession/max20; budget20*10+20*2+20=260, youdocap250/clientcap3000/softFD4096. Reload/PID114852unchanged. Test1timeoutCASversion2/index21058 applied; currentalloc25545ef6-c94a-26e7-985f-665a65751fa9 snapshothealthy/rest0, not sustained acceptance.20:56:52UTC PG1000clientbackends/777Cerberusidle/noPgBouncerwaiting; other13stands stilldirect, no capacity relief claimed. No merge/cleanup/otherstandswitch. [Scope, approvals, verification and pending recovery](../log/2026-10-15-nomad-test-cerberus-pgbouncer-source-capacity20.md).
+
+Actual deployed worker/API1.0.9 entrypoint verified read-only in auto-rescheduled pilotalloc3afa1815-44dd-3c4e-7e10-da3003c9de2b/node10.18.26.30: `/app/entrypoint.sh` hashes match fixed templates7fabb47/MR85. PID1bash/childdotnet/M_TAGunset confirms runtime forwarding branch active (TERM/INT→childSIGTERM/wait). LiveKillTimeout5s/KillSignalempty; no signal/shutdown test performed. AppStartAsync failure skipping explicitStopAsync remains separate, originalstalecreationcause unproven. [Actual image/process evidence](../log/2026-10-15-nomad-test-cerberus-test1-pgbouncer-pilot.md).
+
+User explicitly approved consumer pilot on test1: direct Nomad CAS update20:32:36UTC/index19922/version1 replaced one allocation;4runtime PostgreSql settings now5433/No Reset On Close=true, migrations remain direct5432, noDBrecreation/sourceedits. Newalloc5adea323-d524-9790-1c08-b54a951ba605 on10.18.26.21;20:38:23UTC all3workers Restarts1 after stage19999 MembershipOracle5mintimeout/exit134, APIrestart0, Nomadhealthy stilltrue.20:38:25UTC PgBouncer1server/0waiting/123queries, PGtotal974; membership6Active/18Joining/78Dead, initialpilotgeneration stillJoining and obsolete Active10.18.26.38:15001 observed. Switch complete but sustainedstartup failed, with no observed pool queue. Ordinary CI can overwrite this runtime-only change; source persistence and any membership recovery require separate applicable approvals. [Pilot evidence](../log/2026-10-15-nomad-test-cerberus-test1-pgbouncer-pilot.md).
+
+Subsequent explicitly approved PgBouncer preparation: C2C10.18.26.39:5433 now has Cerberus_test1 transaction mapping to localPG5432, pool_size10/min0/reserve0/maxdb10; shared youdo cap10→20. Reload/PID114852 unchanged, runtime mapping enabled/current_connections0, global settings/auth/16existing DB mappings preserved. First perDB reserve_pool_size key rejected by1.22; corrected to reserve_pool and runtime verified. No consumer switch/rerun/deploy; Orleans compatibility and membership recovery remain pending. [Approved preparation evidence](../log/2026-10-15-postgresql-cerberus-test1-pgbouncer-pool.md).
+
+Read-only 20:12–20:15UTC audit supersedes sustained-health interpretation of the rollout snapshot above: initial observed test1/test2/test6/test7 failed allocations8/11/10/8; GC changes those counts and current restart counts hide replacement history. Logs show MembershipOracle activation timeout5min at stage19999, then startup rejection to dead silo endpoints at stage20000; test2/test6 also PostgreSQL53300. Final PG39 snapshot20:15:50UTC:972/1000connections,729toCerberusDBs/allidle; test1/test2/test6 current3workers eachRestarts1, Nomadhealthy remainedtrue during restarts. test1 membership retains old10.18.26.37 Active endpoints while current10.18.26.34 silos remain Joining; ConnectionRefused evidenced. Test template has3workers+API, no explicit runtime pool bounds, directPG connections, and TCP-only health checks that do not establish Orleans startup completion. Immediate failure chain is verified; original trigger remains unproven. No fixes/restarts/deployments/membership edits authorized/performed. [Evidence, source analysis and limits](../log/2026-10-15-nomad-test-cerberus-restart-loop-membership.md).
+
+DevOps-898 Tochka PgBouncer repair2026-10-15: user-approved12routes (two DBs per test10–test15) added on B2B10.18.26.44; reload-only PID43719 unchanged, TKB/auth preserved. Actual credentials SELECT1 passed24/24 across5432/5433. Pipeline141011 root success masked3failed+3canceled ordinary jobs; prior Nomad worker fatal08P01 auth failure. User-approved ordinary retry jobs3230100–3230105 allSUCCESS; all6Nomad master-1767 running/healthy/restarts0 at2026-10-15 21:08UTC. [Evidence](../log/2026-10-15-postgresql-devops-898-tochka-pgbouncer-routes.md).

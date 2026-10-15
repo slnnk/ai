@@ -106,3 +106,9 @@ Safe evidence is in `/home/slnnk/ai-data/DevOps-898/seven-single-runtime-status.
 The user excluded vks-policy-generator after its README identified it as unused and explicitly requested closing its MR without deployment. [MR !18](https://gitlab.youdo.sg/youdo/vsk/vks-policy-generator/-/merge_requests/18) is closed, `merged=false`, verified by `vks-mr-closed.json`. No merge and no `0.0.27` tag occurred. The published apt-source fix branch/commit remains unmerged; it is historical publication evidence, not an outstanding launch blocker. The optional chat-content cache fix was never implemented; the new unmodified release build succeeded.
 
 Socket is a per-stand service and excluded from this single/dynamic launch by the user's classification correction. The separately approved reverse publication [MR !82](https://gitlab.youdo.sg/youdo/YouDo.Socket/-/merge_requests/82) was merged after explicit approval into master `7f6d81b38de45961893cc6fa794ce231e5f6cc81`. Its original `DEPLOY_TEST_PER_STANDS=true` CI is restored. Receipt: `socket-revert-publication/merge-results.json`. This supersedes earlier unpublished-reversal and remote-MR !81 state statements. No Socket production-rule overrides were published.
+
+## YouTrack work comment published (2026-10-15)
+
+User explicitly requested adding a work comment to [DevOps-898](https://youtrack.youdo.com/youtrack/issue/DevOps-898). Root performed the authorized comment POST, creating comment `74-124675` on issue `71-138489`; GET read-back verified the exact text. The comment summarizes the ten single releases, LogReader test5 limit, Socket/vks exclusions, CI/backend preparation and completed BuildAPI Kubernetes recovery. Issue status was not changed.
+
+Local draft: `/home/slnnk/ai-data/DevOps-898/youtrack-work-comment.md`; receipt: `/home/slnnk/ai-data/DevOps-898/youtrack-work-comment-result.json`. No additional external action was performed by this bookkeeping.

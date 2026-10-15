@@ -327,3 +327,11 @@ User-requested DevOps-890 comment74-124640 published and exact text GET-verified
 Approved commitf4018c2b pins docker:28.5.2-dind for allthree Moleculejobs in MR1371, title updated to cover common Nomad Nexus auth and DinD. Final MRfourfiles verified. New pipelines140672/140673skipped by rules, molecule-nomad manualjobs3219872/3219873; full validation pending separate manualstart authorization. No merge/deploy. [Publication](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
 
 User declined manualMoleculejob3219872 start after DinD pin publication; it was not played. Latest common-auth/DinD MR1371 remains published with static validation only, fullMolecule not run. [Decision](../log/2026-10-12-nexus-automation-services-nomad-docker-auth.md).
+
+## MassTransit1.8.1 assembly repair (2026-10-15)
+
+User-authorized historical rebuild replaced only YouDo.Extensions.MessageBus.MassTransit1.8.1, retaining PackageVersion and removing fallback Version override. DLL/reference identity1.0.0.0; offline .NET6 probe with release-selected MessageBus191/Net181 passed21types. Nexus asset SHA2569f557ada75b1032044635dc2ba0169b2d049e8cadc2e21cb643a778c154aad9f metadata verified after publication via internal PackagePublish endpoint. Subsequent monolith fresh restore/rebuild verified corrected package hash and direct test5 Nomad deployment succeeded; no source or policy change. See [repair](../log/2026-10-15-nexus-messagebus-181-assembly-repair.md).
+
+## UI 0.26.0 and 0.25.4 CI recovery inspection (2026-10-15)
+
+After failed CI retries3228457/3228458 (npm implicit-latest guard), user-authorized local builds from pinned historical sources published UI0.25.4 then0.26.0 with explicit recovery tag. Original build commands passed in node24.13.0/npm11.6.2, both archives516files; only scratch lockfiles changed. Independent metadata GET confirms both versions present, latest0.40.1 preserved and recovery0.26.0; SHA512matches local archives and existing dist metadata retained. No repo edit, policy change or verification download. Original consumer lock integrity remains unverified. [Source identities, builds, publication and limits](../log/2026-10-15-nexus-ui-0260-0254-ci-recovery-inspection.md).

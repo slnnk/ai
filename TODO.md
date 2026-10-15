@@ -27,7 +27,8 @@ Paths below are relative to `~/ai/`.
 - [ ] Rotate yc authorized key `aje1kjc599tg2oj7ok2d` (private part leaked into session output), update consumers, delete the old key (2026-09-13) — [src](companies/youdo/knowledge/log/2026-09-13-workstation-yc-cli-auth-recovery.md)
 - [ ] Rotate the c2c prod PostgreSQL password printed in an agent session; consider a separate read-only role for agents (2026-09-23) — [src](companies/youdo/knowledge/log/2026-09-23-selectel-c2c-prod-postgres-access.md)
 - [ ] Rotate the `dba_automation` SQL password disclosed in diagnostic output (2026-08-02) — [src](companies/youdo/knowledge/log/2026-08-02-mssql-yandex-mssql-restore-youdo.md)
-- [ ] DevOps-898 BuildAPI: obtain prepared four-file VK manifest publication and Vault/Nomad backend apply approvals, then complete authorized manual GitLab deployment and verify BuildAPI; MR !39 merged and master lint/kustomize/build passed; corrected image and scoped kubeconfig verified for VK Kubernetes (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-dev-deployment-devops-898-buildapi-vk-kubeconfig.md)
+- [x] DevOps-898 BuildAPI: VK release 0.5.13/pipeline 140932/manual deploy 3226672 complete; scoped CI kubeconfig and Vault role ready, existing Nomad token reused, 5 workloads Ready/PVC Bound/HTTP 200 (done 2026-10-15 Moscow) — [src](companies/youdo/knowledge/log/2026-10-15-dev-deployment-devops-898-buildapi-existing-nomad-token.md)
+- [x] BuildAPI VK aliases: additional DNS work declined by user (“Не нужно”); existing wildcard observation retained, no DNS changes made; primary buildapi.dev.youdo.corp works (cancelled 2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-dev-deployment-devops-898-buildapi-existing-nomad-token.md)
 - [ ] `buildapi/production.nomad`: check validity of plaintext `NOMAD_TOKEN`, `JENKINS_LOGIN`, `JENKINS_PASSWORD`; move to Vault and rotate (2026-09-13) — [src](companies/youdo/knowledge/log/2026-09-13-nomad-test-buildsinfo-csi-stale-attachment.md)
 - [ ] Android/GitLab runner host_vars hold plaintext access material: migrate to Ansible Vault, rotate, verify runner registration/registry/S3 cache (2026-08) — [src](companies/youdo/knowledge/systems/android-farm/ci-cd.md), [src](companies/youdo/knowledge/systems/gitlab-ci/android-youdo4-dynamic-runner.md)
 - [ ] `fastlane-docker` worktree: untracked Firebase service-account JSON; move to a protected GitLab file variable, keep ignored (2026-08) — [src](companies/youdo/knowledge/systems/android-farm/ci-cd.md)
@@ -74,6 +75,43 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### nomad-test / Consul (Yandex test)
 
+- [x] TKB ordinary retries3230094–3230099 after approved PgBouncer auth/routes fix: all6GitLabSUCCESS/Nomadhealthy/restarts0 (2026-10-16) — [src](current/knowledge/log/2026-10-15-postgresql-devops-898-tkb-pgbouncer-auth-failure.md)
+- [x] Tochka ordinary retries3230100–3230105 after approved12PgBouncer routes: all6GitLabSUCCESS/Nomadhealthy/restarts0 (2026-10-16) — [src](current/knowledge/log/2026-10-15-postgresql-devops-898-tochka-pgbouncer-routes.md)
+
+- [ ] Cerberus2: approve scoped rollout of merged MR117 settings5433/No Reset On Close/timeout30s to remaining13stands; separately approve any stale membership recovery and verify sustained startup/replaced-allocation history. Source persistence done/master078c906; PgBouncer20standcapacity preparedonlyexistingDBs, test1timeout30applied; remaining13notdeployed, no cleanup authorized (2026-10-16) — [src](current/knowledge/log/2026-10-15-nomad-test-cerberus-pgbouncer-source-capacity20.md)
+
+- [x] DevOps-898 TKBmaster267/Tochkamaster1767 ordinary test10–test15 retries accepted after approved PgBouncer repair: all12GitLabSUCCESS/Nomadhealthy/restarts0. Billing707/MobileID58 already accepted; main Business remains last (2026-10-16) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-four-b2b-repositories-preflight.md)
+
+- [x] DevOps-898 Billing: user-deployed master-707/pipeline141010 ordinary test10–test15 jobs all SUCCESS/Nomad all6running/healthy/restarts0, read-only verified20:31UTC (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-billing-user-rollout.md)
+
+- [ ] DevOps-898 Billing production/release: parent141010 last running; verify independent production/release outcome separately, stand rollout accepted (2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-billing-user-rollout.md)
+
+- [x] DevOps-898 Mobile ID: user-deployed master-58/pipeline141008, ordinary jobs3229736–3229741 all SUCCESS/Nomad test10–test15 running/healthy/restarts0; read-only verified (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-mobile-id-user-rollout.md)
+
+- [x] DevOps-898 notifications: master-190 ordinary parallel deploy test10–test15 with DB recreation, jobs3229634–3229639 all SUCCESS/Nomad healthy/restarts0 (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-notifications-b2b-rollout.md)
+
+- [ ] DevOps-898 notifications production/release: downstream141004 last running, check final outcome separately; stand deployment accepted (2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-notifications-preflight.md)
+
+- [x] DevOps-898 auth-service: master-168 accepted on test10–test15 after B2BPG/PgBouncer1000 capacity fix and approved parallel ordinary retries, all6GitLab SUCCESS/Nomad healthy/restarts0 (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-auth-service-b2b-rollout.md)
+
+- [ ] DevOps-898 auth-service auto production downstream141002 last scheduled; check final production/release status separately, stand rollout already accepted (2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-auth-service-preflight.md)
+
+- [x] DevOps-898 SMS: master-191 deployed in parallel to test10–test15 using ordinary jobs with DB recreation; all6GitLab SUCCESS/Nomad healthy, all14target stands latest/healthy (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-sms-b2b-rollout.md)
+
+- [x] DevOps-898 keep-db routing: user merged MR91, mergeef128336/squash0cf1dde, GET verified; removes18child overrides, CI Lint/inheritance checks passed (done2026-10-15) — [src](current/knowledge/log/2026-10-15-gitlab-ci-devops-898-keep-db-vk-routing.md)
+
+- [x] DevOps-898 B2B Landings: master-109/pipeline141019 ordinary jobs3230150–3230155 allSUCCESS, Nomad test10–test15running/healthy/restarts0; user-approved deployment after nginx port fix MR19 merge, status-only verified00:08:46MSK (done2026-10-16) — [src](current/knowledge/log/2026-10-16-nomad-test-devops-898-landings-b2b-rollout.md)
+
+- [ ] DevOps-898 Landings production/release: master pipeline141019 last running; verify independent outcome separately, B2B stand rollout accepted (2026-10-16) — [src](current/knowledge/log/2026-10-16-nomad-test-devops-898-landings-b2b-rollout.md)
+
+- [x] DevOps-898 Kitcut: master-103 ordinary parallel jobs3229673–3229678 test10–test15 SUCCESS/Nomad running/healthy/restarts0, recreate_db=false preserved, no source edits (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-kitcut-b2b-rollout.md)
+
+- [ ] DevOps-898 Kitcut production/release: child141006 last running; check final outcome separately, stand rollout accepted (2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-kitcut-preflight.md)
+
+- [x] DevOps-898 DocValidation: master-757 ordinary parallel deploy test10–test15 with DB recreation, jobs3227436–3227441 SUCCESS/Nomad healthy; latest release accepted on all14target stands (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-docvalidation-b2b-rollout.md)
+
+- [x] DevOps-898 Fns: master-598 deployed in parallel to test10–test15 with ordinary jobs/DB recreation, all6GitLab SUCCESS/Nomad healthy/restarts0; C2C8same release verified, no repo changes needed (done2026-10-15) — [src](current/knowledge/log/2026-10-15-nomad-test-devops-898-fns-preflight.md)
+
 - [x] DevOps-898 current user-approved launch: ten single services and LogReader test5 deployed through GitLab and runtime-verified; Socket per-stand reverse MR82 merged, unused vks excluded/MR18 closed without merge/tag/deploy. Public-test unchanged; no YouTrack closure (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-898-implementation.md)
 - [ ] Restore/verify the other fifteen stand SQL endpoints before extending LogReader beyond the accepted test5 pilot; do not claim full sixteen-stand acceptance from the current one-group deployment (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-898-implementation.md)
 
@@ -87,7 +125,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [ ] Upgrade Nomad from `1.5.3` (all 7 clients and 3 servers on Yandex test, API 2026-09-30), fix `KillMode=process` (still in `automation-test-yandex` `deprecated/roles/nomad-client/templates/nomad.systemd.j2:10`); clean stale `/var/lib/nomad/alloc` on agent-test-02 (2026-07-21) — [src](companies/youdo/knowledge/log/2026-07-21-nomad-test-agent-test-02-crash-loop.md)
 
 - [ ] Jenkins controller DNS: integrate verified standalone dnsmasq role/overrides into canonical automation-services Jenkins configuration on an approved task branch; preserve unrelated changes (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-894-jenkins-es-plan.md)
-- [ ] DevOps-894: working dynamic_deploy final Pipeline saved and exact script approved; project ID in master d98f04c, retry(2); run working-job runtime acceptance on an approved stand (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-894-jenkins-es-plan.md)
+- [x] DevOps-894: working dynamic_deploy ES runtime acceptance verified on test5 in build5826 SUCCESS with ELASTIC=true; standalone thin/thick checks previously passed (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-plan-reconciliation.md)
 - [x] DevOps-894: Jenkins ES-only test job/credentials created; controller dnsmasq and global dc fixed; check3, full thin/test5 build5 and thick/test40GiB build6 SUCCESS; large ES dataset74,235,448docs verified (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-894-jenkins-es-plan.md)
 - [ ] DevOps-894: Cinder readiness wait and repeat test/thick reset verified: full deploy89.680s, repeat102.438s without manual force; automation published via Draft MR104; separately adapt DBA_Clean destination and restore AWX weekly workflow (2026-10-13) — [src](companies/youdo/knowledge/log/2026-10-13-nomad-test-devops-894-playbook-adaptation.md)
 - [x] DevOps-894: user-approved ES healthy_deadline2m/progress_deadline3m applied to templates and all14stands; simultaneous full deployment passed121.790s without retries (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-894-es-unlimited-redeploy.md)
@@ -97,7 +135,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [x] DevOps-897: verify VK MSSQL image and manually deliver CleanYouDo.bak90.1GiB to share10.18.26.4; active400GiB image confirmed, copied backup datedOct11, size/mtime verified, checksum skipped at user request (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-897-mssql-vk-preflight-and-backup.md)
 
-- [ ] DevOps-897: complete live seven-stage VK MSSQL run and reviewed publication; approved task branch/local uri adaptation withSSD400GiB and5fixturecases, base VM10.18.26.9 DHCP repaired/step1green, step2reboot completed with ignoredWindowsUpdate failures, step3restore completed/baseSHUTOFF, prepared-image step4launched/session18374 awaitingactive, stage5alsoexplicitlyexecuted/noexistingtargets; stage6/7notlaunched; migrate DBA_Clean delivery separately from one-time manual copy (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md)
+- [ ] DevOps-897: publish/review completed seven-stage VK MSSQL adaptation and apply previously planned stage1 prepared-image default; approved task branch/local uri adaptation withSSD400GiB and5fixturecases, base VM10.18.26.9 DHCP repaired/step1green, step2reboot completed with ignoredWindowsUpdate failures, step3restore completed/baseSHUTOFF, preparedimage active400GiB/stage4cleanup completed2026-10-15, stage5done/noexistingtargets; stage6completed2026-10-15 all3ACTIVE/high-iops400GiB/MS1 and WinRM passed, stage7completed2026-10-15 renames/Zabbix/SQL-server-name correction/reboots passed all3, full runtime run complete; application/SQL contents/monitoring ingestion unverified; publication pending; Jenkins5832 old thick SQL endpoint fix published as cdb11b5/[MR113](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/113), user-authorized MR113 merge completed/mastercf88e422 endpoint fields verified; endpoint retry/verification closed on user-reported successful playbook2026-10-15 (no independent new build/log check); full workflow publication remains pending ([diagnosis](companies/youdo/knowledge/log/2026-10-15-jenkins-build5832-mssql-old-endpoint.md)); migrate DBA_Clean delivery separately from one-time manual copy (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md)
 - [ ] MSSQL optional proposals only: disk-image provenance on reuse and exact boot-disk attachment ownership on deletion; user rejected adding new checks to DevOps-897 current run, implement only under separate request (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-897-vk-mssql-adaptation.md)
 
 - [x] DevOps-897: fix mcs.local query timeouts on8Nomad clients; route through IPsec/BIND10.18.20.3, private/system/Consul DNS verified8/8 (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-897-dnsmasq-private-forwarding.md)
@@ -158,12 +196,21 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### Jenkins recovery (DevOps-892)
 
+- [ ] Rotate BuildAPI credential stored as buildsinfo_pass in automation-test-yandex/group_vars/all.yml after agent diff hunk-header exposure; do not record its value (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-static-vk-deploy-audit.md)
+
+
+- [x] Merge static/common BuildAPI MR108 and configure project278 VK_TEST_NOMAD_TOKEN completed; build5823 passed config upload, no static deployment performed (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-static-vk-deploy-audit.md)
+
+
+- [x] test5 Rabbit cleanup accepted by user for Jenkins after local clear.yml success (ok3/failed0/ignored0, no401); Jenkins rerun not claimed. Optional nginx empty-input handling remains separate (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-errors-and-disable-quiet-hook.md)
+
+
 - [ ] Optional separate Restore hardening review (outside minimal VK address-adaptation scope): PG naming, MSSQL failure handling, Rabbit error reporting and S3 secret injection; do not implement during current deployment test (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-jenkins-restore-playbooks-review.md)
 
 
 - [x] Verify actual Jenkins job launch and controller credentialed GitLab checkout: test-git4 SUCCESS, revision a240575a6a360a908005fb3f1814fca13ee6e065; agent checkout remains pending (2026-10-13) — [src](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-892-git-smoke.md)
 
-- [ ] Finish Jenkins VK recovery: controller 10.18.26.8 and AutoTest 10.18.26.26 restored and internally verified; quiet mode restored after explicit user approval; API verified quietingDown=true. test-git4 SUCCESS on controller, queue0; permanent recovery hook remains. Agent current disk approved, 7.8 GB free. Replacement balancer 10.18.20.97 supplied by user: existing Nginx route HTTPS200/TLS verified with forced address; public DNS IP138.16.201.238 verified HTTPS200/TLS through corporate OpenVPN (already allowed source45.159.210.228). Local138.16.201.238/32 TrustTunnel exclusion prepared; user screenshot subsequently confirms authenticated browser access at https://build.youdo.sg. Active client route/restart status was not independently checked. Temporary runtime firewall ACCEPT for172.28.0.200/32 TCP80/443 removed at explicit user request; absence verified and public HTTPS through corporate OpenVPN still returns200. No firewall persistence is needed for that removed rule. Browser access is verified by the user; WebSocket forwarding remains to be verified. Restore backup DAG/source and backup-host SSH access. User deferred monitoring and Ansible Git publication on October13; keep local Ansible changes. Align approved Ansible/base compose image with verified digest override later; current base2-555-1-2 could restore defective image on future base-only apply. Actual job launch and controller credentialed GitLab checkout verified by test-git4 SUCCESS; AutoTest actual checkout remains pending. Downstream failures due to unavailable infrastructure are acceptable for this acceptance stage. Both hosts GitLab DNS/HTTPS200 verified. General quiet-mode release/removal of the persistent recovery hook still needs approval (2026-10-13) — [plan](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-892-vk-recovery-plan.md), [balancer check](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-892-vk-balancer-check.md)
+- [ ] Finish Jenkins VK recovery: controller/AutoTest restored, public HTTPS and controller checkout verified; dynamic_deploy5826 SUCCESS with Restore/ES/monolith/static/Suggestions. Remaining: AutoTest actual checkout/workflow; Airflow backup source/SSH/staging and verified fresh off-controller backup; align canonical Ansible image/DNS with working overrides. Monitoring and Git publication deferred by user. Public WebSocket forwarding only needed if agent uses public endpoint (2026-10-15) — [plan](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-892-vk-recovery-plan.md), [latest acceptance](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-plan-reconciliation.md)
 
 - [x] Persistent controller Git correction DevOps-891 complete: .dockerignore MR17 merged96a754a6, master pipeline140773SUCCESS, digest458ac695… deployed by approved recreation; root .git/key absent, stored-credential lookup205/master and API acceptance pass (2026-10-13) — [src](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-891-fixed-image-recreation.md)
 
@@ -438,3 +485,61 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 
 - [x] nomad-test DevOps-897: confirmed deletion of PA2 disk af3c6ccb-402e-4d2e-9b0b-d1a5fe075842 with fresh token, DELETE202/GET404; no replacement or VM (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-897-small-mssql-test5.md)
 - [x] nomad-test DevOps-897: published dad41d4/MR106 and explicitly authorized merge to master9ad35fb; one-line absent MSSQL job handling on DevOps-897-handle-missing-mssql-job; only deploy_mssql_nomad.yml, exclude all large DB local edits (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-897-small-mssql-test5.md)
+
+- [x] Monolith fresh NuGet restore/build3226699 andDocker3226700 completed after corrected MassTransit1.8.1 publication; direct Nomadtest5 version3 deployment successful, both groups healthy19services/restarts0; no source changes (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-monolith-messagebus-assembly-mismatch.md)
+
+- [x] Check final Jenkins dynamic_deploy5824: FAILURE onPostupdateauth timeout; monolith/static rollout successful andNomadhealthy/restarts0 (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-test5-full-deploy-with-static.md)
+
+- [x] Suggestions reindex deployment blocker superseded: Jenkins5826 SUCCESS with SUGGESTIONS_REINDEX=true; no claim about intervening fix/root cause (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-plan-reconciliation.md)
+
+- [x] Jenkins recovery quiet hook removed from startup at user request; backup retained outside init.groovy.d with0600/root, independent SSH check and API quietingDown=false; no restart (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-errors-and-disable-quiet-hook.md)
+
+- [x] Jenkins dynamic_deploy BuildAPI publication: four URLs corrected, HTTP failure handling enabled, exact script hash/approval verified; restored5826 test5 current/history metadata and checked rendered home; no deploy rerun (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-buildapi-publication-fix.md)
+
+- [ ] Jenkins nginx cache cleanup: optional separate request to handle empty grep input before xargs rm; observed ignored rc123 in5826, no fix implemented (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-errors-and-disable-quiet-hook.md)
+
+- [x] DevOps-899: eight selected Monolith services rebuilt/deployed on test5 and accepted in BuildAPI; antifraud23.8.7 directPG5432, escrow13.8.12/shared router healthy, monolith VK routing fixed, config/preprod audited. Form excluded (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-devops-899-monolith-microservice-recovery.md)
+- [x] Next test5 rollout: seven Nomad services deployed (broadcast1.2.11, featuretoggle1.0.11, Content2.5.13, Landings1.3.35, trackingpixel1.0.5, Socket1.2.9, Help1.0.14); moderation1.0.45 S3 accepted. BuildAPI metadata/live checked; Landings/Socket UI limits retained. Cerberus excluded (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-next-test5-service-rollout.md)
+- [ ] BuildAPI UI: map YouDo.Socket project name to socketchat Consul service for rendered version cell; live API and deployed1.2.9 already correct (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-next-test5-service-rollout.md)
+- [x] DevOps-899: seeded eight-service BuildAPI catalogs for13other stands with104correct per-stand manualjob IDs/URLs; GET verified, test5 unchanged (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-devops-899-monolith-microservice-recovery.md)
+- [ ] Diagnose runner DNS inconsistency: GitLab Docker DNS172.28.0.9 returns NXDOMAIN for nomad.service.vk-test.consul; intermittent dyninv lookup produced green zero-task deploys. No runner DNS change applied (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-devops-899-monolith-microservice-recovery.md)
+- [ ] Observe completion of automatic devdocker master pipeline140984 after internal client/DinD MR55; PostgreSQL latest already restored locally and Broadcast accepted (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-next-test5-service-rollout.md)
+
+### Featuretoggle test5
+
+- [x] User-approved featuretoggle-to-test5 PostgreSQL seed completed:149 features/293history rows; ordered data hashes match, ID sequences350/521 (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-nomad-test-featuretoggle-test5-seed.md)
+- [x] Inserted49missing production-CSV feature keys into test5 (38enabled/11disabled); verified198total keys and149existing rows unchanged (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-nomad-test-featuretoggle-test5-seed.md)
+- [x] Resolved featuretoggle-test5 old Npgsql auth with user-approved MD5 only for shared youdo role; default/other roles retain SCRAM, API HTTP200/198features verified (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-nomad-test-featuretoggle-test5-seed.md)
+
+- [x] SMS test5 master-191: all3images+188tests passed; approvedB2B44CIpublickeyadded/rootSSHverified; deploy3228662SUCCESS, migrations/webapp/worker healthy, BuildAPI accepted (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-nomad-test-sms-service-test5-deployment-analysis.md)
+
+- [ ] Jenkins: verify full deployments test2 #5828, test3 #5829, test7 #5830 and BuildAPI results; test8 cancelled and cleaned per user (2026-10-15) — [src](current/knowledge/log/2026-10-15-jenkins-four-stand-full-deploy.md)
+- [x] User-approved13featuretoggle DB clones completed from configured test5 to test,test1-test4,test6-test7,test10-test15; all hashes/sequences verified, source unchanged (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-nomad-test-featuretoggle-stand-clones.md)
+- [x] User-approved main featuretoggle refresh completed from configured test5 with protected backup;198features/301history, hashes/sequences verified (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-nomad-test-featuretoggle-stand-clones.md)
+
+- [x] Antifraud: subsequent user rollout jobs3229391–3229395 succeeded on test2/3/4/5/7; all allocations healthy and BuildAPI23.8.8 reconciled automatically (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-postgresql-antifraud-pgbouncer-minimal-setup.md)
+
+- [x] C2C PostgreSQL39: raise max_connections100→500, restart cluster16/main and verify SQL/PgBouncer/Antifraud health (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-postgresql-c2c-max-connections-500.md)
+
+- [x] PgBouncer PG39: max_client_conn100→500 approved/applied via reload; live SHOW CONFIG500 verified, backend cap10/2 preserved (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-postgresql-antifraud-five-stand-acceptance.md)
+
+- [x] Broadcast1.2.11: all eight test/test1-test7 accepted; seven new jobs succeeded, test5 retained, all migrations0/healthy0restarts/BuildAPI matched (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-broadcast-eight-stand-rollout.md)
+
+- [x] FeatureToggle1.0.11: all eight parallel test/test1-test7 jobs SUCCESS, Nomad running/healthy/zero restarts; user-requested status-only checks (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-featuretoggle-eight-stand-rollout.md)
+- [x] Landings1.3.35: all eight parallel test/test1-test7 jobs SUCCESS, Nomad running/healthy/zero restarts; status-only validation (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-landings-eight-stand-rollout.md)
+
+- [x] Socket1.2.9: test5 CLI monitoring failure diagnosed; user-requested retry3229442 SUCCESS; all eight jobs SUCCESS and Nomad healthy/zero restarts (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-socket-eight-stand-rollout.md)
+
+- [x] Help1.0.14: all eight parallel test/test1-test7 deploy jobs SUCCESS, Nomad running/healthy0restarts, status-only checks (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-help-eight-stand-rollout.md)
+
+- [x] Content2.5.13: all eight parallel deploy jobs SUCCESS and Nomad running/healthy0restarts, GitLab/Nomad statuses only (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-content-eight-stand-rollout.md)
+
+- [x] SMS master-191: all eight parallel jobs SUCCESS, Nomad running/healthy0restarts, status-only checks (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-sms-eight-stand-rollout.md)
+
+- [x] Moderation1.0.45: seven parallel static publication jobs SUCCESS; test5 retained; selected eight-stand rollout sequence complete (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-moderation-seven-stand-publication.md)
+
+- [x] Cerberus2:1.0.9 accepted on14stands test/test1-test7/test10-test15; GitLab all SUCCESS/Nomad all running/healthy, PG/PgBouncer1000 applied (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-jenkins-cerberus-eight-stand-rollout.md)
+
+- [ ] Cerberus2: switch DOTNET_BUILD_IMAGE and DOTNET_BASE_IMAGE to published internal SDK2.1/ASP.NET2.1 mirrors; explicitly deferred by user (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-base-images-dotnet21-mirrors.md)
+
+- [x] Base-images: SDK2.1/ASP.NET2.1 recipes MR42 merged/tagged, both images locally built/checked/pushed and registry verified; SDKCI canceled/runtimeCI succeeded (2026-10-15) — [src](companies/youdo/knowledge/log/2026-10-15-base-images-dotnet21-mirrors.md)

@@ -157,3 +157,23 @@ The user approved the second AP-2347 comment after replacing the redeployment wo
 ```text
 Восстановил в тестовом Nomad задания сервисов Redis, Redis Autotest, Traefik, OAuth2 Proxy, Kafka Schema Registry, Jaeger Agent, Alloy, Alloy Traces, Consul Exporter, CSI-плагина и Selenoid iOS GGR через Terraform. Развернул dynamic_inventory.
 ```
+
+### MSSQL DNS verification, 2026-10-15
+
+- Read-only SSH confirmed runners `gitlab-runner-docker-1` (`172.28.0.171`) and `gitlab-runner-docker-2` (`172.28.0.172`) still use host resolvers `172.28.0.6`/`.7` and Docker daemon DNS `172.28.0.8`/`.9` from `/etc/docker/daemon.json`.
+- From both hosts, direct A queries to each Docker resolver for `vk-ms1-sql-test.mcs.local` returned `NXDOMAIN`. This confirms the configured container upstreams lack the current MSSQL record; it is not merely a connection timeout. No DNS or runner settings were changed.
+- Escrow.Tinkoff job3227460 ran on runner105 (`172.28.0.171`) and failed before migrations while creating the MSSQL database.
+
+### Follow-up Escrow test1 failure, 2026-10-15
+
+User-performed conditional forwarding update: WindowsDNS `.8`/`.9` initially pointed mcs.local to10.18.20.65, then changed to10.18.20.3. Both Windows resolvers successfully returned existing Jenkins agent record10.18.26.26, but cached MSSQL negatives remained. Escrow project422 job3229458 (`deploy-yandex-test 1/17`, test1, runner105/.171) failed after16.5s creating MSSQL DB: Login timeout/TCP0x2AF9 for vk-ms1-sql-test1.mcs.local. No migration or Nomad submission reached. Fresh queries from .171: `.8`/`.9` NXDOMAIN with rootSOA TTL85/89seconds; gateway10.18.20.3 NOERROR10.18.26.121. Negative caching is a hypothesis consistent with declining TTL; no Windows cache cleared or job retried by agent. Safe diagnosis receipt in ai-data/jenkins-recovery/monolith-services-audit/escrow3229458-diagnosis.json.
+
+### DNS forwarding recovery confirmed, 2026-10-15 20:22 MSK
+
+After user changed Windows mcs.local forwarders to10.18.20.3 and earlier negative TTL expired, both172.28.0.8/.9 returned NOERROR for vk-ms1-sql-test1.mcs.local10.18.26.121 and vk-ms1-share-test01.mcs.local10.18.26.4. Read-only15s tcpdump on gateway10.18.20.3 directly confirmed each Windows DNS request arriving via gre_selectel and matching successful reply. This establishes actual forwarding/reachability rather than only cache behavior. Earlier continuing NXDOMAIN after forwarder correction is consistent with expired negative cache; no runner DNS configuration fix required. User-authorized host caches on both runners flushed with resolvectl; no Docker restart. Incidental AAAA SERVFAIL for nomad.service.vk-test.consul observed; A answers correct; separate observation, not investigated or changed.
+
+Follow-up full DNS matrix: both runners172.28.0.171/.172 queried both Docker upstreams172.28.0.8/.9 for all3MSSQL names. All12queries returned expected A records: test10.18.26.17, test1 10.18.26.121, test6 10.18.26.9. DNS resolution verified; SQL connectivity not tested in this matrix.
+
+### Default host resolver differs from Docker DNS
+
+User asked whether resolution works without specifying a DNS server. Read-only `getent ahostsv4` for all3MSSQL names returned no records on either runner. Default `dig` and `resolvectl query` for test1 explicitly returned NXDOMAIN/not-found. Both hosts still use172.28.0.6/.7 with domainlocal, nsswitch `hosts: files dns`; explicit Docker upstreams172.28.0.8/.9 return all3correct records. No running CI build containers were available on either host, so in-container default-resolution check was not possible without creating a new container. Do not conflate successful explicit Windows DNS checks with default host resolver recovery. No host DNS configuration changed.

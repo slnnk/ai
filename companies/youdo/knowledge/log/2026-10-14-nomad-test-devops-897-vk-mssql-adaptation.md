@@ -1,7 +1,7 @@
 ---
 system: nomad-test
 status: verified
-checked: 2026-10-14
+checked: 2026-10-15
 tags: [mssql, ansible, vk-cloud, recovery]
 ---
 # DevOps-897: adapt the seven-stage large MSSQL refresh to VK
@@ -89,3 +89,55 @@ User first deferred further large DB work until tomorrow, then explicitly reques
 User explicitly asked to launchstage5 now. Executed onlyrun_workflow.py --stage step_5 (session87250),exit0,recapok39/changed1/failed0/skipped24. Exactmanagednames vk-ms1-sql-test/test1/test6 and associatednameddisks/ports were absent; all actualdelete tasks skipped. Changed1 was localinventoryadd_host forbase, not a resource deletion. No stage6/7 invoked. Backgroundstage4 image preparation remains separately running; no extra provider checks were performed for this request.
 
 Stage4status on explicit userrequest: liveAnsible18374 stillwaiting. FreshAPI preparedimageb204affb-cf20-473c-816e-09cb03d76421 / vk-ms1-sql-base saving,sizeunset; sourcediskb6553d1a-35f7-4bbd-88c0-0b699212f090 uploading/MS1/400GiB, baseVM3cd129ea-9b4e-4b1e-84fb-2a575522f979 SHUTOFF. No cleanup begun, no completion claimed.
+
+## Stage4 completion verified2026-10-15
+
+On explicit status request, live session18374 returnedexit0 and recapok61/failed0. Preparedimage becameactive; Windowsmetadata preserved; temporarybase VM, Neutronport andbootdisk deletion waits completed. FreshAPI confirms imageb204affb-cf20-473c-816e-09cb03d76421 / vk-ms1-sql-base active,size429496729600bytes(400GiB), no matchingbaseVM orvolume. Temporary10.18.26.9 service address is retired; originalyc-sql-base was excluded fromstage4deletion. Stage5previously passed with no oldmanagedtargets; stages6/7 not launched. Next authorized decision is creation ofthree largeVMs frompreparedimage. Futureweeklystep1 prepared-image boot selection is still a local implementation item, not yet applied.
+
+
+## Stage6 high-IOPS launch (2026-10-15)
+
+User requested resuming stage6 for only the three large stands test/test1/test6, changing their disks to Network High-IOPS SSD (`high-iops`) and keeping placement in MS1. Applied one scoped variable override, `mssql_vk_volume_type: high-iops`, in `playbooks/roles/yandex-mssql-test/tasks/6-create-test-instances-from-base-image.yml`; base-stage default remains ceph-ssd. Existing checkout is `DevOps-899-fix-microservice-postgres-auth`; no branch switch, staging, commit, push or MR operation occurred, and all prior edits were preserved.
+
+Read-only live API preflight found no matching target VMs/disks and confirmed prepared image `b204affb-cf20-473c-816e-09cb03d76421` active, 400GiB. The `high-iops` volume type extra_specs advertises GZ1, MS1, ME1 and PA2; volume and compute MS1 availability was confirmed. Existing Cinder volume and Nova server requests both explicitly set `availability_zone: MS1`; Keystone API endpoint region remains RegionOne, distinct from the MS1 availability zone.
+
+`python3 /home/slnnk/ai-data/mssql-vk-dns/run_workflow.py --stage step_6 --syntax-check` exited0 (legacy inventory progress stderr/group warning), and `git diff --check` exited0. Started the user-requested `python3 /home/slnnk/ai-data/mssql-vk-dns/run_workflow.py --stage step_6`, live session96718; execution is progressing, completion not yet verified. Stage7 was not launched. Local generated `cloud_status.py` now reports Nova availability zone and accepts `--placement`; credentials remain outside outputs/notes. Post-run resource state, guest access and final recap remain unverified at this observation.
+
+Fresh API after launch confirms first disk `vk-ms1-sql-test`, ID `599ef47e-db00-4d17-ad10-7a54c4a0c480`, downloading, 400GiB, type `high-iops`, availability zone `MS1`. No target VM yet; test1/test6 remain absent while sequential stage6 waits for the first disk.
+
+
+## Parallel stage6 continuation (2026-10-15)
+
+The initial sequential stage6 API observation found boot disk `vk-ms1-sql-test`, ID `599ef47e-db00-4d17-ad10-7a54c4a0c480`, downloading, 400GiB, volume_type high-iops, availability_zone MS1, no matching VM; test1/test6 had not yet been created because the loop waited for the first disk.
+
+User then requested parallel creation. Stopped only the local sequential controller session96718 with SIGINT, exit99; existing cloud disk was preserved. Modified only generated `/home/slnnk/ai-data/mssql-vk-dns/run_workflow.py`: `--stand` accepts test/test1/test6 exclusively with step6 and passes an extra-vars singleton `mssql_vk_stands` list. Syntax check exited0. No further repository change or Git action.
+
+Started three independent `run_workflow.py --stage step_6 --stand <stand>` controllers: test/session43477, test1/session51636, test6/session43232. Each inherits the existing high-iops disk type and explicit MS1 Cinder/Nova placement. All controllers launched; final cloud creation, guest availability and completion remain pending. Stage7 not launched. This supersedes the sequential-session96718 in-progress status above.
+
+Parallel-run API verification: all three disks are downloading concurrently, each 400GiB/high-iops/MS1. IDs: test `599ef47e-db00-4d17-ad10-7a54c4a0c480`; test1 `e465ddf6-5472-4f34-b50e-e083cc4cc71b`; test6 `902c74bb-8081-4d38-abf7-a3d0b4f010b7`. No matching VMs yet.
+
+
+## Stage6 completion verified (2026-10-15)
+
+All three independent stage6 controllers completed with exit0 and WinRM wait successful: test/session43477 recap ok58/changed1/failed0/unreachable0/ignored0; test1/session51636 and test6/session43232 each ok59/changed1/failed0/unreachable0/ignored0. Fresh API verification found all three Nova VMs ACTIVE with `OS-EXT-AZ:availability_zone: MS1` and all boot disks in-use, 400GiB, volume_type high-iops, availability_zone MS1.
+
+| Stand | VM ID | Private IPv4 | Boot disk ID |
+| --- | --- | --- | --- |
+| test | 2471779c-5f34-49b4-a462-0ea7051c7591 | 10.18.26.17 | 599ef47e-db00-4d17-ad10-7a54c4a0c480 |
+| test1 | 5056803d-cc7d-47b1-b81c-1a5577779fb5 | 10.18.26.121 | e465ddf6-5472-4f34-b50e-e083cc4cc71b |
+| test6 | 24ab1d9d-6d7f-4326-96d1-21ef65dd1108 | 10.18.26.9 | 902c74bb-8081-4d38-abf7-a3d0b4f010b7 |
+
+Updated `current/service-addresses.env` with these three large-stand addresses and observation date, explicitly distinguishing cloud/WinRM verification from SQL verification. The former temporary base address10.18.26.9 is now assigned to test6. No SQL content verification performed; stage7 has not run, and reviewed Git publication remains pending. This supersedes all stage6-pending observations above.
+
+
+## Stage7 completion verified (2026-10-15)
+
+User explicitly requested starting stage7. `ai-sync.sh` emitted nothing. Ran `python3 /home/slnnk/ai-data/mssql-vk-dns/run_workflow.py --stage step_7`, session12238, exit0. Recap: localhost ok11/changed1/failed0; each of test/test1/test6 ok7/changed6/unreachable0/failed0/ignored0.
+
+Windows renames to sql-test/sql-test1/sql-test6 and their rename reboots passed; VBS copy and Zabbix FQDN configuration change passed; credential-hidden `sqlcmd -b` execution of `sp_CorrectServerName` passed; final `win_reboot` passed for all three. The seven-stage runtime run is complete. No repository edits, staging, commits, pushes or publication occurred in this stage.
+
+This verifies the executed guest configuration tasks, not application behavior, SQL schema/data contents or monitoring ingestion. Git publication/review and the previously recorded future stage1 prepared-image default change remain pending; no extra checks were added. This supersedes stage7-pending observations above.
+
+## YouTrack comment refreshed (2026-10-15)
+
+User explicitly requested updating the MSSQL task comment. Updated existing DevOps-897 comment `74-124677` through the YouTrack API; no duplicate comment created. Replaced obsolete stages6/7-not-started status with completed seven-stage runtime, three ACTIVE400GiB high-iops/MS1 VMs, successful stage7, merged endpoint MR113/cf88e422 and user-reported successful playbook acceptance. Preserved thin-job results, WindowsUpdate limitation, unpublished complete workflow/prepared-image first-stage follow-up and regular DBA_Clean delivery scope. Exact saved text verified by a fresh GET; SHA256 `df94c61f97dbe3ecf5039af969e6e47707e2690e330a954e7485e363089d941d`. Local text/helper/receipt are under `/home/slnnk/ai-data/mssql-vk-dns/devops-897-comment-*` and `update-devops-897-comment.py`.
