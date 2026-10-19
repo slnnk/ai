@@ -1,7 +1,7 @@
 ---
 system: jenkins
 status: verified
-checked: 2026-10-15
+checked: 2026-10-16
 tags: [jenkins, recovery, vkcloud]
 ---
 
@@ -12,6 +12,14 @@ tags: [jenkins, recovery, vkcloud]
 Jenkins controller and AutoTest agent restored on VK hosts on 2026-10-13 under [DevOps-892](https://youtrack.youdo.com/youtrack/issue/DevOps-892). Controller is accessible internally at http://10.18.26.8/. Authorized checkout-only test-git build4 succeeded on the controller; quiet mode was restored after explicit user approval and API confirmed quietingDown=true. Persistent controller image Git correction was merged, published and verified after approved recreation; stored-credential branch lookup returns205/master. AutoTest actual checkout and downstream workflows remain untested. Later that day the user supplied replacement balancer 10.18.20.97: its existing Nginx route to the VK controller returned HTTPS 200 with normal certificate validation using a forced address. Public HTTPS at138.16.201.238 is verified through corporate OpenVPN. After the local TrustTunnel exclusion was prepared, the user supplied a screenshot confirming the authenticated Jenkins UI opens at https://build.youdo.sg; the screenshot does not independently establish the active client route. WebSocket forwarding remains unverified. Historical Jenkins notes incorrectly use DevOps-890, which is the Nexus task; do not carry their completion status into DevOps-892.
 
 Latest acceptance: dynamic_deploy5826 completed SUCCESS on test5 on2026-10-15 with Restore, Elasticsearch, monolith/static, buildsinfo and Suggestions reindex enabled. B2B Elasticsearch/microservices were disabled. Four ignored Ansible failures including HTTP401 remain; successful status does not verify Rabbit cleanup. See [5826 reconciliation](../log/2026-10-15-jenkins-build5826-plan-reconciliation.md). Earlier quiet-mode and failed-build checkpoints below are historical.
+
+## Microservice version selection
+
+Verified2026-10-16: dynamic_deploy5847/5848 on test reapplied badgekeeper21.13.5 from BuildAPI /ms_builds/test despite successful MR36 deployment3232612. BuildAPI delete_stale_ms_build removes feature-ref records whenever a default-branch/semver release record exists;3232612 publication returned insert1/deleted1. Jenkins retries the saved pipeline deploy job even if already successful. Badgekeeper fallback was skipped in5848. Retaining the actual latest deployment requires a separate BuildAPI correction; no fix applied. [Investigation](../log/2026-10-16-jenkins-badgekeeper-5848-version-selection.md).
+
+## Controller timezone
+
+Since 2026-10-16 the controller's default display timezone is `Europe/Moscow`. The active Compose service sets `TZ=Europe/Moscow` and `JAVA_OPTS` includes `-Dorg.apache.commons.jelly.tags.fmt.timeZone=Europe/Moscow`; Jenkins `System Information` confirmed both `user.timezone` and the formatter property after container recreation. This is the default for users without a personal timezone preference. The host OS timezone/clock was not changed. [Change log](../log/2026-10-16-jenkins-controller-timezone-moscow.md).
 
 ## Hosts and access
 
@@ -175,3 +183,12 @@ User-authorized full dynamic_deploy builds test2 #5828, test3 #5829, test7 #5830
 After5831, user cancelled test8: four stand-specific Nomad jobs and dedicated5GiBESvolume deleted; no matching jobs/activeallocations remain. Subsequent cleanup explicitly limited to BuildAPI: exact test8 documents removed from builds/allbuilds/ms_builds; shared resources and remaining data retained. [Evidence](../log/2026-10-15-jenkins-test8-cleanup.md).
 
 Jenkins dynamic_deploy5832 FAILURE2026-10-15 for test/RESTOREtrue: master381391de5d8c21b58ea73f928b5b52c6a63d68b3 still uses old thick MSSQL endpoint, causing controller TCP1433 timeout to sql-test.ru-central1.internal in restartMSSQLSERVER; snapshot Restore never invoked. Controller DNS/TCP1433 succeeds for all3VK names/addresses. User-approved three-variable endpoint publication completed as cdb11b5522ec6c30fae9cd5086898ff70f2cd2ba / [MR113](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/113), source DevOps-897-point-large-mssql-to-vk to master; effective inventory and syntax/YAML/diff checks passed, pipelines[]. User explicitly authorized MR113 merge; fresh GET confirms merged cf88e42259787a8c6350771d17726bd4fcff3e30 and master SQL fields point at VK for all3stands. User subsequently reported successful playbook execution after the endpoint merge; endpoint fix accepted on that report, no independent new build/log verification. No local Git merge/switch; full workflow publication remains separate/pending. [Diagnosis and separate errors](../log/2026-10-15-jenkins-build5832-mssql-old-endpoint.md).
+
+## DNS on controller and AutoTest (2026-10-16)
+
+Controller host uses dnsmasq10.18.26.8 →10.18.20.3; controller container uses Docker127.0.0.11 with cached external127.0.0.53. Both resolve buildsinfo.vk-test.youdo.local → CNAMEbuildapi.dev.youdo.corp →10.18.26.60. AutoTest now uses dnsmasq on10.18.26.26 →10.18.20.3, with searchyoudo.local and Consul forwarding matching the controller. systemd-resolved is disabled. Host getent, dig through127.0.0.53, and agent-container getent resolve buildsinfo.vk-test.youdo.local to10.18.26.60. Applied existing dnsmasq role on2026-10-16; [live evidence](../log/2026-10-16-jenkins-autotest-buildsinfo-local-dns.md).
+
+
+## VK Selenium and diagnostic access
+
+BuildAPI VK operational kubeconfig also provides read access to Selenium: `/home/slnnk/ai-data/buildapi-vk/kubeconfig-ci.yaml` (mode0600, context `default/vk-ms1-k8s-test`), matched to project77 file variable `KUBECONFIG_DEV` (scope `kube-test`). Local exec auth plugin is `/home/slnnk/ai-data/buildapi-vk/bin/client-keystone-auth`; prepend that directory to PATH for `kubectl --kubeconfig ...`. Do not copy kubeconfig contents into notes. Selenium endpoint ingress is `selenium.dev.youdo.corp` →10.18.26.60, namespace `selenium`. Build3362 on2026-10-16 correlated its session-start EOF with KEDA scale-from-zero, registry DNS timeout and Chrome pods unschedulable on two workers; details and evidence: [Selenium incident](../log/2026-10-16-jenkins-selenium-vk-grid-session-eof.md).

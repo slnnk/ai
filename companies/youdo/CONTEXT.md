@@ -40,6 +40,12 @@ and diagnostics.
 
 ## Conventions
 
+- CI deployment target selection (verified 2026-10-16): inherited project/group `NOMAD_ADDR` and `NOMAD_TOKEN` override job YAML variables. Inspect effective inheritance and pass the reviewed target explicitly to Nomad CLI using the intended deploy-token variable; test with conflicting generic inherited placeholders before publication. [Incident](knowledge/log/2026-10-16-nomad-test-devops-898-houstonv2mock-vk-assessment.md).
+
+- Recovery YouTrack work summaries (user correction, 2026-10-16): update the existing summary comment when present; do not add duplicate new comments. Preserve earlier performed-work evidence and replace superseded limitations.
+
+- Service deployment workflow (user correction, 2026-10-16): default to the service's established GitLab deploy jobs. Do not substitute direct Nomad job-spec updates or change established database recreation/preservation behavior unless the user requests it. Cerberus ordinary GitLab deployment recreates the stand database on every run; retain that policy rather than inventing metadata repair to preserve it. [Correction and rollout](knowledge/log/2026-10-16-nomad-test-cerberus-standard-gitlab-rollout.md).
+
 - Base-images release source (user correction, 2026-10-14): release tags in `youdo/base-images` must point to commits on `master`, after the reviewed MR is merged. Do not release from an unmerged feature branch. Tag creation/replacement and rebuild still require explicit user authorization; this rule does not grant standing permission for external writes.
 
 - Jenkins shared credentials (user, 2026-10-14): use stable service/environment IDs without task prefixes. Created IDs: `vk-test-nomad`, `vk-test-consul`, `vk-test-cloud`; use these in the ES test Pipeline. This naming correction does not authorize renaming existing unrelated credentials.

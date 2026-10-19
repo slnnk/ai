@@ -1,0 +1,1 @@
+- [ ] Fix failed-test post-build trigger in `youdo_web_testing_one/two/three`: replace stale Jenkins API host, move hard-coded auth to Credentials and rotate, verify enqueue (2026-10-16) — [src](knowledge/log/2026-10-16-jenkins-selenium-vk-grid-session-eof.md)

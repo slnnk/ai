@@ -22,7 +22,7 @@ Parent played explicitly approved ordinary jobs3230150–3230155; receipts ~/ai-
 
 All six ordinary jobs SUCCESS: test10=3230150, test11=3230151, test12=3230152, test13=3230153, test14=3230154, test15=3230155. All six Nomad jobs running, not stopped, IMAGE_TAGmaster-109; desired allocations running, deployment healthytrue, task restarts0. Fixed port mapping therefore satisfies existing Nomad health conditions. No database configured for this service.
 
-Master pipeline141019 still running due independent production/release stages; stand acceptance does not claim their completion. Other services' acceptance is recorded separately.
+Master pipeline141019 still running due independent production/release stages; stand acceptance does not claim their completion. Other services' acceptance is recorded separately. Peer monitor also confirmed TKB and Tochka accepted after PgBouncer repair at21:08UTC; only main youdo-business remains in the B2B rollout order.
 
 ## Changes
 
@@ -35,3 +35,7 @@ Acceptance strictly follows GitLab/Nomad status scope. No application integratio
 ## Portable lesson
 
 none
+
+## Production completion and public browser routes
+
+Read-only GitLab verification after the user reported completion: pipeline141019 canary3230158, production update3230159 and release3230161 all `success`; rollback3230160 remains manual. Public browser routes supported by app routes and production nginx configuration: `https://youdo.com/selfemployed/terms`, `/selfemployed/personal-data-processing-conditions`, `/selfemployed/marketing`. Source: `youdo.business.landings/src/shared/models/route.model.ts:2-4`, `vite.config.ts:14`; public proxy `automation-services/roles/nginx/templates/vhost/youdo.com.j2:509-515`, backend `inventories/prod_selectel/group_vars/balancers:586-587`. Browser checks suggested: page styling, document links/archive, direct deep-link reload; assets and read-only `/business/api/public-docs/{terms,pdn,marketing}` requests succeed with no JavaScript errors. Live browser validation not performed.

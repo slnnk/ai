@@ -44,3 +44,7 @@ The plan is not deployment acceptance or authorization. Repository adaptations r
 ## Portable lesson
 
 none
+
+## Final delivery 2026-10-16
+
+All13 planned catalog services available on test10–test15, with existing shared doc-generator reused. Business was last: master-21509 ordinary jobs3230182–3230187 SUCCESS, all6Nomadhealthy/restarts0, all66taskimage references verified. [Final rollout and corrections](2026-10-16-nomad-test-devops-898-business-rollout.md). Delivery verified through GitLab/Nomad statuses per user instruction; no additional functional acceptance claimed.
