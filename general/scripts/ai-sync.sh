@@ -2,13 +2,14 @@
 # ai-sync.sh — once-a-day commit and push of the ~/ai knowledge base.
 #
 # Agents call this at the start of every task. It is cheap and idempotent:
-#   - if ~/ai/.last-sync already holds today's date, it exits immediately;
+#   - checks changed agent instructions/skills/settings with report-only agnix;
+#   - if ~/ai/.last-sync already holds today's date, Git work is skipped;
 #   - otherwise it rebuilds the indexes, commits any changes, pulls with rebase,
 #     pushes to all remotes and records today's date.
 #
 # Commit message: subject lists the touched areas (company, general/<tech>, ...);
-# body contains the lines agents appended to ~/ai/.sync-notes ("what and why")
-# followed by every changed note with its title. .sync-notes is emptied after the
+# body groups distinct final work summaries by system, followed by file counts
+# and up to eight reference notes. .sync-notes is emptied after the
 # commit. Agents append with:  echo "- <system>: <what changed and why>" >> ~/ai/.sync-notes
 #
 # Usage:
@@ -32,7 +33,7 @@
 set -u
 AI_ROOT="${AI_ROOT:-$HOME/ai}"
 STATE="$AI_ROOT/.last-sync"
-NOTES="$AI_ROOT/.sync-notes"   # one line per piece of work, appended by agents, cleared after commit
+NOTES="$AI_ROOT/.sync-notes"   # one final result/reason/check/risk line per task, cleared after commit
 TODAY="$(date +%F)"
 FORCE=0; DRY=0
 
@@ -48,12 +49,23 @@ done
 
 cd "$AI_ROOT" || { echo "ai-sync: $AI_ROOT not found" >&2; exit 1; }
 
-if [ "$FORCE" -eq 0 ] && [ "$DRY" -eq 0 ] && [ "$(cat "$STATE" 2>/dev/null)" = "$TODAY" ]; then
-  exit 0
-fi
-
 log() { echo "ai-sync: $*"; }
 fail() { log "FAILED: $*"; exit 1; }
+
+# Exit before any working-file/index/state mutation or scheduled generation.
+if [ "$DRY" -eq 1 ]; then
+  exec python3 -B general/scripts/ai_sync_preview.py --root "$AI_ROOT"
+fi
+
+# Agent lint runs even after today's Git sync, catching edits between tasks.
+# It is report-only: errors remain visible/pending and never block knowledge sync.
+if ! python3 -B general/scripts/agent_lint.py --root "$AI_ROOT"; then
+  log "agent lint needs review or could not complete; retry remains pending (Git sync continues)"
+fi
+
+if [ "$FORCE" -eq 0 ] && [ "$(cat "$STATE" 2>/dev/null)" = "$TODAY" ]; then
+  exit 0
+fi
 
 # 1. indexes
 python3 general/scripts/build_index.py >/dev/null || fail "build_index.py"
@@ -135,18 +147,6 @@ if grep -q '^[EW] ' "$LINT"; then
   log "lint findings to fix (commit proceeds):"; grep '^[EW] ' "$LINT" | sed 's/^/  /'
 fi
 rm -f "$LINT"
-
-added=$(git diff --cached --name-status | grep -c '^A' || true)
-modified=$(git diff --cached --name-status | grep -c '^M' || true)
-deleted=$(git diff --cached --name-status | grep -c '^D' || true)
-renamed=$(git diff --cached --name-status | grep -c '^R' || true)
-
-if [ "$DRY" -eq 1 ]; then
-  log "dry run: $added added, $modified modified, $deleted deleted, $renamed renamed"
-  git diff --cached --name-status | sed 's/^/  /'
-  git reset -q
-  exit 0
-fi
 
 # 3. commit with a message built from agent notes and changed-note metadata
 if ! git diff --cached --quiet; then

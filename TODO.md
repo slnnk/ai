@@ -20,7 +20,14 @@ Paths below are relative to `~/ai/`.
 
 ## YouDo (`current`)
 
-- [ ] HoustonV2Mock CI: consider persistent Buildx attestation compatibility setting for future releases; current0.0.34recovery uses pipeline-only override, no extra source changes requested (2026-10-16) — [src](current/knowledge/log/2026-10-16-nomad-test-devops-898-houstonv2mock-vk-assessment.md)
+### content / production S3
+
+- [x] Prepare Selectel correlation for slow youdo-photos PUT: sampled trace148ae312ae4a95 shows24.246sS3/24.559saction, trace127cc1a1ed5770 thumbnail10.918s; reference currentofficialincident406434published13:57Moscow (slowuploads/500andfastretry409mechanism) and earlier406285resolved05:47; correlate earlier11:09/11:29symptoms and actualonset (2026-10-19) — [src](current/knowledge/log/2026-10-19-content-selectel-s3-put-latency-comparison.md) — Closed by user 2026-10-19: cause attributed to the Selectel incident; further incident diagnostics cancelled, not implemented.
+
+- [x] Review Shift248 C2C creation outcome before retry; address Business30s deadline versus seven sequential successful Content uploads taking37.729s and obtain a sampled representative upload trace separating SQL, two storage writes, limiter wait and JPEG processing; historical incident flags00/0 yielded no saved spans, CPUthrottling counters0 (2026-10-19) — [src](current/knowledge/log/2026-10-19-content-s3-thumbnail-conflicts.md) — Closed by user 2026-10-19: cause attributed to the Selectel incident; further incident diagnostics cancelled, not implemented.
+
+- [x] Diagnose repeated Content thumbnail PUT409 and anomalous object Max384/2026.10.19/21498533.jpeg: zero-filled prefix/empty ETag/HEAD200 but no list entry; correlate recorded S3 read request IDs with Selectel and obtain failed-PUT details. Eight keys now HEAD200; original JPEG header verified; bucket limits disabled per user screenshot (2026-10-19) — [src](current/knowledge/log/2026-10-19-content-s3-thumbnail-conflicts.md) — Closed by user 2026-10-19: cause attributed to the Selectel incident; further incident diagnostics cancelled, not implemented.
+
 
 - [x] DevOps-898 HoustonV2Mock0.0.35 deployed by user through staging3232321/pipeline141077SUCCESS; VK1sharedallocationhealthy/0restarts/Consulpassing, test5Swagger+experimentsHTTP200. WrongSelecteljobuserdeleted, explicit-targetfixMR21verified (2026-10-16) — [src](current/knowledge/log/2026-10-16-nomad-test-devops-898-houstonv2mock-vk-assessment.md)
 
@@ -83,6 +90,8 @@ Deferred, decide later: Adminer / DB discovery; `youdo-business-tickets` onboard
 QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billing `GetYouDoBalanceHistoryTest` assertions; Tochka hard-coded token fallback — [src](companies/youdo/knowledge/log/2026-09-04-dev-deployment-devops-832-handoff.md)
 
 ### nomad-test / Consul (Yandex test)
+
+- [ ] HoustonV2Mock CI: consider persistent Buildx attestation compatibility setting for future releases; current0.0.34recovery uses pipeline-only override, no extra source changes requested (2026-10-16) — [src](current/knowledge/log/2026-10-16-nomad-test-devops-898-houstonv2mock-vk-assessment.md)
 
 - [x] TKB ordinary retries3230094–3230099 after approved PgBouncer auth/routes fix: all6GitLabSUCCESS/Nomadhealthy/restarts0 (2026-10-16) — [src](current/knowledge/log/2026-10-15-postgresql-devops-898-tkb-pgbouncer-auth-failure.md)
 - [x] Tochka ordinary retries3230100–3230105 after approved12PgBouncer routes: all6GitLabSUCCESS/Nomadhealthy/restarts0 (2026-10-16) — [src](current/knowledge/log/2026-10-15-postgresql-devops-898-tochka-pgbouncer-routes.md)
@@ -244,7 +253,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [x] Publish final three approved periodic runtime tags ab-pipeline:master/rowers-ranker:0.19.3/recommended-tasks-generator:1.16.24; push exit0 and independent configs match. Final manifest GETs verify8of8runtime refs for23periodic jobs; seven configs match our publications and cashflow:master is a verified later CI image, not overwritten. No job/deploy/merge (2026-10-13) — [src](companies/youdo/knowledge/log/2026-10-13-nexus-pypi-library-batch-recovery.md)
 
 ### web-autotests (Jenkins `Web+API Tests`, Selenium Grid k8s-dev)
-- [ ] Investigate VK Cloud worker creation/registration: quota API shows88 vCPU/150 GB RAM free and autoscaler requests remain below max10, but new nodes timed out registering; inspect provider events/logs. Validate worker-host DNS path to registry.youdo.sg (transient timeout in build3362; none in3363 retry chain) (2026-10-16) — [src](companies/youdo/knowledge/log/2026-10-16-jenkins-selenium-vk-grid-session-eof.md)
+- [ ] Investigate VK Cloud worker creation/registration: quota API shows88 vCPU/150 GB RAM free and autoscaler requests remain below max10, but new nodes timed out registering; inspect provider events/logs. Validate worker-host DNS path to registry.youdo.sg (transient timeout in build3362; none in3363 retry chain) (2026-10-16) — [src](companies/youdo/knowledge/log/2026-10-16-jenkins-selenium-vk-grid-session-eof.md) Manual minimum increase on2026-10-19 succeeded by12:11UTC: min3/target3/Ready3, new workers-2; subsequent Selenium demand-driven3->4scale-up succeeded by12:21UTC/all12ChromeReady12:22UTC, while historical timeout root cause/provider logs remain unresolved ([check](current/knowledge/log/2026-10-19-vk-cloud-k8s-manual-minimum-scale-check.md)). Evening20:17UTC check confirmed Selenium-driven3->4->5->6 scaling, all6Ready/min3/max10 and3scale-down candidates; historical timeout cause remains open ([evidence](current/knowledge/log/2026-10-19-vk-cloud-k8s-six-workers-selenium.md)).
 
 - [ ] Wait for QA feedback on web autotests after `scalingType: deployment`; for a fair wall-time comparison with Selenoid run regress part 1 from `master` on `test7` (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
 - [ ] Selenium Grid deployment mode: during the next regress runs (only then do chrome pods exist; none on 2026-10-01, no tests running) watch scale-down of busy node pods and browser state leaks across sessions (2026-10-01) — [src](companies/youdo/knowledge/log/2026-10-01-web-autotests-selenium-keda-polling-interval-effect.md)
@@ -341,6 +350,8 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### GitLab recovery
 
+- [ ] If requested separately, persist the Ansible5.10.0 Ubuntu package-manager adaptation upstream; the historical tag recipe fails on its mutable Ubuntu Nomad parent (2026-10-19) — [src](companies/youdo/knowledge/log/2026-10-19-gitlab-ansible-playbook-3236157-local-build.md)
+
 - [x] Manual Molecule job3219872 start declined by user after f4018c2b DinD28.5.2 publication in MR1371; not run, no CI-success claim (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-automation-services-nomad-docker-auth.md)
 
 - [x] Publish reviewed ansible-molecule-toolset Dockerfile recovery after approval;81f3a8e/[MR1](https://gitlab.youdo.sg/sysadmins/ansible-molecule-toolset/-/merge_requests/1) published, remote SHA/MR verified, local build passed (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md)
@@ -361,7 +372,11 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### Agent Git/MR training
 
-- [ ] due 2026-10-30: Prepare Git/MR training results for 2026-10-08 through 2026-10-30: proposal acceptance, user corrections, rule updates, permission/check outcomes and recommendation; review with the user before automation or extended training. Keep supervised mode until that decision (2026-10-08) — [src](companies/youdo/knowledge/systems/gitlab-ci/agent-git-workflow.md)
+- [x] Implement the unified local-first GitLab workflow skill, repository helper and guarded MR verification while retaining both approvals (2026-10-19) — [src](companies/youdo/knowledge/log/2026-10-19-gitlab-ci-gitlab-workflow-skill.md)
+- [x] Prepare Git/MR training results early at the user's request; report covers 2026-10-08 through 2026-10-19 instead of waiting until October 30 (2026-10-19) — [src](companies/youdo/knowledge/log/2026-10-19-gitlab-ci-agent-git-training-early-report.md)
+- [x] Review the early Git/MR training report: user chose to retain both approvals while automating information gathering and review-material preparation (2026-10-19) — [src](companies/youdo/knowledge/log/2026-10-19-gitlab-ci-agent-git-training-early-report.md)
+
+- [ ] due 2026-10-30 (proposed; first active session on/after): review Git/MR training since October 19; assess task scope, task-only staging, approval compliance, CI-effect predictions, publication verification and corrections; retain both approvals unless explicitly changed — [src](companies/youdo/knowledge/systems/gitlab-ci/agent-git-workflow.md)
 
 ### youdo-chat-agent (DevOps-882)
 
@@ -372,7 +387,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [x] DevOps-896 / dynamic_inventory closed by the user on 2026-10-14; prepare/release/deploy: MR26 merged2bc44941; approved VK Consul/Vault/CI config, release-0.56.4, no-attestation rebuild140830 and manual deployment3224500 succeeded; DNS/direct GET200,16stands/64Nomad aliases/0SQL (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-13-gitlab-ci-dynamic-inventory-vk-migration-plan.md)
 - [x] DevOps-896: accept user-reported closure; consumer cutover, live SQL mapping and repeated-refresh caveats are retained in the work log without reopening the task or claiming verification. Further work requires a separate request (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-13-gitlab-ci-dynamic-inventory-vk-migration-plan.md)
 
-- [ ] Decide whether to remove the obsolete local `~/mygit/youdo-ai` copy; optional proposal only, no deletion authorized (2026-10-12) — [src](companies/youdo/knowledge/log/2026-09-30-rp-rp-skill-consolidation.md)
+- [x] Remove obsolete local `~/mygit/youdo-ai` after explicit user request; deletion verified, canonical RP skill links/data retained (2026-10-19) — [src](current/knowledge/log/2026-10-19-rp-obsolete-local-copy-removed.md)
 - [ ] Decide whether a broader read-only check of other test5 RabbitMQ exchanges is still needed after the signin fix; optional proposal (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-07-rabbitmq-test5-signin-exchange-auto-delete-mismatch.md)
 
 - [x] nomad-test / gitlab-ci dynamic_inventory: dnsmasq port 53 proxy restored by the user's temporary playbook on `10.16.28.11-13`; verified 2026-10-10 15:51:31 MSK, both runners resolve through Windows `.8`/`.9` with `NOERROR` and Nomad leader GET succeeds — [src](companies/youdo/knowledge/log/2026-10-10-gitlab-ci-dynamic-inventory-consul-dns.md)
@@ -404,15 +419,23 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 
 ## Knowledge base
 
+- [x] Require report-only agnix after agent instruction/skill/settings changes and add change-aware ai-sync fallback before same-day Git skip;16new tests+10sync tests,live9files0errors,previous optional mode superseded; no auto-fix or Git blocking gate (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-agnix-enforcement.md)
+- [ ] Document installation and setup rules for `~/ai` on another PC: prerequisites, clone/layout and `current` symlink, agent instruction/skill links, secrets and generated data outside Git, external tools such as pinned agnix, and first-run checks (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-agnix-instruction-loading-pilot.md)
+- [x] Research additional local-agent rules, skills and knowledge retrieval for Claude Code, Codex and portable use; expanded through Context Awesome/awesome lists and original sources, bounded local inventory and recommendations documented; no installation/configuration changes (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-agent-capabilities-research.md)
+- [x] Complete agent pilot1 and retain agnix by explicit user decision as optional manual report-only lint: isolated0.59.0, native Codex loading probe,8files/9classified diagnostics; KB-root duplication and stale Claude cache identified, fixes deferred (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-agnix-instruction-loading-pilot.md); original optional mode subsequently superseded by [mandatory checks and sync fallback](personal/knowledge/log/2026-10-19-knowledge-base-agnix-enforcement.md), and deferred findings fixed in step3
+- [x] Complete bounded agent pilot2 on Codex using Skill Creator methodology: five paired scenarios,17/17 assertions per condition, three expected native skill-read probes; no added quality benefit demonstrated, rules unchanged; Claude-specific extension blocked separately (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-skill-evaluation-pilot.md)
+- [ ] Resume Claude skill evaluation after organization access is restored or another authentication method is explicitly authorized; current startup returns is_error with subscription access disabled,0tokens; do not count it as a passed/failed behavioral trial (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-skill-evaluation-pilot.md)
+- [x] Complete agent step3: explicit canonical paths, stale Claude cache replaced with pointers, Codex KB-cwd duplicate instructions removed through bounded project override; native loading1copy in3cwd,agnix0errors,five fresh regression runs17/17 checks; approval policy preserved (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-local-rule-corrections.md)
+- [ ] Choose next proposed agent pilot step4-9; broader/adversarial/repeated skill tests remain proposals and later implementation is not yet authorized (2026-10-19) — [completed corrections](personal/knowledge/log/2026-10-19-knowledge-base-local-rule-corrections.md), [trial order](personal/knowledge/log/2026-10-19-knowledge-base-agent-capabilities-research.md)
 - [ ] Monthly staleness review 2026-11: first review; offer on the first agent session in November, not necessarily November 1; refresh the due-note count with `general/scripts/build_index.py --stale 30`; wait for user agreement (rescheduled by user 2026-10-09) — [src](personal/knowledge/log/2026-10-09-knowledge-base-monthly-review-first-session.md)
-- [ ] Decide whether to enforce a final note-to-TODO reconciliation check: the two-week audit found stale note lists and two untracked proposals (2026-10-12) — [src](personal/knowledge/log/2026-10-12-knowledge-base-agent-behaviour-two-week-review.md)
-- [ ] Decide whether to shorten sync work summaries and exclude generated `__pycache__` files; keep audit details in task logs (2026-10-12) — [src](personal/knowledge/log/2026-10-12-knowledge-base-agent-behaviour-two-week-review.md)
-- [ ] Fix `ai-sync.sh --dry-run` semantics in a separate task: existing code rebuilds indexes and changes the git index despite promising no changes; defect identified by inspection (2026-10-12) — [src](personal/knowledge/log/2026-10-12-knowledge-base-agent-behaviour-two-week-review.md)
+- [x] Adopt mandatory final note-to-TODO reconciliation for substantial work: only task-affected records, source-linked remaining actions, consistent completed/cancelled/deferred status, preserved history and proposals without execution permission (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-agent-learning-record-final-note-todo-reconciliation-da23f6ff0112c778d7f8.md)
+- [x] Shorten sync work summaries and exclude generated Python cache: exact deduplication, grouping, bounded note references and one final result per task; six bytecode files removed from tracking with local copies retained (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-sync-preview-and-summary.md)
+- [x] Fix `ai-sync.sh --dry-run`: private temporary index/object store and in-memory regenerated indexes; 10 sync tests and live zero-change snapshot passed; unsupported shared Git storage fails safely (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-sync-preview-and-summary.md)
 
 ### Token cost optimization (proposed 2026-09-23)
 
 - [ ] due 2026-10-21: compare Codex October 7–13 baseline with October 14–20 using `ai-data/token-cost/audit.py --end-date 2026-10-21`; normalize full/partial reads and full-size proxy per KB-active and tool-active session, report parser coverage; decide whether reading rules need adjustment (2026-10-14) — [src](personal/knowledge/log/2026-10-14-knowledge-base-token-cost-comparison.md)
-- [ ] Consider updating the automated `token_usage.py --kb` Codex classifier to parse nested shell calls: current weekly snapshots collapse functions.exec wrappers and misattribute note sizes; verified audit script is available outside the KB repository (2026-10-14) — [src](personal/knowledge/log/2026-10-14-knowledge-base-token-cost-comparison.md)
+- [x] Improve automated `token_usage.py --kb` Codex accounting: nested static shell extraction, per-command/file reads and explicit incomplete coverage; 17 tests and live report passed, token-total brief output unchanged (2026-10-19) — [src](personal/knowledge/log/2026-10-19-knowledge-base-codex-nested-shell-accounting.md)
 
 
 ---

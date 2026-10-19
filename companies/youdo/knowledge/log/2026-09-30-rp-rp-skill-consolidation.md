@@ -66,3 +66,6 @@ Deleting the obsolete `~/mygit/youdo-ai` copy is an optional proposal, not an au
 ## Portable lesson
 
 none
+
+## Obsolete copy removed (2026-10-19)
+The user explicitly requested deleting `~/mygit/youdo-ai`. The [cleanup record](2026-10-19-rp-obsolete-local-copy-removed.md) confirms deletion and canonical RP link/data checks. This supersedes the October 12 pending authorization status; the central TODO cleanup item is closed. Historical migration evidence is preserved.

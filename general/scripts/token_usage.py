@@ -23,7 +23,13 @@ Columns: fresh input, cache read, cache write, output, in tokens (k = thousand, 
     index     reading an INDEX.md
     full      Read without offset/limit, or cat/less of a note without head/sed/grep
     partial   Read with offset/limit, or head/tail/sed -n/awk on a note
-Paths reached via `cd` and a bare file name are not recognized.
+Codex: statically extract nested shell calls from functions.exec, then classify
+individual shell commands (including cwd/cd and partial-read pipelines).
+Requires Node.js and Acorn for JS wrappers; missing dependencies and unsupported
+calls are reported as incomplete coverage, never guessed as reads.
+Counts are requested static reads, not confirmed output or token savings.
+"full KiB" uses current note file sizes, not historical returned bytes.
+Claude tool classification retains its existing heuristics.
 
 No prices: multiply by the current price list yourself if a cost is needed.
 Record expensive sessions and why in the knowledge-base log (see ~/ai/TODO.md).
@@ -35,6 +41,8 @@ import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+from token_usage_kb import extract_shell_calls, classify_command, classification_status
 
 HOME = Path.home()
 CLAUDE = Path(os.environ.get("CLAUDE_PROJECTS", HOME / ".claude/projects"))
@@ -149,26 +157,102 @@ def claude_tool_calls(since):
                         yield d.get("sessionId") or f.stem, c.get("name"), c.get("input") or {}
 
 
-def codex_tool_calls(since):
-    """Yield (session_id, 'shell', {'command': text}) for Codex tool calls."""
-    for f in CODEX.rglob("*.jsonl"):
-        if datetime.fromtimestamp(f.stat().st_mtime, timezone.utc) < since:
-            continue
-        with f.open(errors="replace") as fh:
-            for line in fh:
-                if '"response_item"' not in line:
-                    continue
-                try:
-                    d = json.loads(line)
-                except ValueError:
-                    continue
-                p = d.get("payload") or {}
-                if not d.get("timestamp") or ts(d["timestamp"]) < since:
-                    continue
-                text = {"custom_tool_call": p.get("input"), "function_call": p.get("arguments"),
-                        "local_shell_call": json.dumps((p.get("action") or {}).get("command"))}.get(p.get("type"))
-                if text:
-                    yield f.stem[-36:], "shell", {"command": text}
+def codex_tool_calls(since, coverage=None):
+    """Yield extracted shell calls; never execute code from the transcripts.
+
+    JS wrappers are parsed in batches. Direct shell calls are decoded separately;
+    unrelated tool arguments (e.g. apply_patch) are not shell commands.
+    """
+    coverage = coverage if coverage is not None else defaultdict(int)
+    pending = []
+
+    def flush():
+        sources = [source for _, _, source in pending]
+        for (sid, cwd, _), result in zip(pending, extract_shell_calls(sources)):
+            coverage["wrappers"] += 1
+            for key in ("exec_nodes", "unresolved", "parse_error", "unavailable"):
+                coverage[key] += result[key]
+            coverage["static"] += len(result["calls"])
+            for call in result["calls"]:
+                yield sid, "shell", {"command": call["cmd"],
+                                     "cwd": call.get("workdir") or cwd}
+        pending.clear()
+
+    # Archived sessions can contain recent tool calls too.
+    roots = [CODEX, CODEX.parent / "archived_sessions"]
+    seen_files = set()
+    for root in roots:
+        for f in root.rglob("*.jsonl"):
+            resolved = f.resolve()
+            if resolved in seen_files:
+                continue
+            seen_files.add(resolved)
+            if datetime.fromtimestamp(f.stat().st_mtime, timezone.utc) < since:
+                continue
+            cwd = str(HOME)
+            seen_calls = set()
+            with f.open(errors="replace") as fh:
+                for line in fh:
+                    try:
+                        d = json.loads(line)
+                    except ValueError:
+                        continue
+                    p = d.get("payload") or {}
+                    if d.get("type") in ("session_meta", "turn_context"):
+                        cwd = p.get("cwd") or cwd
+                        continue
+                    if d.get("type") != "response_item" or not d.get("timestamp"):
+                        continue
+                    if ts(d["timestamp"]) < since:
+                        continue
+                    typ = p.get("type")
+                    if typ not in ("custom_tool_call", "function_call", "local_shell_call"):
+                        continue
+                    cid = p.get("call_id") or p.get("id")
+                    if cid and cid in seen_calls:
+                        continue
+                    if cid:
+                        seen_calls.add(cid)
+                    name = p.get("name", "")
+                    sid = f.stem[-36:]
+                    if name in ("functions.exec", "exec") and typ == "custom_tool_call":
+                        source = p.get("input")
+                        if isinstance(source, str):
+                            pending.append((sid, cwd, source))
+                            if len(pending) >= 400:
+                                yield from flush()
+                        else:
+                            coverage["invalid_calls"] += 1
+                        continue
+                    if typ == "local_shell_call":
+                        args = p.get("action") or {}
+                    elif name in ("exec_command", "functions.exec_command", "shell", "functions.shell", "shell_command", "functions.shell_command"):
+                        args = p.get("arguments") if typ == "function_call" else p.get("input")
+                        try:
+                            args = json.loads(args) if isinstance(args, str) else args
+                        except ValueError:
+                            coverage["invalid_calls"] += 1
+                            continue
+                    else:
+                        continue
+                    if not isinstance(args, dict):
+                        coverage["invalid_calls"] += 1
+                        continue
+                    cmd = args.get("cmd", args.get("command"))
+                    if isinstance(cmd, list):
+                        # local_shell_call uses argv; only unwrap known shell -c forms.
+                        if len(cmd) >= 3 and Path(str(cmd[0])).name in ("bash", "sh", "zsh") and cmd[1] in ("-c", "-lc", "-ic"):
+                            cmd = cmd[2]
+                        else:
+                            import shlex
+                            cmd = shlex.join(cmd) if all(isinstance(x, str) for x in cmd) else None
+                    if not isinstance(cmd, str):
+                        coverage["invalid_calls"] += 1
+                        continue
+                    coverage["direct"] += 1
+                    yield sid, "shell", {"command": cmd, "cwd": args.get("workdir") or args.get("cwd") or cwd}
+    if pending:
+        yield from flush()
 
 
 def classify(name, inp):
@@ -215,23 +299,41 @@ def kb_report(since):
     stats = defaultdict(lambda: defaultdict(int))
     sessions = defaultdict(set)
     full_notes = defaultdict(int)
-    for agent, calls in (("claude", claude_tool_calls(since)), ("codex", codex_tool_calls(since))):
+    coverage = defaultdict(int)
+    for agent, calls in (("claude", claude_tool_calls(since)),
+                         ("codex", codex_tool_calls(since, coverage))):
         for sid, name, inp in calls:
-            kind, notes = classify(name, inp)
-            if not kind:
-                continue
-            stats[agent][kind] += 1
-            sessions[agent].add(sid)
-            if kind == "full":
-                for n in notes:
-                    full_notes[n.split("knowledge/", 1)[-1]] += 1
-                    stats[agent]["full_bytes"] += note_size(n)
+            if agent == "codex":
+                if not classification_status(inp["command"]):
+                    coverage["shell_parse_error"] += 1
+                entries = [(kind, [path] if path else []) for kind, path in
+                           classify_command(inp["command"], inp["cwd"], str(AI_ROOT), str(HOME))]
+            else:
+                kind, notes = classify(name, inp)
+                entries = [(kind, notes)] if kind else []
+            for kind, notes in entries:
+                stats[agent][kind] += 1
+                sessions[agent].add(sid)
+                if kind == "full":
+                    for n in notes:
+                        full_notes[n.split("knowledge/", 1)[-1]] += 1
+                        stats[agent]["full_bytes"] += note_size(n)
     print("\nKnowledge-base access (heuristic, see --help):")
-    print(f"{'agent':<7} {'sess':>4} " + " ".join(f"{k:>8}" for k in kinds) + f" {'full KB':>8}")
+    print(f"{'agent':<7} {'sess':>4} " + " ".join(f"{k:>8}" for k in kinds) + f" {'full KiB':>8}")
     for agent in ("claude", "codex"):
         st = stats[agent]
         print(f"{agent:<7} {len(sessions[agent]):>4} " + " ".join(f"{st[k]:>8}" for k in kinds)
               + f" {st['full_bytes'] // 1024:>8}")
+    print("Codex parser coverage: "
+          f"{coverage['wrappers']} wrappers, {coverage['exec_nodes']} shell sites, "
+          f"{coverage['static']} static calls, {coverage['direct']} direct calls; "
+          f"{coverage['unresolved']} dynamic sites, {coverage['parse_error']} JS parse failures, "
+          f"{coverage['unavailable']} wrappers unavailable, "
+          f"{coverage['invalid_calls']} invalid calls, {coverage['shell_parse_error']} shell parse failures.")
+    if any(coverage[k] for k in ("unresolved", "parse_error", "unavailable", "invalid_calls", "shell_parse_error")):
+        print("Codex coverage is incomplete; excluded calls are not treated as zero KB access.")
+    print("KB counts describe static requested reads; full KiB is a current-file-size estimate, not token usage.")
+    print("Shell parsing is heuristic: dynamic paths, custom readers and runtime control flow may be missed.")
     if full_notes:
         print("Most read in full:")
         for n, c in sorted(full_notes.items(), key=lambda kv: -kv[1])[:5]:

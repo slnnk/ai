@@ -102,3 +102,11 @@ devdocker project63 CI now uses registry.youdo.sg/youdo/base-images/docker:git a
 ## Shared monitoring kubectl image (2026-10-15)
 
 gitlab-ci-templates MR90 merged master7bd1578: v3/.monitoring.yml deploy-monitoring uses registry.youdo.sg/youdo/base-images/kubectl:1.35.6 instead of externalBitnamilatest. Rules/scripts unchanged. Newconsumerpipelinesadopt; oldjob3228652snapshot unchanged. No newSMS pipeline or monitoringdeployment performed. See [publication record](../log/2026-10-15-gitlab-ci-monitoring-internal-kubectl.md).
+
+## Ansible 5.10.0 historical tag recovery (2026-10-19)
+
+User-requested local build/push for job3236157 completed: `registry.youdo.sg/sysadmins/ansible-playbook:ansible-5-10-0`, push-reported digest `sha256:a399762c28ebe8001f80a8838a869fd28385735fd4c8a50e9f7c03379a1e0dd5`. The old tag `ansible_5.10.0` uses Alpine `apk` against the current Ubuntu Nomad parent; only the extracted local build context was adapted to apt. No additional checks or upstream changes, per requested scope. [Build evidence](../log/2026-10-19-gitlab-ansible-playbook-3236157-local-build.md).
+
+## Gear feature-readme alias (2026-10-19)
+
+User-requested `registry.youdo.sg/sysadmins/devops-tools/gear:feature-readme` alias copied from `master-5` (master pipeline56738/IID5); manifest `sha256:262285d5fa853e8310e65b60105f7de0e6e7d381a24757d1e2926ac1cee6ebdb`. Literal registry tag `master` does not exist. Alias push succeeded; consumer job3235910 was not retried. [Evidence](../log/2026-10-19-gitlab-gear-feature-readme-alias.md).

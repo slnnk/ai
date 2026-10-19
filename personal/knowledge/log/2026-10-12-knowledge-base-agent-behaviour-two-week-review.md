@@ -69,3 +69,11 @@ Notes are agent self-reports. Log-note dates do not cover every file changed dur
 ## Portable lesson
 
 A single backlog needs reconciliation at task completion: a completed decision in TODO can coexist with obsolete action wording in a dated log. A non-empty daily work section establishes recorded substance, but does not prove every change or action was covered.
+
+## Sync implementation follow-up (2026-10-19)
+The user requested all sync improvements. The [implementation record](2026-10-19-knowledge-base-sync-preview-and-summary.md) supersedes the pending sync-summary/cache and dry-run proposals: concise summaries, bytecode exclusions and removal from tracking, and an isolated read-only preview are implemented and verified. The separate decision on final note-to-TODO reconciliation remains in the central backlog.
+
+## Final reconciliation rule adopted (2026-10-19)
+The user explicitly approved the bounded completion check. This supersedes the earlier pending-decision statements: before the final response after substantial work, reconcile only records created or changed for that task with the central TODO. The canonical short rule is in `~/ai/AGENTS.md`; the detailed procedure is in `general/knowledge/README.md`, "Final note-to-TODO reconciliation". The log template now keeps dated status, risks and central-backlog links rather than an independent action list.
+
+The [decision evidence](2026-10-19-knowledge-base-agent-learning-record-final-note-todo-reconciliation-da23f6ff0112c778d7f8.md) records the user's approval. Changed files: AGENTS.md, the README procedure/template, the central TODO and this dated audit follow-up. Existing findings and historical decisions were preserved. The adoption item is closed in TODO; no new implementation work or external tracker changes follow from this rule.

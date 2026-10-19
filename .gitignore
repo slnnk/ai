@@ -4,3 +4,7 @@
 # per-machine state of the daily sync
 .last-sync
 .sync-notes
+
+# generated Python bytecode (keep source scripts only)
+__pycache__/
+*.py[co]

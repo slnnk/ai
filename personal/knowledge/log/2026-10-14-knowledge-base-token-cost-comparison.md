@@ -73,3 +73,6 @@ Additional limits: counts represent static requested reads, without success/outp
 - Repeat on October 21: `python3 /home/slnnk/ai-data/token-cost/audit.py --end-date 2026-10-21 --output /home/slnnk/ai-data/token-cost/2026-10-21`, comparing October 7–13 with October 14–20.
 
 Conclusion: this supplies a corrected current baseline for Codex. No previous-week trend or causal effectiveness claim is justified. Reading-rule changes are deferred pending comparable Codex evidence. Future actions are tracked only in the central TODO.
+
+## Regular report update (2026-10-19)
+The user subsequently requested implementation. The [regular classifier update](2026-10-19-knowledge-base-codex-nested-shell-accounting.md) adds static nested-shell extraction, per-command/file classification and parser coverage to `general/scripts/token_usage.py --kb`. This supersedes the statement above that the canonical classifier remains unchanged. The separate audit and fixed-window October 21 comparison remain available; historical snapshots were not regenerated.

@@ -24,7 +24,7 @@ and diagnostics.
 - Registries and storage: Nexus (`msk3-nexus.youdo.corp`), container registry
   `registry.youdo.sg`, Yandex Object Storage for reports and artifacts.
 - Observability: Zabbix; VictoriaMetrics with vmagent and Grafana; Loki with Alloy agents
-  (Loki runs in the dev cluster, `loki.dev.youdo.corp`); Sentry; Jaeger tracing;
+  (production Loki `loki.infra.youdo.corp` runs in `mks-infra`; dev Loki `loki.dev.youdo.corp`); Sentry; Jaeger tracing;
   Elasticsearch.
 - Product: .NET services and base images; MSSQL and PostgreSQL; RabbitMQ, Redis, Hangfire
   (on PostgreSQL); Temporal (dev, in progress); iOS and Android apps.
@@ -67,7 +67,8 @@ and diagnostics.
 - Environment names carry meaning: `prod`/`production` is sensitive, `test` and `dev`
   are shared stands. Treat anything named prod as change-controlled.
 - Company skills live in `~/ai/current/skills/`: `rp` (daily and sprint reports from
-  Mattermost and YouTrack), `android-dig` (Android CI infrastructure diagnosis).
+  Mattermost and YouTrack), `android-dig` (Android CI infrastructure diagnosis),
+  `gitlab-workflow` (local-first Git/GitLab work with two supervised approvals).
 - Secrets for tooling are in `~/ai/current/.env` (GitLab, YouTrack, Jenkins, Nomad,
   Consul, Zabbix tokens). Never copy values elsewhere.
 - Android farm maps follow the extended template in `general/knowledge/README.md`.
@@ -79,5 +80,6 @@ and diagnostics.
 
 ## Operational scripts
 
-- `scripts/gitlab_task_mr.py`: GitLab task publication helper (`inspect`, `publish`, `verify`; see `--help`). Uses the existing company GitLab token environment variable without printing its value. Publication requires the supervised workflow approval in `knowledge/systems/gitlab-ci/agent-git-workflow.md`.
+- `scripts/gitlab_repo.py`: local checkout discovery/inspection, explicit clone/fetch and publication proposal snapshots. See `--help`; inspection performs no network calls.
+- `scripts/gitlab_task_mr.py`: GitLab task publication helper (`inspect`, `publish`, `verify`; see `--help`). Uses the existing company GitLab token environment variable without printing its value. Publication requires the supervised approvals in `skills/gitlab-workflow/SKILL.md`; MR and optional pipeline verification results are separate.
 - `scripts/gitlab_ci_lint.py`: read-only GitLab CI lint/dry-run helper; see `--help`. Validates parent/child configuration without creating a real pipeline.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learning from corrections"
+  short_description: "Capture corrections and apply shared rules across agents"
+  default_prompt: "Use $agent-learning to process corrections and retrieve applicable rules."

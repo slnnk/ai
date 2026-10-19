@@ -55,8 +55,9 @@ One recipe per file, `<topic>-<slug>.md`, no date in the name; the date lives in
     ## Changes
     Files, configs, roles, playbooks, services, MRs.
 
-    ## Open items
-    Risks and next steps as of this date. Actionable items also go to `~/ai/TODO.md`.
+    ## Status and risks
+    Dated outcome, remaining risks and links to the relevant central TODO entries.
+    Keep actionable follow-ups in `~/ai/TODO.md`, not a separate live list here.
 
     ## Portable lesson
     Link to `general/knowledge/...` if one was written, otherwise "none".
@@ -147,12 +148,16 @@ gradually while working; do not crawl the whole filesystem.
 
 | Script | Purpose |
 | --- | --- |
+| `general/scripts/todo.py [--layer TEXT] [--system TEXT] [--query TEXT]` | deterministic Markdown list of all open tasks; optional case-insensitive literal substring filters; `--file PATH` for another backlog |
 | `general/scripts/new_note.py log\|system\|recipe ...` | create a note with correct path, name and frontmatter |
 | `general/scripts/kb_find.py <keywords>` | compact search: path, system, status, checked, title and matching lines per note |
-| `general/scripts/token_usage.py [--days N] [--kb] [--brief]` | token totals of Claude Code and Codex sessions per project/model, top sessions; `--kb` counts how agents read the knowledge base (kb_find, search, INDEX, full vs partial reads); run weekly by `ai-sync.sh` into `personal/usage/` |
+| `general/scripts/agent_learning.py --help` | record, retrieve and check scoped correction-learning evidence; workflow in `general/skills/agent-learning/SKILL.md` |
+| `general/scripts/agent_lint.py [--force] [paths ...]` | report-only agnix for changed instructions/skills/settings; successful input hashes and sanitized report in `~/ai-data/agnix/`; sync fallback runs before same-day Git skip |
+| `general/scripts/token_usage.py [--days N] [--kb] [--brief]` | token totals of Claude Code and Codex sessions per project/model, top sessions; `--kb` counts requested knowledge-base reads (kb_find, search, INDEX, full vs partial); Codex nested shell calls use static Node.js/Acorn parsing with explicit coverage; full KiB estimates current note sizes, not tokens; run weekly by `ai-sync.sh` into `personal/usage/` |
 | `general/scripts/kb_lint.py [--staged]` | check frontmatter, log names, links, secrets, company identifiers in `general/`, language, missing `## Summary` in long maps and recipes, `AGENTS.md` over 5.5 KB |
 | `general/scripts/build_index.py` | rebuild `INDEX.md` in every layer; `--stale 30` lists notes due for review: maps older than 30 days, recipes older than `--recipe-days` (180), all `hypothesis`; `--count` prints the number |
 | `general/scripts/ai-sync.sh` | once-a-day lint, index, commit and push; weekly token usage report (see below) |
+| `general/scripts/ai_sync_preview.py [--root PATH]` | isolated read-only sync preview, also used by `ai-sync.sh --dry-run`; includes regenerated knowledge indexes |
 
 Company identifiers that must never appear in `general/` are listed one per line in
 `companies/<name>/lint-identifiers.txt`; private IP ranges and `*.corp` hosts are checked
@@ -161,30 +166,107 @@ by default. Use RFC 5737 addresses (192.0.2.x, 198.51.100.x, 203.0.113.x) in rec
 Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
 `extract-recipe.md`).
 
+## TODO output
+
+Standalone `todo` and `задачи` requests, or requests to list the backlog, use
+`python3 ~/ai/general/scripts/todo.py`. The default includes every unchecked item in
+`~/ai/TODO.md`, including deferred proposals; checked items are excluded wherever they
+appear. Listing is read-only and grants no permission to act on any item.
+
+The output begins with `Открытые задачи: N`, followed by Russian heading paths and
+ordinary `- description` bullet lists in file order. Use short Russian action titles,
+typically 6–12 words and at most 120 characters. No blank lines between items in a group;
+keep a blank line before each heading and before its list. Preserve useful task IDs and
+explicit deferral/proposal labels. Implementation details and full permission conditions
+remain in source TODO; listing grants no execution permission. Omit dates, checkboxes,
+source references and completed historical detail. Do not
+omit tasks, reorder or prioritize. Markdown headings define groups; free-standing prose
+is not a task. Fenced examples are ignored. Source TODO entries remain unchanged.
+With no matches, return `Открытых задач нет.`; a read error is an error, not zero tasks.
+
+Russian descriptions live in `~/ai-data/todo/display-ru.json`, outside Git: `tasks` maps
+SHA-256 of each complete original entry to its Russian description, and `headings` maps
+original headings to Russian labels. This is a derived presentation cache, not another
+backlog. Only entries still open in TODO are displayed. Changed source text invalidates
+its description; stale text is never silently reused. No translation API is called.
+
+After editing TODO entries, agents refresh affected descriptions in the same task. If a
+list request exits with status 2, run `todo.py --missing` with the same filters, translate
+only the returned entries/headings, merge strings into the cache while preserving other
+keys, and rerun. Keep each title on one line, at most 120 characters, with no bullet
+prefix, date or link. Overlong titles require refresh instead of silent truncation.
+Do not infer completion or merge separate source items when shortening descriptions.
+`--display PATH` overrides the cache location. With a current cache, list requests need
+one script call and no model translation of the full backlog.
+
+Use filters only when the user requests a subset: `--layer` matches the top heading,
+`--system` matches lower headings, `--query` matches headings or item text. All matches
+are case-insensitive literal substrings; combined filters use AND. Query also searches
+cached Russian descriptions. Return the complete
+script stdout as the final Markdown answer without a code fence or extra commentary.
+This display contract does not replace the separate rule for preserving an agent-proposed
+list when reporting its remaining unfinished items after completing work.
+
 ## Indexes
 
 `python3 ~/ai/general/scripts/build_index.py` rewrites `knowledge/INDEX.md` in every
 layer (`general`, `personal`, `current`). Run it after adding or renaming notes.
 
+## Final note-to-TODO reconciliation
+
+Before the final response after substantial work, review only the notes created or changed
+for that task, including its work log and affected system maps, against `~/ai/TODO.md`.
+
+1. Ensure remaining actions are represented in the central backlog with source-note links;
+   reuse existing entries rather than creating duplicates. Notes retain dated status, risks
+   and links, not independent live task lists.
+2. Mark completed items closed only when supported by the actual result. Distinguish work
+   the user cancelled or explicitly closed without action from work that was implemented.
+3. Keep deferred work open with its deferral context, date or resumption condition when
+   known. Respect the user's decision to stop; do not revive cancelled diagnostics.
+4. Supersede stale directions with a dated final status or explicit reference to the later
+   outcome, preserving historical actions and decisions instead of silently rewriting them.
+5. Label optional improvements as proposals for a decision. Recording an item never grants
+   permission to implement it or change external systems.
+
+Check that the final response agrees with these records. Report unresolved ambiguity as
+such; do not invent completion, user decisions or authorization. Do not scan unrelated
+notes, perform additional infrastructure checks or change external task trackers as part
+of this reconciliation. This is an agent review of meaning; link/format lint alone cannot
+prove that statuses agree.
+
 ## Daily sync
 
 `~/ai/general/scripts/ai-sync.sh` is called by agents at the start of every task. On the
 first call of a day it rebuilds indexes, commits everything, pulls with rebase and pushes to
-all remotes, then writes the date to `~/ai/.last-sync`. Later calls the same day exit at once.
+all remotes, then writes the date to `~/ai/.last-sync`. Before the daily Git skip,
+normal invocations run `agent_lint.py` when watched agent inputs changed since its last
+successful check. Later calls the same day therefore catch new instruction edits while
+skipping Git work. Identical successfully checked inputs produce no lint output.
 
-The commit subject lists the touched areas (`Sync 2026-09-24: youdo, general/linux`). The body
-starts with the lines agents appended to `~/ai/.sync-notes` after each piece of work
-(`- nomad-test: root disk full on agent-test-01, dnsmasq log-queries; recipe added`), then
-lists every changed note with its title. `.sync-notes` is emptied after the commit; both
-state files are per machine and ignored by git. `--force` runs
-regardless of the date, `--dry-run` shows what would be committed, `--status` prints the
-last sync date. A failed push leaves the commit local and the state file untouched, so the
-next call retries. Agents never run `git commit` in `~/ai` themselves.
+The commit subject lists the touched areas (`Sync 2026-09-24: youdo, general/linux`).
+After each completed task, append one concise final summary to `~/ai/.sync-notes`:
+`- <system>: <final result and why>; <key check>; <material remaining risk if any>`.
+Keep intermediate steps, commands and approval evidence in the task log rather than adding
+separate work lines for each stage. Do not combine unrelated tasks into one result.
+The message helper removes exact duplicate records, groups distinct records by system
+without dropping descriptions, and adds file counts with up to eight reference-note paths.
+Additional changed paths remain available through `git show --stat`.
+`.sync-notes` is emptied after the commit; both state files are per machine and ignored.
+
+`--force` runs regardless of the date. `--dry-run` uses a disposable copy of the Git index
+and object storage, computes rebuilt knowledge indexes in memory and prints the proposed
+working-tree changes without changing files, staging, Git objects or sync state. It never
+commits, pulls or pushes. Weekly usage reports and monthly TODO updates are not generated
+in this preview; the output states that limitation. External Git object alternates and repositories containing split-index shared files cause
+a safe preview failure rather than accessing mutable shared Git storage.
+`--status` prints the last sync date. A failed push leaves the commit local and the state
+file untouched, so the next call retries. Agents never run `git commit` in `~/ai` themselves.
 
 `~/ai` is one private repository; `origin` fetches from GitHub and pushes to both GitHub and
 GitFlic (a separate `gitflic` remote also exists).
-The company layer and the `current` symlink are tracked in it; `.gitignore` holds only `.env`
-and the sync state files. Do not ignore `companies/` or split it into a nested repository.
+The company layer and the `current` symlink are tracked in it; `.gitignore` excludes `.env`,
+the sync state files and generated Python bytecode (`__pycache__/`, `*.py[co]`). Do not ignore `companies/` or split it into a nested repository.
 
 Monthly staleness review starts in November 2026. On the first agent session/sync in a
 new month with notes due, regardless of the day of the month, `ai-sync.sh` adds or refreshes
@@ -196,6 +278,44 @@ task remains in TODO.md until addressed; the review is not run automatically.
 Dated reminders: an open `TODO.md` item written as `- [ ] due YYYY-MM-DD: ...` is printed by
 `ai-sync.sh` as `reminder:` on every daily sync from that date until the item is closed.
 
+## Agent instruction lint
+
+After changing agent instructions, skills (including their references and scripts), or
+agent settings, agents must run `python3 ~/ai/general/scripts/agent_lint.py --force`
+before the final response, review the findings and report the result. Pass additional
+repository-local instruction files or directories as arguments for work outside `~/ai`.
+For an additional directory, instruction/skill entry points and skill resources are
+included; pass its settings files explicitly as additional arguments. This is a local
+report-only check: no model calls, installation, auto-fix or permission expansion.
+
+The default inventory covers shared AGENTS/CLAUDE/GEMINI instruction files, SKILL.md
+entry points and their text/code resources, KB-local Claude/Codex settings and Claude
+rule directories, global Claude/Codex instructions/settings (including Claude local settings/rules),
+user skill links in `.codex/skills`, `.claude/skills` and `.agents/skills`, `.agnix.toml`,
+the KB rule README and lint/sync implementation. Runtime links are watched for rewiring.
+Equivalent entry points are deduplicated while preserving instruction filenames whose
+names select different tool rules (for example AGENTS.md versus CLAUDE.md). System and
+plugin skill catalogs are not inventoried. Agnix runs with the KB root as a deterministic
+working directory; its root configuration is included in the fingerprint. Deleted files invalidate the previous snapshot. Only supported entry points
+are passed to agnix; resource changes trigger rechecking their SKILL.md. This static
+lint does not replace behavioral tests or external approval.
+
+The helper prefers `~/.local/share/agnix/v0.59.0/agnix`, then `agnix` on PATH; `--agnix`
+overrides it. Machine-local state/report/lock are in `~/ai-data/agnix/` (outside Git).
+Only successful complete checks update input hashes. Warnings are recorded once per
+unchanged successful snapshot; errors, missing binary, execution failure or changed
+inputs during checking leave a retry pending. The compact JSON report retains rule IDs,
+severity, file and line, omitting raw settings, source snippets and diagnostic messages.
+Use rule explanations and the specific affected file to investigate findings safely.
+
+Every normal `ai-sync.sh` invocation performs the change-aware fallback before checking
+today's Git sync date. Its lint failure is visible but does not block Git synchronization.
+An unchanged successful snapshot is skipped; this is change-triggered rather than one
+scan per calendar day. `ai-sync.sh --dry-run`, `--status` and `--help` do not invoke the
+helper or write lint state. The explicit post-edit `--force` check always reruns and can
+also satisfy the next sync fallback. A newly installed PC needs the documented external
+binary; absence is reported and never causes an automatic installation.
+
 ## Connecting an agent
 
 Agent-specific directories (`~/.codex`, `~/.claude`, `~/.gemini`) hold only symlinks into
@@ -206,3 +326,8 @@ Agent-specific directories (`~/.codex`, `~/.claude`, `~/.gemini`) hold only syml
 - Skills: one symlink per directory from `~/ai/general/skills/` and `~/ai/current/skills/`
   into the agent's skills folder (`~/.codex/skills/`, `~/.claude/skills/`).
 - Switching employer: create `companies/<new>/`, repoint `current`, redo skill symlinks.
+
+The portable `general/skills/agent-learning/` workflow is linked into the Codex and
+Claude skill directories. Shared instructions also direct Gemini to read its `SKILL.md`
+explicitly; this does not assume native Gemini skill discovery or automatic hooks.
+Corrections use the same layered knowledge base, not separate per-agent memories.

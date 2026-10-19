@@ -1,7 +1,7 @@
 ---
 system: dev-deployment
 status: verified
-checked: 2026-10-15
+checked: 2026-10-19
 tags: [b2b, ephemeral-dev, jenkins, gitlab-ci, helm, kubernetes, yandex-dev, roadmap]
 ---
 # B2B dev deployment: authoritative system map and roadmap
@@ -35,6 +35,10 @@ Deploy a B2B service under development, together with its catalog dependencies, 
 ## Current status
 
 ### VK Kubernetes access for BuildAPI (2026-10-14)
+
+- Evening scaling 2026-10-19 20:17 UTC: six Ready workers, min3/max10. Selenium HPA reached16Chrome replicas; pending Chrome pods directly triggered3->4 at20:04UTC,4->5 at20:06:50,5->6 at20:09:20 due CPU/memory requests. Chrome later8Ready; autoscaler has3scale-down candidates. One old worker CPU99%/RAM97%, others substantially lower; no configuration changes. Historical timeout cause remains unresolved. [Evidence](../../log/2026-10-19-vk-cloud-k8s-six-workers-selenium.md).
+
+- Scaling outcome 2026-10-19 12:11 UTC: manual minimum increase succeeded; min3/target3/max10 and3Ready workers, including new workers-2 at10.18.26.125. Autoscaler Running/Healthy. Raw managed autoscaler logs remain unavailable; A subsequent Selenium run successfully triggered3->4workers; all12Chrome pods became Ready by12:21:57UTC ([observation](../../log/2026-10-19-jenkins-selenium-vk-scale-observation.md)). [Evidence](../../log/2026-10-19-vk-cloud-k8s-manual-minimum-scale-check.md).
 
 BuildAPI recovery now targets existing `vk-ms1-k8s-test`, API `https://10.18.26.57:6443`, separately from the historical Yandex B2B pipeline described below. Two workers and required Traefik/VSO platform deployments are ready. Terraform CI identity from `vkcloud-tf` project 625 has working cluster reads; private exec kubeconfig was prepared and tested. This does not imply B2B workloads or BuildAPI have been deployed. Corrected master-based kubectl image pipeline 140923 and scoped project-77 `KUBECONFIG_DEV` file upload are verified. BuildAPI MR !39 merged after explicitly approved removal of legacy Nomad/Terraform CI; master lint/kustomize/build passed. Four VK manifest changes passed client dry-run, while manifest publication and backend apply were explicitly approved on October 15. User requires existing Nomad token reuse: corrected backend helper performs Vault writes only, no Nomad ACL/token writes. Approved Vault-only apply passed and four-manifest MR !40 passed pipeline 140931 and merged as master `9531d9ef`. Tag `0.5.13` created on master; release pipeline 140932 and manual deployment 3226672 passed. Five workloads/pods are ready, MongoDB PVC Bound, VSO secrets synced, primary `http://buildapi.dev.youdo.corp` HTTP 200, pod Nomad jobs GET 200 and Redis SRV verified. User declined optional VK alias DNS work; existing alias observation is retained, no DNS changes made. Primary route works and BuildAPI recovery is complete. No BuildAPI Kubernetes deployment has occurred. CI image update and approvals are documented in the [BuildAPI access log](../../log/2026-10-14-dev-deployment-devops-898-buildapi-vk-kubeconfig.md).
 

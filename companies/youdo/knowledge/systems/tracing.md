@@ -1,7 +1,7 @@
 ---
 system: tracing
 status: verified
-checked: 2026-06-10
+checked: 2026-10-19
 tags: [tracing, jaeger, tempo, youdo, Tracing:Hosts, nomad, consul]
 ---
 # YouDo tracing configuration
@@ -53,3 +53,17 @@ Context: investigation of `Tracing:Hosts` for `YouDo.Web.MvcApplication`.
 ## Portable lesson
 
 [`~/ai/general/knowledge/jaeger/udp-sender-pointed-at-grpc-port-no-spans.md`](../../../../general/knowledge/jaeger/udp-sender-pointed-at-grpc-port-no-spans.md)
+
+
+## Production Content correlation and sampling (2026-10-19)
+
+- Tempo query endpoint is `http://tempo.infra.youdo.corp`; Kubernetes context `admin@mks-infra`, namespace `monitoring`, ingress backend service `tempo`, port3100. Read/query API was reachable during the investigation; successful queries returned other stored traces. Source: `~/git/infra-tf/prod/tempo.tf:261-289` and team monitoring documentation.
+- Content registers the Jaeger/OpenTracing service `back/content/api` in `src/YouDo.Content.Api/Startup.cs:94-99`. Its checked deployment template uses host-local Jaeger compact UDP6831 and sampling rate0.1; this is configuration evidence, not proof every request is exported.
+- The Business shift248 incident has W3C/.NET Activity trace ID `abaebdf3a9760781769ffbf774f5f330`, while the seven corresponding Content requests carry legacy `Uber-Trace-Id` trace ID `450a530e4aeb1d75`. These are distinct tracing contexts. Querying only the JSON log's `TraceId` can miss custom Jaeger spans.
+- All seven requests carry W3C traceparent flags `00` and Jaeger flags `0` (unsampled). Broader nearby Content upload completions:19records,19valid Jaeger headers, all19unsampled, no sampled upload candidate.
+- Tempo lookups of both the W3C ID and actual Jaeger ID returned404. Unsampled propagation explains why stage spans may not have been retained; it does not establish a Tempo outage, and other trace queries worked.
+- Existing internal spans `StorageUploadFile` (`AbstractStorage.cs:114`) and `UploadManager.GetJpeg` (`UploadManager.cs:117`) would separate storage from conversion/limiter time when sampled. `UploadManager.GetJpeg` begins before limiter acquisition, so its duration includes queueing plus conversion. No saved stage timings were recovered for this incident.
+- Source: `~/git/youdo.extensions/src/Tracing/YouDo.Extensions.Tracing/TracingContainerBuilderExtensions.cs:42-54` constructs a probabilistic Jaeger tracer with UDP reporter and registers `GlobalTracer`; monolith middleware extracts HTTP tracing context before creating child spans (`~/git/youdo/YouDo.AspNetCore/Tracing/TracingApplicationBuilderExtensions.cs:50-62`).
+
+These observations supplement the historical test1 configuration notes above; they do not reverify or supersede test1 delivery settings.
+

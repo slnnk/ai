@@ -15,7 +15,7 @@ The user is a DevOps engineer. `~/ai` is the shared knowledge base for every AI 
 
 ## Before a task
 
-- Run `~/ai/general/scripts/ai-sync.sh` (daily commit and push; instant when already done).
+- Run `~/ai/general/scripts/ai-sync.sh` (daily Git sync plus changed-agent-file lint).
   Do not hide its output; pass any reminder it prints on to the user.
   Starting in November 2026, offer the knowledge-base staleness review on the first
   session in each new month, even if it is after day 1. Use the monthly proposal from
@@ -24,7 +24,23 @@ The user is a DevOps engineer. `~/ai` is the shared knowledge base for every AI 
 - Find notes with `~/ai/general/scripts/kb_find.py <keywords>` (hosts, jobs, services,
   tickets); open `INDEX.md` only to browse. Read a long note by its `## Summary` and the
   needed section (`sed -n A,Bp`), not whole.
-- Check `knowledge/repos.md` before searching the disk for a repository.
+- Before searching the disk for a repository, check `~/ai/current/knowledge/repos.md`
+  for company work or `~/ai/personal/knowledge/repos.md` for personal work.
+
+## Skills
+
+- Use `superpowers` skills only when the user explicitly requests them for the current
+  task. Do not automatically invoke them based on task type or their own activation
+  instructions, including `superpowers:using-superpowers`.
+
+## Learn from corrections
+
+- Before related work and when corrected, read `~/ai/general/skills/agent-learning/SKILL.md`
+  and run its scoped rule lookup. Read applicable canonical targets before acting.
+- Apply explicit durable corrections immediately within existing authorization; keep
+  task-specific directions scoped. Record evidence and diagnose repeats using the skill.
+- Discussion and planning authorize investigation and the requested plan; implementation
+  starts after a request to implement. A correction never expands external permissions.
 
 ## Which layer
 
@@ -36,20 +52,33 @@ The user is a DevOps engineer. `~/ai` is the shared knowledge base for every AI 
 
 ## After significant work
 
-- New notes via `python3 ~/ai/general/scripts/new_note.py log|system|recipe ...`, then fill
+- New notes via `python3 ~/ai/general/scripts/new_note.py log|system|recipe ...` (correction
+  evidence via `agent_learning.py`), then fill
   the sections. Log entry: task, context, actions and key commands, findings, changed files,
   risks. Update the existing system map; never create a duplicate.
 - Frontmatter (`system`, `status: verified|hypothesis|outdated`, `checked`, `tags`) on every
   note. Mark hypotheses in the text; `status: outdated` instead of deleting. English;
   hostnames, jobs, variables and commands verbatim.
-- Keep `knowledge/repos.md` current (path, origin URL without credentials, purpose, date).
+- Keep the relevant layer's `~/ai/<layer>/knowledge/repos.md` current
+  (path, origin URL without credentials, purpose, date).
 - For VK Cloud only, maintain `~/ai/current/service-addresses.env`: whenever a new or
   changed service address is discovered, add or update it in the relevant datacenter
   section. Keep credentials in `.env`; record the observation date and known verification
   status in comments. Updating the map does not require extra infrastructure checks.
+- Before the final response, reconcile notes created or changed in this task with
+  `~/ai/TODO.md`: track remaining actions with source links, align completed/cancelled/deferred
+  status and supersede stale directions while preserving history. Optional improvements stay
+  proposals, not execution permission. Review only this task's affected records; details in
+  `general/knowledge/README.md`, "Final note-to-TODO reconciliation".
+- After changing agent instructions, skills (including references/scripts), or agent settings,
+  run `python3 ~/ai/general/scripts/agent_lint.py --force` before the final response.
+  Add changed repository-local files/directories as arguments when outside `~/ai`.
+  Review findings and report the result; if unavailable or failed, report the pending check.
+  Use report-only mode; findings do not grant permission for fixes or external actions.
 - Run `kb_lint.py` and fix what it reports, then `build_index.py` (both in `general/scripts/`).
-- `echo "- <system>: <what changed and why>" >> ~/ai/.sync-notes`. Do not commit `~/ai`
-  yourself; `ai-sync.sh` does it.
+- Append one concise final result per completed task to `~/ai/.sync-notes`: system, what
+  changed and why, key check and material remaining risk. Keep stage details in the task log.
+  Do not commit `~/ai` yourself; `ai-sync.sh` does it.
 
 ## Token economy
 
@@ -76,6 +105,24 @@ The user is a DevOps engineer. `~/ai` is the shared knowledge base for every AI 
 open items there as `- [ ] action (date) — [src](note)` and close finished ones; notes keep
 no TODO lists of their own.
 
+For standalone `todo` or `задачи` requests (case-insensitive, optional punctuation), or
+requests to show the backlog, run `python3 ~/ai/general/scripts/todo.py`. Return its
+complete Markdown stdout as the final answer: Russian descriptions, ordinary bullet lists,
+no dates, source links or checkboxes; no code fence, extra commentary or silent truncation.
+Use short task titles (6–12 words, at most 120 characters), with no blank lines between
+items in a group. Keep details in source TODO; preserve IDs and deferral/proposal labels.
+Default: all open items in file order. Reuse the derived Russian display cache; on exit 2
+run with `--missing`, translate only missing descriptions and rerun (README: "TODO output").
+After editing TODO entries, refresh affected cached descriptions in the same task.
+For an explicitly requested subset use `--layer`, `--system` or `--query`; never infer a
+company-only filter from the default layer. On failure report the error, not an empty list.
+See `general/knowledge/README.md`, "TODO output", for the contract. Listing tasks is
+read-only and does not authorize executing them.
+
+After completing a task from a list you initially proposed to the user, show the remaining
+unfinished items in the final response, preserving the original wording, order, numbering,
+grouping and formatting; remove only completed items. If none remain, say so.
+
 Agent memory (`~/.claude/projects/*/memory` etc.) is a cache; anything worth keeping also
 goes to `~/ai`.
 
@@ -90,6 +137,10 @@ goes to `~/ai`.
 
 ## Git
 
+- For company GitLab work, use `~/ai/current/skills/gitlab-workflow/SKILL.md`.
+  Inspect code in an existing local checkout first; consult `current/knowledge/repos.md`
+  before searching. Clone a missing project into `~/git/<repo>` without overwriting
+  existing paths. Use GitLab for remote revisions, MR discussion, CI and settings.
 - Work in the existing repository checkout (`~/git/<repo>` by default), not a separate
   git worktree. Create a separate worktree only when the user explicitly requests it.
   Preserve unrelated local changes; if they block switching branches, explain the
@@ -105,36 +156,23 @@ goes to `~/ai`.
 - Exceptions: the daily `~/ai/general/scripts/ai-sync.sh` run, which commits and pushes
   `~/ai`, and the explicitly confirmed training stages below.
 
-### Supervised Git/MR training (2026-10-08 through 2026-10-30)
+### Supervised Git/MR training (started 2026-10-08)
 
-- Before editing repository task files, propose the branch name, repository and base
-  branch; wait for explicit confirmation. That approval permits creating/switching to
-  the approved task branch and making the task's local file changes. If reusing a branch,
-  propose reuse for approval. Read-only investigation and KB bookkeeping can proceed.
-- After implementation and checks, present the actual diff summary, check results,
-  commit message, MR title, source/target and relevant CI effects. Wait for explicit
-  confirmation. That approval covers staging the task's explicit paths, committing,
-  pushing the approved branch and creating/updating its MR as one publication action;
-  do not ask again for each command. Corrections must be applied before execution.
-  Material changes to approved names, scope, target or effects require renewed approval.
-- Branch: `<TASK-ID>-<english-kebab-case>`; suffix describes the change, not the repository name; respect observed project exceptions.
-  Commit: concise lowercase English action + object, no mandatory task ID or feat:/fix:.
-  MR title: `<TASK-ID> <change summary>`. Preserve project settings.
-  MR description: one short paragraph in Russian describing the change, then a link
-  to the task, and nothing else. Do not include checks, related tasks/MRs, dependencies
-  or CI details. Keep those details in the work log and publication approval summary.
-  No separate Closes policy is needed.
-- No merge, auto-merge, direct target-branch push, force push, tags, history rewriting
-  or deployment is authorized by these approvals. CI runtime changes/releases still
-  need explicit approval covering those effects. Preserve unrelated user changes.
-- Record each task's proposed/final names, approvals, corrections, results and MR link
-  in its work log. Apply reusable user corrections immediately to the canonical rules
-  below (and this file if global); keep task-specific exceptions scoped to that task.
-  Do not infer broader permissions from wording corrections.
-- Canonical details and training evidence: `~/ai/current/knowledge/systems/gitlab-ci/agent-git-workflow.md`.
-  Prepare the training report on 2026-10-30, or the first session after that date,
-  following the due item in `~/ai/TODO.md`. Continue supervised mode until the user
-  reviews the results and explicitly chooses automation or further training.
+- Keep two approvals until the user explicitly chooses a different mode. The early
+  report was delivered on 2026-10-19; the date alone never changes permissions.
+- Before repository task edits, propose repository, branch/reuse and base branch;
+  wait for explicit confirmation. KB bookkeeping is exempt.
+- Before publication, present the actual diff, checks, commit message, MR title/body,
+  source/target and CI effects; wait for explicit confirmation. One confirmation covers
+  task-only staging, commit, push and MR creation/update. Do not ask per command again.
+  Material changes to names, scope, source/target or effects require renewed approval.
+- Neither gate authorizes merge, auto-merge, target-branch push, force push, tags,
+  history rewriting or deployment. Triggered release/deployment effects need explicit
+  approval covering them. Preserve unrelated user changes, including pre-staged edits.
+- Detailed workflow and naming conventions are canonical in the
+  skill `~/ai/current/skills/gitlab-workflow/SKILL.md`; training history and the early report
+  are linked from system map `~/ai/current/knowledge/systems/gitlab-ci/agent-git-workflow.md`.
+  Record original/final proposals, both approvals, corrections and outcomes in task logs.
 
 ## Changes outside local files
 
