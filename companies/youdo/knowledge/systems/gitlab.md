@@ -1,7 +1,7 @@
 ---
 system: gitlab
 status: verified
-checked: 2026-10-14
+checked: 2026-10-20
 tags: [gitlab, recovery, registry]
 ---
 # GitLab server and recovery state
@@ -110,3 +110,7 @@ User-requested local build/push for job3236157 completed: `registry.youdo.sg/sys
 ## Gear feature-readme alias (2026-10-19)
 
 User-requested `registry.youdo.sg/sysadmins/devops-tools/gear:feature-readme` alias copied from `master-5` (master pipeline56738/IID5); manifest `sha256:262285d5fa853e8310e65b60105f7de0e6e7d381a24757d1e2926ac1cee6ebdb`. Literal registry tag `master` does not exist. Alias push succeeded; consumer job3235910 was not retried. [Evidence](../log/2026-10-19-gitlab-gear-feature-readme-alias.md).
+
+## iOS API-key release acceptance (2026-10-20)
+
+YouDoApp DevOps-880 release authentication is verified: successful `1 Build release` job 3230246 for `v4.233.0` used an App Store Connect API key and uploaded its binary. Current CI/Fastfile no longer reference Apple-ID/session variables. The user confirmed `APPLE_DEVELOPER_USER` should remain; its removal is unnecessary. The local DevOps-880 backlog item is closed. Project `FASTLANE_SESSION` is absent; inherited/runner environment was not inspected and is not remaining work for this task. [Evidence and limits](../log/2026-09-14-ios-ci-fastlane-spaceauth-service-key.md).

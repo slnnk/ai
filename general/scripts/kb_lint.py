@@ -14,7 +14,7 @@ Checks (E = error, W = warning):
   E secret         token/password/private key pattern in any file
   E leak           company identifier in general/ (from companies/*/lint-identifiers.txt
                    plus private IP ranges and *.corp hosts)
-  W language       more than 60 Cyrillic characters outside code blocks (notes are English)
+  W language       more than 60 Cyrillic characters outside code (notes are English)
 
 Exit codes: 0 clean or warnings only, 1 errors found, 2 usage error.
 """
@@ -69,7 +69,30 @@ def strip_code(text):
             continue
         if not code:
             out.append(line)
-    return "\n".join(out)
+    prose = "\n".join(out)
+    # Code spans close only with a backtick run of the same length. Unmatched
+    # or escaped opening delimiters remain prose so they cannot hide warnings.
+    runs = list(re.finditer(r"`+", prose))
+    out, start, i = [], 0, 0
+    while i < len(runs):
+        opening = runs[i]
+        pos = opening.start()
+        while pos > 0 and prose[pos - 1] == "\\":
+            pos -= 1
+        if (opening.start() - pos) % 2:
+            i += 1
+            continue
+        closing = next((j for j in range(i + 1, len(runs))
+                        if len(runs[j].group()) == len(opening.group())), None)
+        if closing is None:
+            i += 1
+            continue
+        out.append(prose[start:opening.start()])
+        out.append(" ")
+        start = runs[closing].end()
+        i = closing + 1
+    out.append(prose[start:])
+    return "".join(out)
 
 
 def parse_frontmatter(text):
@@ -190,7 +213,7 @@ def main():
         # language
         cyr = len(re.findall(r"[А-Яа-яЁё]", strip_code(text)))
         if cyr > 60:
-            warn(f, "language", f"{cyr} Cyrillic characters outside code blocks")
+            warn(f, "language", f"{cyr} Cyrillic characters outside code blocks and inline code")
 
     if not args.quiet:
         for line in errors + warnings:

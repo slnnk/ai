@@ -36,6 +36,12 @@ Deploy a B2B service under development, together with its catalog dependencies, 
 
 ### VK Kubernetes access for BuildAPI (2026-10-14)
 
+- Jenkins2006 duration analysis2026-10-20: wall267min, test phase263min, effective test concurrency~11.45/12. Browser-start sample median0.828s; API response durations consume66%of60passed sample time. Same max-offer test API sum953s/370calls vs Yandex K8s165s/369calls; registration/signin medians~8–10s. Underlying API latency cause unisolated. [Analysis](../../log/2026-10-20-web-autotests-jenkins-2006-duration-api-latency.md).
+
+- Live check2026-10-20 14:16:49UTC during Jenkins two/2007: autoscaler Healthy/4Ready/min3/max10; Chrome13/13Ready, Grid ready,3busy/13slots, queue0. Chrome-triggered3->4 at14:08:43 succeeded, worker Ready14:12:54. [Evidence](../../log/2026-10-20-web-autotests-jenkins-2007-live-autoscaler-selenium.md).
+
+- Build-window autoscaling verified2026-10-20: Jenkins web two/2006 ran09:37:39–14:04:38UTC. Chrome triggered workers3->4 at13:51:25, new node registered13:56:30, autoscaler scale-down14:01:22 and removal14:02:31. Full-window metrics returned no samples; shared demand is not uniquely attributable to this build. [Evidence](../../log/2026-10-20-web-autotests-jenkins-2006-k8s-autoscaling.md).
+
 - Evening scaling 2026-10-19 20:17 UTC: six Ready workers, min3/max10. Selenium HPA reached16Chrome replicas; pending Chrome pods directly triggered3->4 at20:04UTC,4->5 at20:06:50,5->6 at20:09:20 due CPU/memory requests. Chrome later8Ready; autoscaler has3scale-down candidates. One old worker CPU99%/RAM97%, others substantially lower; no configuration changes. Historical timeout cause remains unresolved. [Evidence](../../log/2026-10-19-vk-cloud-k8s-six-workers-selenium.md).
 
 - Scaling outcome 2026-10-19 12:11 UTC: manual minimum increase succeeded; min3/target3/max10 and3Ready workers, including new workers-2 at10.18.26.125. Autoscaler Running/Healthy. Raw managed autoscaler logs remain unavailable; A subsequent Selenium run successfully triggered3->4workers; all12Chrome pods became Ready by12:21:57UTC ([observation](../../log/2026-10-19-jenkins-selenium-vk-scale-observation.md)). [Evidence](../../log/2026-10-19-vk-cloud-k8s-manual-minimum-scale-check.md).

@@ -1,13 +1,15 @@
 ---
 system: corporate-network
 status: verified
-checked: 2026-10-11
+checked: 2026-10-20
 tags: [ssh, vpn, mtu]
 ---
 
 # SSH handshake stall and rejected root keys on 10.18.24.233
 
 ## Summary
+
+Current status (2026-10-20): the user confirmed access works and requested task closure. Further VPN packet-loss investigation is closed; historical open directions below are superseded by this decision. No new diagnostics or network changes were performed for closure.
 
 Default SSH stalls before authentication. Restricting HostKeyAlgorithms to ecdsa-sha2-nistp256 permits the handshake. Login as youdo succeeds with the workstation id_ed25519 key; root rejects all three available user keys. Packet-size-dependent loss strongly suggests a VPN path MTU/MSS problem; the exact dropping component is unverified.
 
@@ -91,3 +93,7 @@ Successful comparison flow49224 advertises MSS1100, unchanged through gateway. C
 After user reconnected corporate VPN, simultaneous route checks show public corporate endpoint45.159.210.228 directly viaWiFi192.168.192.1; Nexus10.18.24.233 via172.30.63.1 devtun1 source172.30.63.6; public1.1.1.1 viaTrustTunnel tun0/table880 source172.16.219.2. Interface names changed with reconnect; roles are identified by routes, not names.
 
 Identical6000-byte-header HTTP test now passes with default MSS: HTTP200,591 bytes,0.06s (previously7s timeout/0 bytes). MSS1100 comparison also HTTP200/0.05s. Nexus UI GET `http://10.18.24.233/` returns HTTP200. Local endpoint exclusion fixes the reproduced transport failure with both VPNs active; no firewall/MSS or remote-network changes were applied. User should refresh the browser and confirm its UI symptom is gone; browser-session behavior itself is not yet independently verified. Nexus repository/realm/CI-user initialization remains separate pending work.
+
+## User-confirmed closure (2026-10-20)
+
+The user confirmed working access and explicitly requested closure. Closed the corresponding central TODO entry. Historical transport observations and the unlocated dropping component remain diagnostic evidence; no further investigation is requested, and no new verification or infrastructure fix is claimed.

@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -117,6 +118,39 @@ def atomic_json(path, data):
             os.unlink(temporary)
 
 
+def stale_service_tier_finding(item, version, root, entries):
+    """Recheck only 0.59.0's obsolete fast/flex allowlist; fail closed.
+
+    Official Codex schema explicitly includes default and priority:
+    https://learn.chatgpt.com/docs/config-schema.json
+    Keep every other value, version, severity and rule under native validation.
+    """
+    if version != '0.59.0' or item.get('rule') != 'CDX-CFG-025' or item.get('level') != 'warning':
+        return False
+    try:
+        try:
+            import tomllib
+        except ImportError:
+            import tomli as tomllib
+        path = Path(item['file'])
+        if not path.is_absolute():
+            path = root / path
+        if path.name != 'config.toml' or path.parent.name != '.codex' or path.resolve() not in {p.resolve() for p in entries}:
+            return False
+        source = path.read_text()
+        # A failed parse keeps the native warning, including invalid TOML inputs.
+        tomllib.loads(source)
+        line = item['line']
+        if not isinstance(line, int) or isinstance(line, bool) or line < 1:
+            return False
+        lines = source.splitlines()
+        # Parse the prefix too so text inside a multiline TOML string cannot qualify.
+        tomllib.loads('\n'.join(lines[:line-1]))
+        return bool(re.fullmatch(r'''\s*service_tier\s*=\s*(["'])(?:default|priority)\1\s*(?:#.*)?''', lines[line-1]))
+    except (ImportError, OSError, ValueError, KeyError, TypeError, IndexError):
+        return False
+
+
 def check(args):
     watched, entries = discover(args.root, args.runtime_home, args.paths)
     executable = args.agnix or str(args.runtime_home / '.local/share/agnix/v0.59.0/agnix')
@@ -151,9 +185,13 @@ def check(args):
             raise ValueError('invalid result')
         # Never persist raw settings, source snippets or linter messages (may contain secrets).
         safe = []
+        corrections = 0
         for item in diagnostics:
             if not isinstance(item, dict) or item.get('level') not in ('error', 'warning', 'info'):
                 raise ValueError('unknown diagnostic severity')
+            if stale_service_tier_finding(item, raw.get('version'), args.root, entries):
+                corrections += 1
+                continue
             safe.append({k: item.get(k) for k in ('level', 'rule', 'file', 'line', 'column')})
         # An executable can exit1 for a crash too; require real diagnostics in that case.
         if process.returncode == 1 and not safe:
@@ -164,9 +202,13 @@ def check(args):
     counts = {level: sum(d['level'] == level for d in safe) for level in ('error', 'warning', 'info')}
     report = {'version': raw.get('version'), 'files_checked': raw.get('files_checked'),
               'counts': counts, 'diagnostics': safe, 'exit': process.returncode}
+    if corrections:
+        report['compatibility_rechecks'] = {'CDX-CFG-025': corrections}
     atomic_json(args.state_dir / 'report.json', report)
     print('agent-lint: {} files; {} errors, {} warnings, {} info; report {}'.format(
         raw['files_checked'], counts['error'], counts['warning'], counts['info'], args.state_dir / 'report.json'))
+    if corrections:
+        print('agent-lint: CDX-CFG-025: {} valid default/priority values rechecked (agnix 0.59.0 compatibility)'.format(corrections))
     if counts['error'] or process.returncode:
         print('agent-lint: findings require review; no successful checkpoint saved; retry pending')
         return 1

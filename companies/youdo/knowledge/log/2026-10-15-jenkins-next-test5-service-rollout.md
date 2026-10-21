@@ -1,14 +1,14 @@
 ---
 system: jenkins
 status: verified
-checked: 2026-10-15
+checked: 2026-10-20
 tags: [recovery, gitlab-ci, ansible, deploy]
 ---
 # Next test5 rollout excluding Cerberus2
 
 ## Summary
 
-User authorized executing the next iteration except Cerberus2. Seven Nomad targets remain: broadcast, featuretoggle, youdo.content, youdo.landings, youdo.trackingpixel, YouDo.Socket, youdo.help; separate moderation build/S3 publication is tracked explicitly. Cerberus excluded from build/deploy sources. Seven selected Nomad services are deployed to test5 with expected source/version confirmed via BuildAPI; moderation S3 publication also completed. Content2.5.13 fixes missing CI credential aliases; trackingpixel historical packages restored without source changes; Broadcast integrations passed after targeted local PostgreSQL image publication. UI limitations remain for Landings (no healthcheck/HTML row) and Socket (version cell alias).
+User authorized executing the next iteration except Cerberus2. Seven Nomad targets remain: broadcast, featuretoggle, youdo.content, youdo.landings, youdo.trackingpixel, YouDo.Socket, youdo.help; separate moderation build/S3 publication is tracked explicitly. Cerberus excluded from build/deploy sources. Seven selected Nomad services are deployed to test5 with expected source/version confirmed via BuildAPI; moderation S3 publication also completed. Content2.5.13 fixes missing CI credential aliases; trackingpixel historical packages restored without source changes; Broadcast integrations passed after targeted local PostgreSQL image publication. Historical UI limitations were observed for Landings (no healthcheck/HTML row) and Socket (version cell alias). The user closed the Socket UI mapping follow-up as unnecessary on 2026-10-20; no fix or new live verification was performed.
 
 ## Approvals and scope
 
@@ -62,7 +62,7 @@ Socket build succeeded; approved first test5 deploy3228384 played. Trackingpixel
 
 ## Socket acceptance and dependency recovery steering
 
-Socket deploy3228384 SUCCESS; two expected socketChat-test5 allocations healthy with0restarts and Consul passing. BuildAPI saved metadata matches pipeline140976/release1.2.9/source/deployjob; live VersionCompatible1.2.9 confirmed (custom template has VERSION but no IMAGE_TAG). HTML socketchat row exists. Existing BuildAPI UI cannot map project nameYouDo.Socket to consul name socketchat, so its rendered version cell stays blank despite correct live API; record optional UI mapping follow-up rather than changing unrelated application metadata.
+Socket deploy3228384 SUCCESS; two expected socketChat-test5 allocations healthy with0restarts and Consul passing. BuildAPI saved metadata matches pipeline140976/release1.2.9/source/deployjob; live VersionCompatible1.2.9 confirmed (custom template has VERSION but no IMAGE_TAG). HTML socketchat row exists. Existing BuildAPI UI cannot map project nameYouDo.Socket to consul name socketchat, so its rendered version cell stays blank despite correct live API; an optional UI mapping follow-up was recorded rather than changing unrelated application metadata. On 2026-10-20, the user closed this follow-up as unnecessary. The central TODO is closed without implementation; the historical finding is retained, with no new live verification.
 
 Trackingpixel prepare-nuget3228339 failed NU1605: direct DI.Abstractions6.0.0 in net6 migration project versus resolved Common0.5.0 requiring8.0.1. Initial one-line8.0.1 bump was proposed but NOT approved; user asked what was wrong with existing version. Root corrected diagnosis: historical Common0.4.1 and Common/Logging/Metrics/Tracing0.3.1 are missing from restored Nexus, causing NuGet fallback to0.5.0. Existing6.0.0 is valid for the intended historical graph. User then asked whether internal Common0.4.1 can be rebuilt; root proceeds with local historical package reconstruction, preserving application source and version pin. No trackingpixel branch was created and no source edits made.
 

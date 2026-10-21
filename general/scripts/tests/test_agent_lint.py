@@ -1,5 +1,6 @@
 """Behavioral checks for change-aware lint checkpoints and same-day sync integration."""
 import datetime
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -10,6 +11,9 @@ import tempfile
 import unittest
 
 SCRIPTS = Path(__file__).resolve().parents[1]
+SPEC = importlib.util.spec_from_file_location('agent_lint', SCRIPTS/'agent_lint.py')
+LINT = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(LINT)
 
 
 class AgentLintTests(unittest.TestCase):
@@ -125,6 +129,30 @@ raise SystemExit(1 if mode=='error' else 0)
         self.assertNotIn('message',text)
         self.assertEqual(json.loads(text)['counts']['warning'],1)
 
+    def test_service_tier_rechecks_are_reported_without_hiding_invalid_values(self):
+        # On Python 3.10 the installed tomli lives in the real user's site-packages.
+        # Runtime lint inputs are still isolated through explicit --runtime-home.
+        self.env['HOME'] = os.environ['HOME']
+        config = self.runtime/'.codex/config.toml'; config.parent.mkdir()
+        config.write_text('[profiles.standard]\nservice_tier = "default"\n[profiles.other]\nservice_tier = "bogus"\n')
+        payload = {'version': '0.59.0', 'files_checked': 2, 'diagnostics': [
+            {'level': 'warning', 'rule': 'CDX-CFG-025', 'file': str(config),
+             'line': line, 'column': 1, 'message': 'TEST_SECRET_DO_NOT_STORE'} for line in [2, 4]]}
+        self.agnix.write_text('#!/usr/bin/env python3\nimport json\nprint(json.dumps('+repr(payload)+'))\n')
+        result = self.run_lint('--force'); self.assertEqual(result.returncode, 0, result.stderr)
+        report = json.loads((self.state/'report.json').read_text())
+        self.assertEqual(report['counts']['warning'], 1)
+        self.assertEqual(report['diagnostics'][0]['line'], 4)
+        self.assertEqual(report['compatibility_rechecks'], {'CDX-CFG-025': 1})
+        self.assertNotIn('TEST_SECRET_DO_NOT_STORE', (self.state/'report.json').read_text())
+        config.write_text(config.read_text().replace('bogus', 'priority'))
+        result = self.run_lint('--force'); self.assertEqual(result.returncode, 0, result.stderr)
+        report = json.loads((self.state/'report.json').read_text())
+        self.assertEqual(report['counts']['warning'], 0)
+        self.assertEqual(report['compatibility_rechecks'], {'CDX-CFG-025': 2})
+        self.assertTrue((self.state/'success.json').exists())
+        self.assertEqual(self.run_lint().stdout, '')
+
     def test_explicit_repo_inputs_invalidate(self):
         extra=self.base/'repo'; extra.mkdir()
         file=extra/'AGENTS.md'; file.write_text('foreign checkout policy')
@@ -188,6 +216,62 @@ raise SystemExit(1 if mode=='error' else 0)
             self.assertEqual(self.calls(),3)
             self.assertEqual((self.state/'success.json').read_bytes(),checkpoint)
         self.assertFalse((self.base/'git-calls').exists())
+
+
+class ServiceTierCompatibilityTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.config = self.root/'.codex/config.toml'
+        self.config.parent.mkdir()
+        self.item = {'rule': 'CDX-CFG-025', 'level': 'warning',
+                     'file': '.codex/config.toml', 'line': 1}
+
+    def recheck(self, source, item=None, version='0.59.0'):
+        self.config.write_text(source)
+        return LINT.stale_service_tier_finding(item or self.item, version, self.root, [self.config])
+
+    def test_schema_examples_are_rechecked_with_toml_quotes_comments_and_profiles(self):
+        for value in ['default', 'priority']:
+            for quote in ['"', "'"]:
+                with self.subTest(value=value, quote=quote):
+                    line = 'service_tier = '+quote+value+quote+' # explicit tier\n'
+                    self.assertTrue(self.recheck(line))
+                    item = dict(self.item, line=2)
+                    self.assertTrue(self.recheck('[profiles.standard]\n'+line, item))
+
+    def test_native_values_and_invalid_values_are_not_filtered(self):
+        for value in ['fast', 'flex', 'bogus', 'DEFAULT', '', 'priority-extra']:
+            with self.subTest(value=value):
+                self.assertFalse(self.recheck('service_tier = "'+value+'"\n'))
+
+    def test_other_rules_versions_and_errors_are_preserved(self):
+        source = 'service_tier = "default"\n'
+        for item in [dict(self.item, rule='OTHER'), dict(self.item, level='error')]:
+            self.assertFalse(self.recheck(source, item))
+        for version in ['0.58.0', '0.60.0', None]:
+            self.assertFalse(self.recheck(source, version=version))
+
+    def test_malformed_and_multiline_source_are_preserved(self):
+        self.assertFalse(self.recheck('service_tier = "default"\nbroken = [\n'))
+        source = 'description = \'\'\'\nservice_tier = "default"\n\'\'\'\n'
+        self.assertFalse(self.recheck(source, dict(self.item, line=2)))
+
+    def test_diagnostic_must_point_at_actual_input_and_matching_line(self):
+        source = 'model = "fixture"\nservice_tier = "default"\n'
+        for line in [0, -1, True, '2', 1, 99]:
+            self.assertFalse(self.recheck(source, dict(self.item, line=line)))
+        outside = self.root/'other/.codex/config.toml'
+        outside.parent.mkdir(parents=True)
+        outside.write_text('service_tier = "default"\n')
+        self.assertFalse(self.recheck(source, dict(self.item, file=str(outside))))
+        self.assertTrue(self.recheck(source, dict(self.item, line=2, file=str(self.config))))
+
+    def test_mixed_profiles_preserve_invalid_warning(self):
+        source = '[profiles.standard]\nservice_tier = "default"\n[profiles.other]\nservice_tier = "bogus"\n'
+        self.assertTrue(self.recheck(source, dict(self.item, line=2)))
+        self.assertFalse(self.recheck(source, dict(self.item, line=4)))
 
 
 if __name__ == '__main__':

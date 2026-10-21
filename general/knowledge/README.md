@@ -18,6 +18,13 @@ Inside `general/knowledge/` group by technology: `docker/`, `nomad/`, `gitlab-ci
 `ansible/`, `terraform/`, `dotnet/`, `postgresql/`, `mssql/`, `linux/`, `android/`, ...
 One recipe per file, `<topic>-<slug>.md`, no date in the name; the date lives in `checked`.
 
+~/ai/general/     portable knowledge, no company context: knowledge/<technology>/, skills/, scripts/, prompts/
+    ~/ai/personal/    the user's own servers, VPN, side projects: knowledge/, scripts/, .env
+    ~/ai/companies/<name>/  one employer: CONTEXT.md, knowledge/, skills/, scripts/, prompts/, .env
+    ~/ai/current -> companies/<name>   active employer; always address it as `current`
+    ~/ai-data/        generated data of skills and scripts, one subdirectory per tool (e.g. rp/); outside git, may hold private data
+    knowledge/ = INDEX.md, systems/ (maps), log/ (dated entries), repos.md
+
 ## Frontmatter
 
     ---
@@ -29,6 +36,40 @@ One recipe per file, `<topic>-<slug>.md`, no date in the name; the date lives in
 
 `build_index.py` reads these fields. A note without frontmatter is listed under
 "Missing frontmatter" in `INDEX.md` until fixed.
+
+### Bookkeeping after significant work
+
+- New notes via `python3 ~/ai/general/scripts/new_note.py log|system|recipe ...` (correction
+  evidence via `agent_learning.py`), then fill
+  the sections. Log entry: task, context, actions and key commands, findings, changed files,
+  risks. Update the existing system map; never create a duplicate.
+- Frontmatter (`system`, `status: verified|hypothesis|outdated`, `checked`, `tags`) on every
+  note. Mark hypotheses in the text; `status: outdated` instead of deleting. English;
+  hostnames, jobs, variables and commands verbatim.
+- Preserve exact source strings in their original language, including UI labels,
+  parameter values and error messages. Format them as Markdown inline code; use fenced
+  code blocks for multiline excerpts. Write surrounding note prose in English; do not
+  wrap ordinary prose in code merely to bypass the language check.
+- Keep the relevant layer's `~/ai/<layer>/knowledge/repos.md` current
+  (path, origin URL without credentials, purpose, date).
+- For VK Cloud only, maintain `~/ai/current/service-addresses.env`: whenever a new or
+  changed service address is discovered, add or update it in the relevant datacenter
+  section. Keep credentials in `.env`; record the observation date and known verification
+  status in comments. Updating the map does not require extra infrastructure checks.
+- Before the final response, reconcile notes created or changed in this task with
+  `~/ai/TODO.md`: track remaining actions with source links, align completed/cancelled/deferred
+  status and supersede stale directions while preserving history. Optional improvements stay
+  proposals, not execution permission. Review only this task's affected records; details in
+  `general/knowledge/README.md`, "Final note-to-TODO reconciliation".
+- After changing agent instructions, skills (including references/scripts), or agent settings,
+  run `python3 ~/ai/general/scripts/agent_lint.py --force` before the final response.
+  Add changed repository-local files/directories as arguments when outside `~/ai`.
+  Review findings and report the result; if unavailable or failed, report the pending check.
+  Use report-only mode; findings do not grant permission for fixes or external actions.
+- Run `kb_lint.py` and fix what it reports, then `build_index.py` (both in `general/scripts/`).
+- Append one concise final result per completed task to `~/ai/.sync-notes`: system, what
+  changed and why, key check and material remaining risk. Keep stage details in the task log.
+  Do not commit `~/ai` yourself; `ai-sync.sh` does it.
 
 ## Template: log entry (`knowledge/log/YYYY-MM-DD-<system>-<slug>.md`)
 
@@ -144,6 +185,45 @@ purpose, related system, date checked. Link related clones in the system map
 (app <-> autotests <-> infrastructure <-> shared library <-> docs). Extend the registry
 gradually while working; do not crawl the whole filesystem.
 
+### Repository workflow details
+
+- For company GitLab work, use `~/ai/current/skills/gitlab-workflow/SKILL.md`.
+  Inspect code in an existing local checkout first; consult `current/knowledge/repos.md`
+  before searching. Clone a missing project into `~/git/<repo>` without overwriting
+  existing paths. Use GitLab for remote revisions, MR discussion, CI and settings.
+- Work in the existing repository checkout (`~/git/<repo>` by default), not a separate
+  git worktree. Create a separate worktree only when the user explicitly requests it.
+  Preserve unrelated local changes; if they block switching branches, explain the
+  conflict before taking any action that moves or discards them.
+- Commits must contain only changes made by the agent for the current task, unless
+  the user explicitly asks to include other changes. Check the actual staged diff,
+  including pre-staged changes and mixed user/agent edits within the same file;
+  selecting a task file does not authorize committing every change in that file.
+- Never run state-changing git commands (`git add`, `git commit`, `git push`, `git tag`,
+  `git merge`, `git rebase`, `git reset`, `git stash`, ...) in any repository unless the
+  user explicitly asks for it in the current task. Read-only commands (`status`, `diff`,
+  `log`, `show`, `fetch`) are fine.
+- Exceptions: the daily `~/ai/general/scripts/ai-sync.sh` run, which commits and pushes
+  `~/ai`, and the explicitly confirmed training stages below.
+
+### Supervised Git/MR training (started 2026-10-08)
+
+- Keep two approvals until the user explicitly chooses a different mode. The early
+  report was delivered on 2026-10-19; the date alone never changes permissions.
+- Before repository task edits, propose repository, branch/reuse and base branch;
+  wait for explicit confirmation. KB bookkeeping is exempt.
+- Before publication, present the actual diff, checks, commit message, MR title/body,
+  source/target and CI effects; wait for explicit confirmation. One confirmation covers
+  task-only staging, commit, push and MR creation/update. Do not ask per command again.
+  Material changes to names, scope, source/target or effects require renewed approval.
+- Neither gate authorizes merge, auto-merge, target-branch push, force push, tags,
+  history rewriting or deployment. Triggered release/deployment effects need explicit
+  approval covering them. Preserve unrelated user changes, including pre-staged edits.
+- Detailed workflow and naming conventions are canonical in the
+  skill `~/ai/current/skills/gitlab-workflow/SKILL.md`; training history and the early report
+  are linked from system map `~/ai/current/knowledge/systems/gitlab-ci/agent-git-workflow.md`.
+  Record original/final proposals, both approvals, corrections and outcomes in task logs.
+
 ## Scripts
 
 | Script | Purpose |
@@ -166,9 +246,46 @@ by default. Use RFC 5737 addresses (192.0.2.x, 198.51.100.x, 203.0.113.x) in rec
 Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
 `extract-recipe.md`).
 
+### Economical tool use
+
+- Check `<layer>/scripts/` before improvising. A sequence of three or more commands run
+  twice becomes a script (CLI args or env, `--help`, compact summary output).
+- Reading more than three files or a long log: delegate to a subagent that returns a few
+  lines of conclusions.
+- Never print a whole file or raw output when a line will do: `head`, `grep -c`, `wc -l`,
+  `--quiet`.
+- Reusable prompts go to `<layer>/prompts/<name>.md` with a `model:` tier line.
+
+### External changes
+
+- Ask the user for permission before every command that changes state anywhere other than
+  local files. Examples: `terraform apply`/`destroy`, `ansible-playbook` without `--check`,
+  `kubectl apply`/`delete`/`scale`, `nomad job run`/`stop`, `helm install`/`upgrade`,
+  `docker` commands on shared hosts, editing files or restarting services on remote servers
+  over ssh, and API calls that create, update or delete (POST/PUT/PATCH/DELETE to GitLab,
+  YouTrack, Zabbix, cloud providers, ...).
+- Say what the command changes and where, then wait for an explicit yes. A yes covers only
+  that action; ask again for the next one. Exception: the second training-stage approval
+  above covers commit + branch push + MR creation/update for the reviewed task together;
+  it does not authorize other external changes.
+- No permission is needed for editing local files (including files in a repository
+  checkout), or for read-only commands: `terraform plan`, `--check`/`--diff`, `kubectl get`,
+  GET requests, reading logs.
+
 ## TODO output
 
-Standalone `todo` and `задачи` requests, or requests to list the backlog, use
+`~/ai/TODO.md` is the single live backlog for all layers, grouped by system. Add open
+items as `- [ ] action (date) — [src](note)` and close finished ones; notes keep no
+independent TODO lists. Agent memory is a cache; anything worth keeping also goes to `~/ai`.
+
+Before adding or moving a TODO entry, choose its section from the task subject and source
+note, and inspect the complete Markdown heading ancestry at the insertion point. Do not
+append under the last heading merely because it is convenient. Reuse the matching system
+section, or create an appropriately nested section when none exists. After editing, render
+the affected task or section with `todo.py` and verify the displayed heading path; for a
+closed entry, inspect its source heading ancestry because it is excluded from the output.
+
+Standalone `todo` and `задачи` requests (case-insensitive, optional punctuation), or requests to list the backlog, use
 `python3 ~/ai/general/scripts/todo.py`. The default includes every unchecked item in
 `~/ai/TODO.md`, including deferred proposals; checked items are excluded wherever they
 appear. Listing is read-only and grants no permission to act on any item.
@@ -204,8 +321,9 @@ Use filters only when the user requests a subset: `--layer` matches the top head
 are case-insensitive literal substrings; combined filters use AND. Query also searches
 cached Russian descriptions. Return the complete
 script stdout as the final Markdown answer without a code fence or extra commentary.
-This display contract does not replace the separate rule for preserving an agent-proposed
-list when reporting its remaining unfinished items after completing work.
+After completing a task from a list you initially proposed to the user, show the remaining
+unfinished items in the final response, preserving the original wording, order, numbering,
+grouping and formatting; remove only completed items. If none remain, say so.
 
 ## Indexes
 
@@ -307,6 +425,13 @@ unchanged successful snapshot; errors, missing binary, execution failure or chan
 inputs during checking leave a retry pending. The compact JSON report retains rule IDs,
 severity, file and line, omitting raw settings, source snippets and diagnostic messages.
 Use rule explanations and the specific affected file to investigate findings safely.
+
+For agnix0.59.0 only, the helper rechecks CDX-CFG-025 warnings against the official Codex
+schema's `default` and `priority` examples. It validates TOML and the exact diagnostic
+line in a scanned `.codex/config.toml`; invalid values and all other findings remain.
+TOML parsing uses Python's `tomllib` or installed `tomli`; missing parsing support keeps
+the original warning. Corrections are counted in stdout and the sanitized report.
+The native binary and rule stay enabled; direct binary runs retain the old allowlist.
 
 Every normal `ai-sync.sh` invocation performs the change-aware fallback before checking
 today's Git sync date. Its lint failure is visible but does not block Git synchronization.

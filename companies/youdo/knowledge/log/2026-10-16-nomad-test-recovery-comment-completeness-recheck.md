@@ -94,3 +94,8 @@ Created this audit log and sanitized snapshots/reports; expanded the existing co
 ## Subsequent publication (2026-10-16)
 
 The user approved updating existing comments; all7proposed tasks now have their original summary comments updated in place, verified with no new comments or state changes. [Publication and exact IDs](2026-10-16-nomad-test-recovery-existing-comments-updated.md).
+
+
+## Jenkins deployment follow-up closed by user — 2026-10-20
+
+The user confirmed that deployment now works correctly and BuildAPI updates. Closed the test2/test3/test7 deployment and metadata-consistency follow-up in the [central backlog](../../../../TODO.md), moving its closed record from the unrelated FeatureToggle section to Jenkins recovery. Earlier build failures and diagnostic limits remain historical evidence, not a current open investigation. No new fixes, Jenkins reruns or independent runtime checks were performed in this closure. This acceptance does not close unrelated Jenkins backup, monitoring or recovery proposals.

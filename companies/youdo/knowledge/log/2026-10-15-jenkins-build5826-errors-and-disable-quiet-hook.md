@@ -44,3 +44,7 @@ ansible-playbook -i /home/slnnk/ai-data/jenkins-recovery/rabbit-test5-local.ini 
 ```
 
 Local group_vars/all.yml dc=vk-test and existing rabbit_admin_pass were used; no credential value copied. User-authorized execution obtained queues and performed contents DELETE operations for test5. Final recap localhost ok=3 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0; subprocess rc0, HTTP401/fatal/ignoring markers all0, no stderr warnings. Ansible uri default success reporting leaves changed=0 despite purge operations. No Jenkins rerun or job credential/config change performed; local success does not establish Jenkins uses the same effective credential. Further Jenkins-source comparison remains in TODO.
+
+## Nginx follow-up (2026-10-20)
+
+Historical unimplemented nginx proposal superseded by DevOps-903: xargs `-r` fix validated, published in MR122 and user-merged to master d9ee37a; fetched source verified, no live cleanup. See [task record](2026-10-20-jenkins-devops-903-empty-nginx-cache-cleanup.md).

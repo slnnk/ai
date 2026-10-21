@@ -9,6 +9,8 @@ tags: [jenkins, buildapi, badgekeeper]
 
 ## Summary
 
+User clarification2026-10-20: the observed BuildAPI/Jenkins version selection is correct intended behavior. The earlier correction proposal below is superseded and cancelled; no implementation is required.
+
 Jenkins dynamic_deploy5848 on test retried release21.13.5/pipeline140954, not the MR36/pipeline141089 deployed by GitLab3232612. The console explicitly records the release in the BuildAPI response; fallback was skipped. Earlier Jenkins5847 had already redeployed the same release via3232811.
 
 ## Task and context
@@ -34,3 +36,8 @@ Jenkins recreate_microservices uses /ms_builds/test as its version source and re
 ## Changed files and limits
 
 Only this knowledge log, the existing Jenkins system map, TODO.md and .sync-notes were updated. No runtime or repository task changes. Proposed correction: retain the most recent successful deployment as effective /ms_builds selection, keeping fallback-release metadata separate. Implementation requires a separate request and supervised branch approval.
+
+
+## User clarification and closure — 2026-10-20
+
+The user confirmed that this behavior is correct and that they had previously been unaware of it. The agent's earlier classification as requiring a correction was mistaken. Preserve the observed selection mechanics and investigation evidence above, but do not treat them as a defect. Cancelled the proposed change in the [central backlog](../../../../TODO.md) and moved its closed record from the unrelated SMTP section to Jenkins recovery. No code or runtime changes were made.

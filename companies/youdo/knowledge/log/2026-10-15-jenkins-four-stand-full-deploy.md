@@ -33,3 +33,8 @@ Full restore was explicitly requested and uses the reference build's effects. A 
 User questioned long duration and possible stale Antifraud BuildAPI version. Read-only evidence: BuildAPI test2/test3/test7 references Antifraud23.8.7, pipeline140965, SHAfb11521; latest release tag also23.8.7. Therefore a stale release version was not established. test3 original deploy3228066 failed at PostgreSQL DB creation against10.18.26.39:5432 with FATAL: sorry, too many clients already (9.29s execution,186.7s queue). Jenkins started retries3228678(test3) and3228686(test7); final results not yet verified at this observation.
 
 Jenkins test2 #5828 has not reached microservices: Nomad youdo-test2 deployment357009c7 failed due to progress deadline. Initial run14:45:08UTC waited for deadline; retry14:57:39UTC saw the same failed deployment and returnedrc1. test3/#5829 andtest7/#5830 reached Deploymicroservices/Checkjobs waiting. This is separate from Antifraud metadata freshness. No remediation was applied as part of this diagnosis.
+
+
+## Jenkins deployment follow-up closed by user — 2026-10-20
+
+The user confirmed that deployment now works correctly and BuildAPI updates. Closed the test2/test3/test7 deployment and metadata-consistency follow-up in the [central backlog](../../../../TODO.md), moving its closed record from the unrelated FeatureToggle section to Jenkins recovery. Earlier build failures and diagnostic limits remain historical evidence, not a current open investigation. No new fixes, Jenkins reruns or independent runtime checks were performed in this closure. This acceptance does not close unrelated Jenkins backup, monitoring or recovery proposals.

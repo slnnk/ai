@@ -106,3 +106,13 @@ User explicitly requested one test email through postfix-test to their supplied 
 ## Authentication and DNS follow-up
 
 User clarified Gmail placed the test in spam (earlier inbox inference is superseded). Supplied original headers confirm SPF pass for138.16.203.115 and noreply@mail.youdo.sg; no DKIM-Signature and no reported DMARC result. Read-only DNS: mail.youdo.sg TXT `v=spf1 a mx ~all`, A138.16.203.115; _dmarc.mail.youdo.sg returns NXDOMAIN, _dmarc.youdo.sg TXT returns NOERROR with empty answer through system resolver. Public1.1.1.1 reverse lookup138.16.203.115 returns NXDOMAIN (no PTR); other queries to that resolver timed out. Fresh Postfix postconf again shows smtpd_milters/non_smtpd_milters empty; /etc/opendkim.conf points at KeyTable/SigningTable and socket localhost8891. No private keys read. Deficits established: absent reverse DNS, no DKIM integration/signature, no DMARC TXT returned. They do not identify a unique cause of provider antispam decisions. No DNS or server changes performed.
+
+
+## Authentication task handoff — 2026-10-20
+
+The user reported that the PTR, DKIM and DMARC coordination task was handed over to another employee. Removed this task from the user's active [backlog](../../../../TODO.md); the checked entry records handoff, not implementation. No authentication changes or new infrastructure checks were performed. The recipient employee was not named. Other mailer follow-ups remain unchanged.
+
+
+## Runtime follow-up closed by user — 2026-10-20
+
+The user confirmed that mailer works correctly on the test stands and explicitly closed the follow-up covering scheduler OOM, historical PostgreSQL-limit errors, the logger assembly mismatch and SMTP greeting/CRLF handling. The [central backlog](../../../../TODO.md) records this as user-accepted closure without further investigation. Historical findings above remain evidence of the earlier state; no new fixes or independent runtime checks were performed. PTR/DKIM/DMARC coordination remains handed over to another employee.

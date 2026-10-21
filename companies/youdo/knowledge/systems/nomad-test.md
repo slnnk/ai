@@ -6,6 +6,8 @@ tags: [nomad, consul, terraform, vk-cloud, recovery]
 ---
 # Nomad test platform and VK recovery
 
+Escrow Tinkoff job3236554,2026-10-20: release13.8.12 common test deployment fails before migrations creating MSSQL TinkoffEscrow on vk-ms1-sql-test.mcs.local (login timeout/TCP0x2AF9); Follow-up runner105 verification: host resolves10.18.26.17/TCP1433 connects; Docker DNS172.28.0.8 returns NXDOMAIN while.9 returns correct A record, no runner DNS overrides/running containers. Gateway packet capture: fresh probe via.9 reaches.3/gets mcs.local SOA, probe via.8 returns root SOA with no.8 traffic observed at gateway; user server-cache clear did not fix.8. Container/SQL login not tested; primary Docker resolver failure verified. Earlier Nomad stop failure is ignored: unsuffixed escrow-tinkoff-test prefix matches numbered jobs. No external changes. [Log review](../log/2026-10-20-nomad-test-escrow-job-3236554.md). Follow-up recovery: user nslookup now succeeds; fresh runner105 queries to both.8/.9 return10.18.26.17 in4ms/0ms and host TCP1433 connects. DNS symptom resolved, uncached stability and CI/SQL login unverified; no agent retry.
+
 DevOps-898 TKB master-267 rollout blocked: all six Nomad jobs dead; worker Hangfire startup fails PG authentication on B2B PgBouncer5433. Empty authfile/database mappings confirmed on10.18.26.44; ordinary migrations use direct5432 and complete. No repository fix needed. User-approved sixDB/user configuration applied with reload only/PID43719 unchanged; all6DB SELECT1 pass on5432+5433 using actualworkercredentials. User-approved ordinary retries3230094–3230099 completed all6SUCCESS on test10–test15; Nomad master-267 running/healthy/restarts0 at2026-10-15 21:06UTC. [Evidence](../log/2026-10-15-postgresql-devops-898-tkb-pgbouncer-auth-failure.md).
 
 DevOps-898 final Business readiness2026-10-16: no mandatory edits; master-21509/current523609a16/pipeline140959 all9buildsSUCCESS, existing ordinary test10–test15 jobs3227749–3227754 manual/exactNomadabsent. Special playbook recreates main+mock PG DBs/direct5432, seven runtimeport80 valid. LegacyESDNS and canonicalVK both10.18.26.32. No newpipeline/deploy launched; deployment permission pending. [Evidence](../log/2026-10-16-nomad-test-devops-898-business-preflight.md).
@@ -20,7 +22,11 @@ DevOps-898 B2B catalog COMPLETE2026-10-16: finalBusinessmaster-21509 ordinary jo
 
 ## Summary
 
-Mailer authentication recheck2026-10-16: Gmail test landed in spam per user. SPF passes; no DKIM signature/milters, DMARC TXT absent on subdomain/parent queries; PTR138.16.203.115 public lookup NXDOMAIN. No changes; exact antispam trigger not established. [Evidence](../log/2026-10-16-nomad-test-mailer-smtp-diagnosis.md#authentication-and-dns-follow-up).
+Test1 latency diagnosed2026-10-20: youdo-test1 running/restarts0, but RabbitMQ rejects youdo.user.signin and youdo.user.signout2 declarations in vhosttest1 (publisher auto_delete=true/currentfalse). Signin publication retries through9attempts add~8seconds; MVC logs confirm signin8.3–8.7s and registration8.8–11.4s despite HTTP200. Error exists during Jenkins2006 and current2007. No runtime changes. [Evidence](../log/2026-10-20-nomad-test-test1-monolith-rabbitmq-exchange-latency.md). Deployed141210=38b4812/MR10099, previous141203=c06afbf; both declaretrue. Independent MR10103 removed true, mergedOctober19 16:06Moscow and reverted18:59; actual creator of incompatible broker objects unproven.
+
+Mailer runtime follow-up closed2026-10-20: user confirms correct operation on test stands and closes investigation of OOM, historical PostgreSQL errors, logger mismatch and SMTP greeting/CRLF handling. No new fixes or independent runtime verification; earlier findings remain historical. [Closure](../log/2026-10-16-nomad-test-mailer-smtp-diagnosis.md#runtime-follow-up-closed-by-user--2026-10-20).
+
+Mailer authentication ownership2026-10-20: user handed PTR/DKIM/DMARC coordination to another employee; removed from the user backlog without implementation. Mailer authentication recheck2026-10-16: Gmail test landed in spam per user. SPF passes; no DKIM signature/milters, DMARC TXT absent on subdomain/parent queries; PTR138.16.203.115 public lookup NXDOMAIN. No changes; exact antispam trigger not established. [Evidence](../log/2026-10-16-nomad-test-mailer-smtp-diagnosis.md#authentication-and-dns-follow-up).
 
 User-requested Gmail test2026-10-16 14:05UTC: one locally injected postfix-test message queue4DD0C20D90E accepted by Gmail MX2502.0.0/statussent. Inbox placement and Authentication-Results await recipient original headers; differs from mailer content/path. [Evidence](../log/2026-10-16-nomad-test-mailer-smtp-diagnosis.md#user-requested-gmail-delivery-test-at-1405-utc).
 
@@ -556,3 +562,10 @@ Fresh read-only reconciliation covers all11closed recovery tasks;7comments need 
 ## Recovery comments reconciled (2026-10-16)
 
 User-corrected publication updated the7existing summary comments for DevOps-899/898/894/892/891/896/889, preserving their IDs and closed states. No new comments were created. Final GET verified one original comment per task;890/893/895/897already-current comments retained. [Publication evidence](../log/2026-10-16-nomad-test-recovery-existing-comments-updated.md).
+
+
+## Cerberus2 test HTTP verification 2026-10-20
+
+All14current test/test1–test7/test10–test15 API endpoints verified with direct GET `/v1/sources`: HTTP200/valid9-element JSON list and normal404 for an unknown route, allAPIrestart0/currentallocationshealthy. Worker historical restarts1 ontest2/test10/test15 retained; no cause investigated. Single-request source response times0.123–7.872s. Production HTTP still fails inside its API container, so test success is not production acceptance. [Detailed comparison](../log/2026-10-20-cerberus2-devops-902-production-verification.md).
+
+Production comparison update2026-10-20: user API restart at01:04:45 restored HTTP200/~0.17s, thread count859before/69after. Test14HTTPchecks remain successful; root cause of production blocking remains unproven. Detailed production evidence is linked above.

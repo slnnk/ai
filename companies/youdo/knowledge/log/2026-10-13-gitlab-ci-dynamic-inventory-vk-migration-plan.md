@@ -1,7 +1,7 @@
 ---
 system: gitlab-ci
 status: verified
-checked: 2026-10-14
+checked: 2026-10-20
 tags: [dynamic-inventory, vk-cloud, nomad, consul]
 ---
 # Dynamic inventory migration to VK: audit and proposed plan
@@ -127,6 +127,10 @@ The user requested a completion comment and explicitly approved the prepared tex
 ## User-reported task closure (2026-10-14)
 
 The user reported DevOps-896 closed. Treat VK dynamic-inventory recovery as accepted complete. The previously documented consumer-cutover, live-SQL and repeated-refresh limitations do not reopen this task and must not be represented as verified or completed work. Any further work requires a separate request; the independent permanent CI compatibility proposal remains separately tracked. No YouTrack state mutation or additional runtime action was performed for this closure acknowledgment.
+
+## Permanent CI compatibility proposal cancelled (2026-10-20)
+
+The user declined the permanent registry-compatible image/CI follow-up because no service updates are planned. The central TODO entry is closed without implementation, image publication or external changes. This decision supersedes the open follow-up status above; the historical pipeline-only workaround and accepted deployment remain recorded as evidence, not an active request.
 
 ## Changes
 

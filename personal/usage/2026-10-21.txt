@@ -1,0 +1,29 @@
+Token usage, last 7 days (since 2026-10-14)
+agent   project                            model                sess   fresh  c.read c.write     out
+codex   ~                                  gpt-6.1-sol           159   19.1M 1351.9M       0    3.7M
+codex   ~/git/youdo.content                gpt-6.1-sol             2    433k   37.9M       0    107k
+codex   ~                                  gpt-6-luna              2    726k   18.4M       0    162k
+codex   ~/git/youdo-business-tickets       gpt-6.1-sol             3    128k    2.8M       0     13k
+total                                                            166   20.4M 1411.1M       0    4.0M
+
+Top 5 sessions by input (fresh + cache read + cache write):
+  2026-10-15 09:54  codex   250.7M in   519k out  ~  01a13efc
+  2026-10-15 09:54  codex   122.8M in   155k out  ~  01a13f16
+  2026-10-15 18:20  codex   101.3M in   187k out  ~  01a140cb
+  2026-10-15 09:54  codex    85.3M in   130k out  ~  01a13f16
+  2026-10-14 14:16  codex    79.7M in   251k out  ~  01a13ac5
+
+Knowledge-base access (heuristic, see --help):
+agent   sess  kb_find   search    index     full  partial full KiB
+claude     0        0        0        0        0        0        0
+codex    142      324     1007        0       50      416     1186
+Codex parser coverage: 7578 wrappers, 10293 shell sites, 10231 static calls, 0 direct calls; 62 dynamic sites, 9 JS parse failures, 0 wrappers unavailable, 0 invalid calls, 0 shell parse failures.
+Codex coverage is incomplete; excluded calls are not treated as zero KB access.
+KB counts describe static requested reads; full KiB is a current-file-size estimate, not token usage.
+Shell parsing is heuristic: dynamic paths, custom readers and runtime control flow may be missed.
+Most read in full:
+   21x README.md
+    9x repos.md
+    2x log/2026-10-20-knowledge-base-lint-warning-review.md
+    1x log/2026-10-14-nomad-test-devops-897-large-mssql-legacy-workflow.md
+    1x log/2026-10-14-nomad-test-devops-898-single-dynamic-plan.md

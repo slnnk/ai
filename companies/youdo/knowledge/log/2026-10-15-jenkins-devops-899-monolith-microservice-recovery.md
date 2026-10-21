@@ -123,7 +123,7 @@ Escrow deploy3228097 SUCCESS, release13.8.12/pipeline140950. Shared router remai
 
 Final verify_buildapi.py exited0 with8/8 accepted: /ms_builds/test5 exact project/pipeline/deploy-job/source/ref/Monolith metadata, /get_microservices_info/test5 live requested release versions and /ms/test5 rendered rows all match. Evidence buildapi-verification-all.json. Fns master-598, antifraud2 23.8.7, attribution1.0.22, badgekeeper21.13.5, bruteforcingdetector1.13.20, docvalidation master-757, escrow.tinkoff13.8.12, userinsurance0.0.68.
 
-All19 pre-existing unrelated Ansible dirty/untracked file hashes remain unchanged. Selected CI job/database behavior was preserved: skipdropdb retains databases, normal migrations run. Runtime preflight was skipped as requested; post-deploy scope covers job health and metadata, not full application business tests. Runner upstream DNS inconsistency remains a separate live backlog item; no additional infrastructure changes were made for it.
+All19 pre-existing unrelated Ansible dirty/untracked file hashes remain unchanged. Selected CI job/database behavior was preserved: skipdropdb retains databases, normal migrations run. Runtime preflight was skipped as requested; post-deploy scope covers job health and metadata, not full application business tests. Runner upstream DNS inconsistency was recorded as a separate backlog item on2026-10-15; no additional infrastructure changes were made for it. On2026-10-20 the user confirmed it currently works and explicitly closed the investigation. The central TODO is closed; no new diagnosis, DNS change or root-cause verification was performed for this closure.
 
 ## Other stand catalog seeding (2026-10-15)
 

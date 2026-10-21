@@ -1,7 +1,7 @@
 ---
 system: ios-ci
 status: verified
-checked: 2026-10-07
+checked: 2026-10-20
 tags: [ios, fastlane, spaceauth, app-store-connect, apple-id, keychain, runner]
 ---
 # YouDo iOS: fastlane `spaceauth` — `Service key is empty`
@@ -92,7 +92,7 @@ parameter so that it does not end up in history/process list.
 If the lane in use supports the official App Store Connect API key, migrating to it is
 preferable to session auth: no dependency on 2FA and short-lived regional cookies.
 
-## Open items: TODO
+## Historical migration checkpoints (superseded by release verification below)
 
 - Check the actual fastlane version and installation method on `idcn-10`. Done: the user installed `2.240.0` on the runner (stated 2026-10-05).
 - After 2.240.0 is released, update the project's Gemfile and remove the temporary git pin. Done: `Gemfile` pins `2.240.0` (IOS-5036 `ceb8f4e881`, checked 2026-10-05). `Gemfile.lock` is not tracked in YouDoApp: removed in 2019 (`936297d245`), listed in `.gitignore`.
@@ -104,3 +104,17 @@ preferable to session auth: no dependency on 2FA and short-lived regional cookie
 ## Portable lesson
 
 - `~/ai/general/knowledge/fastlane/spaceauth-service-key-is-empty.md`
+
+## Release API-key verification (2026-10-20)
+
+User supplied [job 3230246](https://gitlab.youdo.sg/team-youdo-ios/YouDoApp/-/jobs/3230246) and asked whether it satisfies DevOps-880. Read-only GitLab GET metadata/trace confirmed `1 Build release`, ref `v4.233.0`, commit `5331d7c695bd2555f1b941a6e8cc6db5547f2c93`, pipeline `141026`, runner `93`, job success on 2026-10-16 at 11:38:34 Moscow. The pipeline status is manual because other jobs remain manual; the release job itself succeeded.
+
+Trace lines 6707–6719 show `app_store_connect_api_key`, `testflight`, creation of an App Store Connect API authorization token, and successful upload of the package/new binary to App Store Connect. This completes the previously missing release/TestFlight authentication check. It does not establish App Store review/publication or post-upload processing completion. No new build or release was triggered.
+
+Exact release SHA and current remote `develop` `.gitlab-ci.yml`/`fastlane/Fastfile` contain no references to `APPLE_DEVELOPER_USER`, `FASTLANE_SESSION`, `FASTLANE_USER` or `FASTLANE_PASSWORD`; CI has three `--api_key_path` calls and Fastfile one `app_store_connect_api_key` call. `fastlane/Appfile` requests returned HTTP errors; absence of references is asserted only for the two successfully read files. Local checkout remained clean and unchanged.
+
+Project variable metadata GET found `APPLE_DEVELOPER_USER` still present (masked, scope `*`, unprotected), and no project `FASTLANE_SESSION`. Values were not printed or saved. Inherited/group variables and runner environment were not inspected. Remaining cleanup is tracked only in the central TODO: removal of the unused project Apple-ID variable requires explicit external-write approval. No variables or external tickets were changed.
+
+## Final user decision (2026-10-20)
+
+The user explicitly requested retaining `APPLE_DEVELOPER_USER`; deleting it is unnecessary. This supersedes the cleanup proposal above. Release/API-key verification is complete, and the remaining local DevOps-880 backlog item is closed with cleanup cancelled. No variable deletion, inherited-session investigation or external ticket update was performed or requested. There are no remaining actions for this task in the central TODO.

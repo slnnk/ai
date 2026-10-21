@@ -21,7 +21,7 @@ Restore Vysor/ADB input control of the Redmi Note 13 Pro farm device whose scree
 
 Vysor connects and shows the screen, but clicks and keys do not work. The device is present in `adb devices -l` with state `device`; USB and the video stream are fine.
 
-The check `adb -s x4pf5l5haegykni7 shell input keyevent 0` returns `SecurityException: Injecting input events requires ... INJECT_EVENTS`. On MIUI the protected property `persist.security.adbinput=0` is set: the option "Отладка по USB (Настройки безопасности)" (USB debugging (Security settings)) is turned off.
+The check `adb -s x4pf5l5haegykni7 shell input keyevent 0` returns `SecurityException: Injecting input events requires ... INJECT_EVENTS`. On MIUI the protected property `persist.security.adbinput=0` is set: the option `Отладка по USB (Настройки безопасности)` (USB debugging (Security settings)) is turned off.
 
 An attempt to run `setprop persist.security.adbinput 1` from an ordinary ADB shell is rejected; there is no root (`su`) on the phone. Therefore the toggle has to be enabled locally on the phone screen.
 
