@@ -37,6 +37,10 @@ Paths below are relative to `~/ai/`.
 
 ### Security: leaked or plaintext credentials
 
+- [ ] Review exposed inline Consul token in automation-test-yandex nomad_environment.json.j2 Services.Consul.Token; determine validity and move/rotate under separate authorization (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-monolith-data-dependencies.md)
+
+- [ ] Review validity and rotate exposed inline APNs key at automation-test-yandex environment.json.j2 Push.Apns.PrivateKey; move to external secret under separate authorization (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-daily-compilations-missing.md)
+
 - [ ] Review/rotate hardcoded NuGet source credential in gitlab-ci-templates v3/.dotnet-nuget.yml:53; value encountered during read-only CI audit, record location only and use external CI secret under separate request (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-14-nomad-test-devops-898-service-build-retries.md)
 
 - [ ] Rotate yc authorized key `aje1kjc599tg2oj7ok2d` (private part leaked into session output), update consumers, delete the old key (2026-09-13) — [src](companies/youdo/knowledge/log/2026-09-13-workstation-yc-cli-auth-recovery.md)
@@ -90,6 +94,24 @@ Deferred, decide later: Adminer / DB discovery; `youdo-business-tickets` onboard
 QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billing `GetYouDoBalanceHistoryTest` assertions; Tochka hard-coded token fallback — [src](companies/youdo/knowledge/log/2026-09-04-dev-deployment-devops-832-handoff.md)
 
 ### nomad-test / Consul (Yandex test)
+
+- [x] Kafka MR3 merged with explicit approval as627242c9; pipeline141395/staging3242525 SUCCESS, full isolated kafka-vk-test healthy/alltasksrestart0, Consulpassing and REST/brokers200; existing VMbroker unchanged, productionmanual (2026-10-21) — [Kafka](current/knowledge/log/2026-10-21-nomad-test-kafka-vk-full-job.md)
+- [x] Subcategory-predictor production promoted by user; deployment0a973c76SUCCESS/Promotedtrue/2of2healthy, both active replicas1.0.8/running/restart0, Consulpassing and health200; pipeline141391/deploy3242503SUCCESS (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-subcategory-predictor-vk.md)
+- [ ] Proposals: restore remaining monolith dependencies price-predictor, customer-task-recommendations and taskqualitycontrolfortest; taskqualitycontrol directly accounts for8Jenkins2020failures. Predictor retrycontract3242527/load3242528SUCCESS, readiness barrier optional rather than a blocker; Kafka REST restored (2026-10-21) — [inventory](current/knowledge/log/2026-10-21-nomad-test-monolith-data-dependencies.md), [predictor](current/knowledge/log/2026-10-21-nomad-test-subcategory-readiness-kafka-rest.md)
+
+- [x] Recommendations mock0.0.16 restored by user rollout: MR14merged74f4115e, master141384/release141385/deploy3242474SUCCESS; registrydigest, VKhealthy0restarts/Consulpassing/root200 independently verified, no remote fixture writes (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-recommendations-mock-vk.md)
+
+- [x] Prepared: prepare restoration of shared data/daily-compilations subscription API in VK test; audit current CI, image and database prerequisites, obtain repository/deployment approvals before changes (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-daily-compilations-missing.md) Preparation complete without CI edits; direct Nomad registration remains an unapproved exception.
+
+- [x] Published: review and publish prepared daily-compilations staging CI dc/proxy=vk-test only, retaining the standard CI-supplied image version, then separately approve deployment with new empty PostgreSQL database; Nomad address/token unchanged, user requested no checks (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-daily-compilations-missing.md) Completed as ef37ce8/MR9 on 2026-10-21; no merge or deployment.
+
+- [x] Reviewed: review daily-compilations MR9 and pipeline141345, resolve VK Nomad address/token selection before separately approved merge/release/deployment; dc/proxy change published, no runtime changes (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-daily-compilations-missing.md) MR9 user-merged as b1901e5; release0.5.15 build/release passed; staging3241027 failed403 against inherited old endpoint (2026-10-21).
+
+- [x] Superseded/completed: configure project-only staging NOMAD_STAGE_ADDR/TOKEN for VK in daily-compilations, then separately approve retry of failed deployment3241027; release0.5.15 built, old inherited target caused submission403, VK job absent (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-daily-compilations-missing.md) User selected Data-group correction instead; group values updated and temporary project overrides removed, independent GET verified (2026-10-21).
+
+- [x] Completed via user retry: retry daily-compilations staging job3241027 after user-approved Data-group VK address/token correction, then verify allocations and API health; requires separate deployment approval (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-daily-compilations-missing.md) User retry3241056 SUCCESS; API0.5.15 and PostgreSQL running/restarts0, Consulpassing and health/users GET200 verified (2026-10-21).
+
+- [x] User promoted healthy daily-compilations0.5.15 production deployment edf404b3, then monitor rollout and job3241028 to terminal result; canary healthy/restarts0, shared health200, monitoring alone grants no promotion permission (2026-10-21) — [src](current/knowledge/log/2026-10-21-nomad-test-daily-compilations-missing.md) Completed: job3241028/pipeline141347 SUCCESS; production rollout2/2healthy/API0.5.15/0restarts, Consulpassing and health200 GET-verified (2026-10-21).
 
 - [ ] Proposed: inspect RabbitMQ test1 exchange properties/bindings and prepare correction for youdo.user.signin and youdo.user.signout2 auto_delete mismatch; preserve consumers/bindings, obtain explicit approval before any runtime change; verify signin latency and event publication afterward (2026-10-20) — [src](current/knowledge/log/2026-10-20-nomad-test-test1-monolith-rabbitmq-exchange-latency.md)
 
@@ -383,6 +405,10 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [x] Infrastructure and production launch completed; pipelines 140457/140458 successful. User closed DevOps scope on 2026-10-09; functional verification belongs to developers. Additional inferred operational checks and shared-template improvements were not requested and are not completion blockers — [src](companies/youdo/knowledge/log/2026-10-09-youdo-chat-agent-prod-deploy.md)
 
+### Corporate network access
+
+- [x] Diagnose s.zubakha macOS buildsinfo access: system resolver failed despite correct direct DNS and working forced-IP HTTP; user configured /etc/resolver/youdo.local with 172.30.63.1, ordinary curl HTTP401 verified by screenshot (2026-10-21) — [src](companies/youdo/knowledge/log/2026-10-21-corporate-network-szubakha-buildsinfo.md)
+
 ### Other systems
 
 - [x] DevOps-896 / dynamic_inventory closed by the user on 2026-10-14; prepare/release/deploy: MR26 merged2bc44941; approved VK Consul/Vault/CI config, release-0.56.4, no-attestation rebuild140830 and manual deployment3224500 succeeded; DNS/direct GET200,16stands/64Nomad aliases/0SQL (2026-10-14) — [src](companies/youdo/knowledge/log/2026-10-13-gitlab-ci-dynamic-inventory-vk-migration-plan.md)
@@ -520,6 +546,8 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 - [x] Consolidated open items from all notes into this file (done 2026-09-28).
 
 ## Corporate network access
+
+- [x] VK connectivity incident: user confirmed nginx/Nexus/Nomad recovery and then all Jenkins UI/version/branch functions working; no agent runtime changes or builds, exact root cause and sustained stability unverified, support draft not sent by agent (2026-10-21) — [src](current/knowledge/log/2026-10-21-vk-cloud-inter-subnet-access-outage.md)
 
 - [x] VPN access to 10.18.24.233: user confirmed access works and requested closure on 2026-10-20; further packet-loss investigation closed without additional diagnostics or network changes (original 2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-corporate-network-ssh-10-18-24-233.md)
 - [x] Complete host-specific SSH config for 10.18.24.233: user runs prepared sudo script to exclude SendEnv, then verify plain interactive login (2026-10-11) — [src](companies/youdo/knowledge/log/2026-10-11-corporate-network-ssh-10-18-24-233.md)
