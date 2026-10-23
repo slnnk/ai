@@ -1,10 +1,14 @@
 ---
 system: nomad-test
 status: verified
-checked: 2026-10-16
+checked: 2026-10-22
 tags: [nomad, consul, terraform, vk-cloud, recovery]
 ---
 # Nomad test platform and VK recovery
+
+2026-10-22 CSI test1: Jenkins5895/5897 claim-release timeout follows cloud409detach rejection. VM vk-ms1-nomad-agent-test-07 remains Nomadready but cloudERROR/faultMessagingTimeout since11:38:39UTC; completed ES allocation retains writer claim. CSI8/8healthy; test5deploy5896SUCCESS. Project-wide follow-up:40VMs/36ACTIVE/4ERROR, allMessagingTimeout500 at11:38–11:41UTC: Nomadtest-05/test-07, elastic-b2b-test01, pg-b2b-test. Shared provider incident suspected, unverified. Cloud recovery pending separate approval; test2/test13disks also attached, future detach risk. No runtime changes. [Evidence](../log/2026-10-22-nomad-test-csi-test1-vm-error.md).
+
+2026-10-22 B2B auth: all six active test10-test15 failed with PgBouncer `08P01: no such database`; direct PostgreSQL probes passed, auth_type already md5. User-approved fourteen explicit auth DB mappings (test/test1-test7/test10-test15) and reload restored all six via5433, process PID unchanged/zero app restarts. Root disk100% initially blocked backup; separately approved1.45GB rotated-log move to/data restored1.4GBfree/85%used. Future stands configured without DB creation/deployment; log retention/config persistence remain proposals in central TODO. [Evidence](../log/2026-10-22-nomad-test-b2b-auth-pgbouncer-missing-databases.md).
 
 2026-10-21 taskqualitycontrolfortest: read-only fetch master9286ebee, project233/sharedrunnersenabled, parameterized Nomad spec. User approved branch/base and four-line CI targeting change for manual VK tag deployment; local patch/YAML+diff checks pass, approved publication2bfc03a/[MR10](https://gitlab.youdo.sg/sysadmins/taskqualitycontrolfortest/-/merge_requests/10) independently verified, no branchCI; merge/tag/deploy remain pending, no runtime changes. [Preparation](../log/2026-10-21-nomad-test-taskqualitycontrolfortest-vk.md). User merged efbd84b4/tag staging-0.0.7; build3242530/pipeline141397 compiles successfully but registry push fails on child manifest after attestation/index export. User-approved follow-up in DevOps-898-disable-taskqualitycontrol-attestations adds no-attestation CI setting and removes oldspb2deploy; YAML/semantic/diff checksPASS; approved publication0794496/[MR11](https://gitlab.youdo.sg/sysadmins/taskqualitycontrolfortest/-/merge_requests/11) independently verified, no branchCI; merge/release/deploy pending.
 

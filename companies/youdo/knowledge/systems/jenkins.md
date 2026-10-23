@@ -23,6 +23,8 @@ Verified2026-10-16: dynamic_deploy5847/5848 on test reapplied badgekeeper21.13.5
 
 ## Controller timezone
 
+Agent update 2026-10-22: after explicit approval, `AutoTest` on `10.18.26.26` was recreated with `TZ=Europe/Moscow` and `JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Moscow` in `/data/jenkins-agent/docker-compose.yml`. Container date confirmed `+03:00`, JVM confirmed `user.timezone = Europe/Moscow`, and Jenkins confirmed online with five idle executors. Host OS remains UTC. Reported test not rerun. Runtime Compose is updated; canonical Ansible alignment remains part of the existing recovery backlog, since a future role apply could overwrite these settings. [Change log](../log/2026-10-22-jenkins-autotest-agent-timezone-moscow.md).
+
 Since 2026-10-16 the controller's default display timezone is `Europe/Moscow`. The active Compose service sets `TZ=Europe/Moscow` and `JAVA_OPTS` includes `-Dorg.apache.commons.jelly.tags.fmt.timeZone=Europe/Moscow`; Jenkins `System Information` confirmed both `user.timezone` and the formatter property after container recreation. This is the default for users without a personal timezone preference. The host OS timezone/clock was not changed. [Change log](../log/2026-10-16-jenkins-controller-timezone-moscow.md).
 
 ## Hosts and access

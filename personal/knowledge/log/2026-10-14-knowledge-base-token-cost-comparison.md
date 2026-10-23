@@ -76,3 +76,6 @@ Conclusion: this supplies a corrected current baseline for Codex. No previous-we
 
 ## Regular report update (2026-10-19)
 The user subsequently requested implementation. The [regular classifier update](2026-10-19-knowledge-base-codex-nested-shell-accounting.md) adds static nested-shell extraction, per-command/file classification and parser coverage to `general/scripts/token_usage.py --kb`. This supersedes the statement above that the canonical classifier remains unchanged. The separate audit and fixed-window October 21 comparison remain available; historical snapshots were not regenerated.
+
+## Scheduled comparison completed (2026-10-22)
+The October 21 reminder was executed for the original October 7–13 and October 14–20 windows. See the [follow-up report](2026-10-22-knowledge-base-token-cost-oct21-comparison.md). Full reads per KB-active session increased91.52%; partial reads per session were stable. Both size proxies were recomputed because living files changed. Existing scoped-reading rules remain sufficient; actual token/cost savings and causal effectiveness remain unestablished. The central reminder is closed, with no new scheduled work.
