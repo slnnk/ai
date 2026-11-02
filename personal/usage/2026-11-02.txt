@@ -1,0 +1,18 @@
+Token usage, last 7 days (since 2026-10-26)
+agent   project                            model                sess   fresh  c.read c.write     out
+codex   ~/mygit/ansible                    gpt-6.1-sol             1      8k     12k       0      64
+total                                                              1      8k     12k       0      64
+
+Top 5 sessions by input (fresh + cache read + cache write):
+  2026-11-02 16:17  codex      20k in     64 out  ~/mygit/ansible  01a19d0d
+
+Knowledge-base access (heuristic, see --help):
+agent   sess  kb_find   search    index     full  partial full KiB
+claude     0        0        0        0        0        0        0
+codex      1        1        1        0        2        0       28
+Codex parser coverage: 2 wrappers, 3 shell sites, 3 static calls, 0 direct calls; 0 dynamic sites, 0 JS parse failures, 0 wrappers unavailable, 0 invalid calls, 0 shell parse failures.
+KB counts describe static requested reads; full KiB is a current-file-size estimate, not token usage.
+Shell parsing is heuristic: dynamic paths, custom readers and runtime control flow may be missed.
+Most read in full:
+    1x README.md
+    1x repos.md
