@@ -51,3 +51,10 @@ tags: [strongswan, ikev2, eap-mschapv2, l2tp, letsencrypt, windows, vpn]
 ## Portable lesson
 
 `~/ai/general/knowledge/strongswan/windows-ikev2-aborts-before-eap-incomplete-ca-chain.md`
+
+## Migration preparation, 2026-11-02
+
+Read-only SSH to `root@91.218.141.22` on port 22 returned connection refused.
+Historical configuration above has not been reverified. Local Ansible support for
+IKEv2 on `it-garage-de-01` was prepared without copying old credentials or
+performing deployment. See [preparation log](../log/2026-11-02-vpn-gateway-strongswan-ansible.md).

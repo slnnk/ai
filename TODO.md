@@ -443,6 +443,14 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 
 ## Personal
 
+### TrustTunnel endpoint
+
+- [x] iPhone TrustTunnel working after correcting client password, confirmed by user; no server change needed (2026-11-02) — [src](personal/knowledge/log/2026-11-02-vpn-gateway-strongswan-ansible.md)
+
+### StrongSwan endpoint
+
+- [ ] Verify an iPhone IKEv2 connection and Internet access on it-garage-de-01; approved deployment completed, services and firewall verified (2026-11-02) — [src](personal/knowledge/log/2026-11-02-vpn-gateway-strongswan-ansible.md)
+
 ### TrustTunnel client
 
 - [x] TrustTunnel corporate endpoint exclusion active with both VPNs connected; Nexus UI GET and default-MSS6000-byte request HTTP200 verified; browser refresh/symptom confirmation belongs to user; done2026-10-11 — [src](personal/knowledge/log/2026-10-11-trusttunnel-client-corporate-vpn-exclusion.md)
