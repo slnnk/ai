@@ -135,7 +135,7 @@ raise SystemExit(1 if mode=='error' else 0)
         self.env['HOME'] = os.environ['HOME']
         config = self.runtime/'.codex/config.toml'; config.parent.mkdir()
         config.write_text('[profiles.standard]\nservice_tier = "default"\n[profiles.other]\nservice_tier = "bogus"\n')
-        payload = {'version': '0.60.3', 'files_checked': 2, 'diagnostics': [
+        payload = {'version': '0.61.0', 'files_checked': 2, 'diagnostics': [
             {'level': 'warning', 'rule': 'CDX-CFG-025', 'file': str(config),
              'line': line, 'column': 1, 'message': 'TEST_SECRET_DO_NOT_STORE'} for line in [2, 4]]}
         self.agnix.write_text('#!/usr/bin/env python3\nimport json\nprint(json.dumps('+repr(payload)+'))\n')
@@ -236,9 +236,9 @@ class ServiceTierCompatibilityTests(unittest.TestCase):
         self.item = {'rule': 'CDX-CFG-025', 'level': 'warning',
                      'file': '.codex/config.toml', 'line': 1}
 
-    def recheck(self, source, item=None, version='0.59.0'):
+    def recheck(self, source, item=None):
         self.config.write_text(source)
-        return LINT.stale_service_tier_finding(item or self.item, version, self.root, [self.config])
+        return LINT.stale_service_tier_finding(item or self.item, self.root, [self.config])
 
     def test_schema_examples_are_rechecked_with_toml_quotes_comments_and_profiles(self):
         for value in ['default', 'priority']:
@@ -254,17 +254,10 @@ class ServiceTierCompatibilityTests(unittest.TestCase):
             with self.subTest(value=value):
                 self.assertFalse(self.recheck('service_tier = "'+value+'"\n'))
 
-    def test_current_version_has_same_bounded_exception(self):
-        self.assertTrue(self.recheck('service_tier = "default"\n', version='0.60.3'))
-        self.assertTrue(self.recheck('service_tier = "priority"\n', version='0.60.3'))
-        self.assertFalse(self.recheck('service_tier = "bogus"\n', version='0.60.3'))
-
-    def test_other_rules_versions_and_errors_are_preserved(self):
+    def test_other_rules_and_errors_are_preserved(self):
         source = 'service_tier = "default"\n'
         for item in [dict(self.item, rule='OTHER'), dict(self.item, level='error')]:
             self.assertFalse(self.recheck(source, item))
-        for version in ['0.58.0', '0.60.0', None]:
-            self.assertFalse(self.recheck(source, version=version))
 
     def test_malformed_and_multiline_source_are_preserved(self):
         self.assertFalse(self.recheck('service_tier = "default"\nbroken = [\n'))

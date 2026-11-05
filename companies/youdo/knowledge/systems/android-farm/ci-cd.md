@@ -6,6 +6,10 @@ tags: [android, gitlab-ci, gradle, fastlane, google-play, huawei, rustore, nexus
 ---
 # YouDo Android: infrastructure and CI/CD map
 
+## Verified job observation (2026-11-05)
+
+[Job3278160 diagnosis](../../log/2026-11-05-android-farm-dig-job-3278160.md) confirms `gradle:18` runs on the DevOps-908 branch. Suite setup fails against the configured Houston mock `yandex-test` URL (404), while read-only checks of the documented `vk-test` endpoint return200. The Zabbix API missing-`dbversion` outage was subsequently resolved under [DevOps-909](../../log/2026-11-05-zabbix-docker-before-data-mount.md); authenticated Enabled Selenium inventory returned all three farm hosts at15:41:31 UTC. Historical farm correlation was not resumed. These observations do not establish master cutover or device health.
+
 ## Staleness review (2026-11-04)
 
 The local product checkout is now clean at `227f7518c341` on `DevOps-833-fix-hotfix`: the hotfix fixes are committed locally, but this does not establish merge or production execution. The 2026-10-12 image recovery is already recorded below. Newer [Maven recovery evidence](../../log/2026-10-22-nexus-cyberity-aar-publication-assessment.md) and [central backlog](../../../../../TODO.md) record restored Cyberity/Fotoapparat artifacts and the user confirmation on 2026-10-23 that Android builds work; SDK runtime remains unverified. August build/dependency details and suite counts must not be treated as a fresh November snapshot.

@@ -172,3 +172,8 @@ Root read-only verification on `root@172.28.0.200` / sc-gateway2 shows Nexus10.1
 Local `/home/slnnk/ai-data/nexus-recovery/public-lb-route-plan.json` proposes one temporary host route on public LB172.28.0.141: `10.18.24.233/32 via172.28.0.1 deveth0`. Not applied; persistent configuration remains to be selected after verifying the existing LB network manager and successful reachability. Two approved automation-services backend edits are local only: public-balancer variable targets10.18.24.233 and shared template renders all six proxy destinations with preserved hostname fallback for other groups. Render and `git diff --check` passed. No deployment, commit or publication has occurred.
 
 Daily ai-sync retry for2026-10-12 failed at pull/rebase because KB changes are unstaged; root informed the user. No manual git mutation, stash or commit was used to bypass it.
+
+## Cyberity upstream status update (2026-11-05)
+
+User reports Cyberity is online and supplied a Nexus UI screenshot: `maven-cyberity`, type `proxy`, format `maven2`, blob store `maven-cache`, status `Online - Remote Available`. This supersedes the earlier unresolved upstream status; the corresponding central TODO item is closed on user-provided evidence. No independent workstation probe, artifact download, configuration change or CI run was performed. SDK runtime verification remains a separate open TODO item.
+

@@ -509,6 +509,12 @@ Normal invocations then run `agent_lint.py` when watched agent inputs changed si
 successful check. Later calls the same day therefore catch new instruction edits while
 skipping Git work. Identical successfully checked inputs produce no lint output.
 
+Before publication, staged KB lint must finish with its final summary and the matching
+exit status (0 without errors, 1 with findings). A checker crash, incomplete output or
+inconsistent status stops sync before commit/pull/push, shows the checker diagnostics,
+and preserves staged changes, `.sync-notes` and the prior sync date. Completed nonsecret
+findings remain report-only; detected credentials still block publication.
+
 The commit subject lists the touched areas (`Sync 2026-09-24: youdo, general/linux`).
 After each completed task, append one concise final summary to `~/ai/.sync-notes`:
 `- <system>: <final result and why>; <key check>; <material remaining risk if any>`.
@@ -574,13 +580,13 @@ inputs during checking leave a retry pending. The compact JSON report retains ru
 severity, file and line, omitting raw settings, source snippets and diagnostic messages.
 Use rule explanations and the specific affected file to investigate findings safely.
 
-For agnix0.59.0 and0.60.3, the helper rechecks CDX-CFG-025 warnings against the official Codex
+For every agnix version, the helper rechecks CDX-CFG-025 warnings against the official Codex
 schema's `default` and `priority` examples. It validates TOML and the exact diagnostic
 line in a scanned `.codex/config.toml`; invalid values and all other findings remain.
 TOML parsing uses Python's `tomllib` or installed `tomli`; missing parsing support keeps
 the original warning. Accepted compatibility findings are omitted from stdout and the
-report diagnostics; their count remains in report metadata for audit. Other agnix
-versions retain native validation until separately verified.
+report diagnostics; their count remains in report metadata for audit. The exception
+does not depend on the agnix version.
 
 By user decision, the helper also omits informational AGM-004 (missing project overview)
 for the canonical root `AGENTS.md`, which contains shared policy rather than project

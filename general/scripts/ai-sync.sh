@@ -141,9 +141,22 @@ git add -A || fail "git add"
 if git diff --cached --name-only | grep -qE '(^|/)\.env$'; then
   git reset -q; fail "a .env file is staged; check .gitignore"
 fi
-# lint staged notes: a credential blocks the commit, other findings are reported and fixed later
-LINT=/tmp/ai-sync-lint.$$
+# Lint must complete before publication; ordinary nonsecret findings remain report-only.
+LINT=$(mktemp "${TMPDIR:-/tmp}/ai-sync-lint.XXXXXX") || fail "create lint report"
 python3 general/scripts/kb_lint.py --staged > "$LINT" 2>&1
+LINT_STATUS=$?
+LINT_SUMMARY=$(tail -n 1 "$LINT")
+# Exit 1 also means normal lint findings, so require its final completion summary.
+LINT_EXPECTED=-1
+if [[ "$LINT_SUMMARY" =~ ^kb-lint:\ ([0-9]+)\ errors,\ ([0-9]+)\ warnings\ \(staged\ files\ only\)$ ]]; then
+  LINT_EXPECTED=0
+  [ "${BASH_REMATCH[1]}" != "0" ] && LINT_EXPECTED=1
+fi
+if [ "$LINT_STATUS" -ne "$LINT_EXPECTED" ]; then
+  cat "$LINT" >&2
+  rm -f "$LINT"
+  fail "kb_lint.py did not complete (exit $LINT_STATUS); commit/pull/push skipped; staged changes preserved"
+fi
 if grep -q '^E secret' "$LINT"; then
   grep '^E secret' "$LINT" >&2; rm -f "$LINT"; git reset -q
   fail "a staged note looks like it contains a credential; remove it and rerun"

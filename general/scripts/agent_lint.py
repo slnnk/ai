@@ -118,14 +118,14 @@ def atomic_json(path, data):
             os.unlink(temporary)
 
 
-def stale_service_tier_finding(item, version, root, entries):
-    """Recheck verified versions with the obsolete fast/flex allowlist; fail closed.
+def stale_service_tier_finding(item, root, entries):
+    """Recheck service tier warnings independently of the agnix version; fail closed.
 
     Official Codex schema explicitly includes default and priority:
     https://learn.chatgpt.com/docs/config-schema.json
-    Keep every other value, version, severity and rule under native validation.
+    Keep every other value, severity and rule under native validation.
     """
-    if version not in {'0.59.0', '0.60.3'} or item.get('rule') != 'CDX-CFG-025' or item.get('level') != 'warning':
+    if item.get('rule') != 'CDX-CFG-025' or item.get('level') != 'warning':
         return False
     try:
         try:
@@ -210,7 +210,7 @@ def check(args):
         for item in diagnostics:
             if not isinstance(item, dict) or item.get('level') not in ('error', 'warning', 'info'):
                 raise ValueError('unknown diagnostic severity')
-            if stale_service_tier_finding(item, raw.get('version'), args.root, entries):
+            if stale_service_tier_finding(item, args.root, entries):
                 corrections += 1
                 continue
             if accepted_instruction_finding(item, args.root):
