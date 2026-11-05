@@ -1,11 +1,15 @@
 ---
 system: team-config-repo
 status: verified
-checked: 2026-09-30
+checked: 2026-11-04
 indexed_commit: 3d96ec6
 tags: [claude-code-config-infra, sysadmins, index, runbooks, infra-docs]
 ---
 # Team repo claude-code-config-infra: index
+
+## Staleness review (2026-11-04)
+
+The local index marker `3d96ec6` exactly matches both the checkout HEAD and cached `origin/main`; `team_repo_changes.sh --no-fetch` reports `index is current: 3d96ec6`. The findability index therefore needs no row or commit-marker update for this local snapshot. This is a local index check, not a fetch or verification of operational facts in team documents; open the underlying source document before relying on a topology or runbook. See the [repository registry](../repos.md).
 
 ## Summary
 

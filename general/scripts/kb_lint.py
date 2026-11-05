@@ -186,6 +186,12 @@ def main():
                 err(f, "frontmatter", f"status must be one of {sorted(STATUSES)}, got {meta.get('status')!r}")
             if not DATE_RE.match(meta.get("checked", "")):
                 err(f, "frontmatter", f"checked must be YYYY-MM-DD, got {meta.get('checked')!r}")
+            # Scoped decisions are independent of the note's evidence status.
+            from kb_find import decision
+            try:
+                decision(meta, f, AI_ROOT)
+            except (ValueError, OSError) as e:
+                err(f, "decision", str(e))
 
         # log filename
         if "log" in rel.parts and rel.parts[rel.parts.index("log") - 1] == "knowledge":

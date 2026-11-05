@@ -135,7 +135,7 @@ raise SystemExit(1 if mode=='error' else 0)
         self.env['HOME'] = os.environ['HOME']
         config = self.runtime/'.codex/config.toml'; config.parent.mkdir()
         config.write_text('[profiles.standard]\nservice_tier = "default"\n[profiles.other]\nservice_tier = "bogus"\n')
-        payload = {'version': '0.59.0', 'files_checked': 2, 'diagnostics': [
+        payload = {'version': '0.60.3', 'files_checked': 2, 'diagnostics': [
             {'level': 'warning', 'rule': 'CDX-CFG-025', 'file': str(config),
              'line': line, 'column': 1, 'message': 'TEST_SECRET_DO_NOT_STORE'} for line in [2, 4]]}
         self.agnix.write_text('#!/usr/bin/env python3\nimport json\nprint(json.dumps('+repr(payload)+'))\n')
@@ -150,6 +150,7 @@ raise SystemExit(1 if mode=='error' else 0)
         report = json.loads((self.state/'report.json').read_text())
         self.assertEqual(report['counts']['warning'], 0)
         self.assertEqual(report['compatibility_rechecks'], {'CDX-CFG-025': 2})
+        self.assertNotIn('CDX-CFG-025', result.stdout)
         self.assertTrue((self.state/'success.json').exists())
         self.assertEqual(self.run_lint().stdout, '')
 
@@ -198,6 +199,10 @@ raise SystemExit(1 if mode=='error' else 0)
         scripts=self.root/'general/scripts'; scripts.mkdir(parents=True)
         for name in ['agent_lint.py','ai-sync.sh']:
             shutil.copyfile(SCRIPTS/name,scripts/name)
+        update_marker = self.base / 'update-calls'
+        (scripts/'agnix_update.py').write_text(
+            'from pathlib import Path\np=Path(' + repr(str(update_marker)) + ')\n'
+            'with p.open("a") as f: f.write("update\\n")\n')
         (self.root/'.last-sync').write_text(datetime.date.today().isoformat()+'\n')
         git=self.fakebin/'git'; git.write_text('#!/bin/sh\necho forbidden-git >> "'+str(self.base/'git-calls')+'"\nexit 99\n'); git.chmod(0o700)
         def sync(*args):
@@ -205,16 +210,19 @@ raise SystemExit(1 if mode=='error' else 0)
                                   text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         first=sync(); self.assertEqual(first.returncode,0,first.stderr)
         self.assertIn('agent-lint:',first.stdout); self.assertEqual(self.calls(),1)
+        self.assertEqual(len(update_marker.read_text().splitlines()), 1)
         self.assertEqual(sync().stdout,''); self.assertEqual(self.calls(),1)
         self.instructions.write_text('edited after daily sync')
         self.assertEqual(sync().returncode,0); self.assertEqual(self.calls(),2)
         self.mode.write_text('error'); self.instructions.write_text('another edit')
         error=sync(); self.assertEqual(error.returncode,0); self.assertIn('retry',error.stdout)
         checkpoint=(self.state/'success.json').read_bytes()
+        update_calls = update_marker.read_bytes()
         for flag in ['--status','--help']:
             self.assertEqual(sync(flag).returncode,0)
             self.assertEqual(self.calls(),3)
             self.assertEqual((self.state/'success.json').read_bytes(),checkpoint)
+            self.assertEqual(update_marker.read_bytes(), update_calls)
         self.assertFalse((self.base/'git-calls').exists())
 
 
@@ -246,6 +254,11 @@ class ServiceTierCompatibilityTests(unittest.TestCase):
             with self.subTest(value=value):
                 self.assertFalse(self.recheck('service_tier = "'+value+'"\n'))
 
+    def test_current_version_has_same_bounded_exception(self):
+        self.assertTrue(self.recheck('service_tier = "default"\n', version='0.60.3'))
+        self.assertTrue(self.recheck('service_tier = "priority"\n', version='0.60.3'))
+        self.assertFalse(self.recheck('service_tier = "bogus"\n', version='0.60.3'))
+
     def test_other_rules_versions_and_errors_are_preserved(self):
         source = 'service_tier = "default"\n'
         for item in [dict(self.item, rule='OTHER'), dict(self.item, level='error')]:
@@ -272,6 +285,23 @@ class ServiceTierCompatibilityTests(unittest.TestCase):
         source = '[profiles.standard]\nservice_tier = "default"\n[profiles.other]\nservice_tier = "bogus"\n'
         self.assertTrue(self.recheck(source, dict(self.item, line=2)))
         self.assertFalse(self.recheck(source, dict(self.item, line=4)))
+
+
+class InstructionExceptionTests(unittest.TestCase):
+    def test_only_shared_policy_info_is_excluded(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            item = {'level': 'info', 'rule': 'AGM-004', 'file': 'AGENTS.md'}
+            self.assertTrue(LINT.accepted_instruction_finding(item, root))
+            self.assertTrue(LINT.accepted_instruction_finding(dict(item, file=str(root/'AGENTS.md')), root))
+            for change in [{'file': 'project/AGENTS.md'}, {'level': 'warning'},
+                           {'level': 'error'}, {'rule': 'OTHER'}, {'file': None}]:
+                self.assertFalse(LINT.accepted_instruction_finding(dict(item, **change), root))
+            item['rule'] = 'CDX-AG-008'
+            self.assertFalse(LINT.accepted_instruction_finding(item, root))
+            (root/'AGENTS.override.md').write_text('Canonical policy pointer')
+            self.assertTrue(LINT.accepted_instruction_finding(item, root))
+            self.assertFalse(LINT.accepted_instruction_finding(dict(item, file='project/AGENTS.md'), root))
 
 
 if __name__ == '__main__':

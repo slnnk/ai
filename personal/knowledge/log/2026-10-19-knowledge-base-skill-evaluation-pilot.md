@@ -3,10 +3,17 @@ system: knowledge-base
 status: verified
 checked: 2026-10-19
 tags: [agents, skills, evals, skill-creator]
+decision_state: cancelled
+decision_scope: Claude-specific evaluation only
+decision_summary: Cancelled by the user; access restoration does not authorize resuming. Completed Codex results are retained.
+decision_date: 2026-11-04
+decision_source: #claude-extension-cancelled-2026-11-04
 ---
 # Knowledge base: controlled skill evaluation pilot
 
 ## Summary
+Current status (2026-11-04): the user cancelled the Claude-specific extension as irrelevant because Claude is not used and no use is currently planned. No Claude evaluation or access restoration was performed; earlier blocked/resumption statements below are historical.
+
 Step2 was explicitly authorized and a bounded Codex pilot completed: five paired artifact-based scenarios, ten healthy runs, 17/17 assertions in each condition; three native activation probes matched their expected skill reads. No incremental task-quality advantage was demonstrated on these straightforward single-repeat cases. Claude behavioral evaluation is blocked by organization access policy, not scored as a pass or failure. Canonical agent rules and skills were not edited.
 
 ## Task and context
@@ -68,3 +75,12 @@ Executed upstream aggregation, regraded10 actual runs, rejected5 mutated fixture
 
 ## Step3 completion (2026-10-19)
 The user subsequently authorized the audited local-rule fixes. The [correction record](2026-10-19-knowledge-base-local-rule-corrections.md) supersedes earlier pending/deferred statements for the stale Claude cache, ambiguous canonical paths and KB-cwd Codex duplication: all three were corrected and verified; five fresh regression sessions passed17/17 checks, native loading is one full policy copy in three directories, and agnix reports0errors. Approval policy and canonical skills remain intact. Claude model-backed evaluation remains blocked separately; later steps4-9 still require selection.
+
+## Claude extension cancelled (2026-11-04)
+
+The user stated that Claude is not used and no use is currently planned, and
+identified this task as irrelevant. The central TODO entry is closed as cancelled,
+not implemented. This supersedes the earlier plan to resume after access recovery;
+access restoration alone is no longer a reason to resume. No access check,
+authentication change or model evaluation was performed. Existing Codex pilot
+results and unrelated agent-pilot proposals are unchanged.

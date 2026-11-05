@@ -7,6 +7,10 @@ tags: [ssh, vpn, mtu]
 
 # Diagnose SSH handshake stalls caused by packet size on a VPN path
 
+## Staleness review (2026-11-04)
+
+The evidence still supports a bounded diagnostic workaround, not a confirmed general MTU root cause. No packet capture or controlled route comparison identifying the dropping device has been added, and no current end-to-end reproduction was performed in this review. Keep the distinctions already stated between completed key exchange, key authorization and a usable interactive PTY, and retain normal host-key verification. Preserve hypothesis status and the original evidence date rather than renewing it through editorial review alone.
+
 ## Summary
 
 TCP connects and SSH banners exchange, but the client waits at expecting SSH2_MSG_KEX_ECDH_REPLY. A shorter host-key algorithm proposal completes the handshake, while larger ICMP packets fail and smaller ones succeed. This pattern strongly suggests a path MTU/MSS problem; it does not identify the dropping device.

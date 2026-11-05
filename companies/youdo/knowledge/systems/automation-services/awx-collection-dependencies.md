@@ -6,6 +6,10 @@ tags: [awx, ansible-collections, execution-environment, galaxy]
 ---
 # automation-services: AWX collection dependencies
 
+## Staleness review (2026-11-04)
+
+The local `automation-services` checkout has no `collections/` directory, and the local `base-images/awx-ee/24.6.1/Dockerfile` still installs the documented major-version ranges for all three collections. The AWX image was rebuilt/released during [October recovery](../../log/2026-10-12-gitlab-devops-891-official-hashicorp-releases.md); exact versions observed in September must not be assumed to identify the rebuilt image contents. The production AWX pod and local onboarding behavior were not rechecked.
+
 Last verified: 2026-09-01
 
 ## Context

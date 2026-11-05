@@ -6,6 +6,10 @@ tags: [android, autotests, testng, suites, gitlab-ci]
 ---
 # YouDo Android testing: CI suites
 
+## Staleness review (2026-11-04)
+
+The table remains the dated 2026-08-12 static audit, not a current count of the remote test suite. Local `youdo-android-testing` is clean at `38f5a58f56ec`; no fresh remote revision or test recount was obtained. Preserve the original verification date and the dynamic failed-suite limitation.
+
 - Date: 2026-08-12
 - Repository: `/home/slnnk/git/youdo-android-testing`
 - Context: static audit of suites selected by `.gitlab-ci.yml` rules.

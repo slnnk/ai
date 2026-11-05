@@ -57,6 +57,11 @@ if [ "$DRY" -eq 1 ]; then
   exec python3 -B general/scripts/ai_sync_preview.py --root "$AI_ROOT"
 fi
 
+# Daily local agnix maintenance is independent of the Git sync date.
+if ! python3 -B general/scripts/agnix_update.py; then
+  log "agnix update pending; continuing with the available linter"
+fi
+
 # Agent lint runs even after today's Git sync, catching edits between tasks.
 # It is report-only: errors remain visible/pending and never block knowledge sync.
 if ! python3 -B general/scripts/agent_lint.py --root "$AI_ROOT"; then

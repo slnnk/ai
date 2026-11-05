@@ -6,6 +6,10 @@ tags: [apt, debian, ubuntu, gpg, dotnet, bullseye, vscode, google-chrome, gitlab
 ---
 # Local APT repositories
 
+## Staleness review (2026-11-04)
+
+This note contains dated incident/setup records from August and September. No present-day workstation APT sources, installed package versions, container tag contents or repository metadata were queried, so the original verification date is retained. These observations must not be used as a current package inventory; the historical user-confirmed fixes remain recorded without reopening them.
+
 ## 2026-09-08: Debian 11 Bullseye Security expired in the .NET 6 image
 
 Context: Docker host `gitlab-runner-docker-2`, image

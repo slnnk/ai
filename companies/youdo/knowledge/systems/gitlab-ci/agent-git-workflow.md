@@ -10,7 +10,7 @@ tags: [agents, gitlab, training, workflow]
 Supervised policy approved on 2026-10-08; the original review date was 2026-10-30.
 Local-first workflow, two approvals and detailed conventions are maintained in the
 [gitlab-workflow skill](../../../skills/gitlab-workflow/SKILL.md), implemented on 2026-10-19.
-The user received the early review and chose on 2026-10-19 to retain both approvals while automating information gathering and preparation of review materials. The next review is proposed for 2026-10-30 or the first active session after it.
+The user received the early review and chose on 2026-10-19 to retain both approvals while automating information gathering and preparation of review materials. The follow-up review was delivered on 2026-11-04. The user approved observing the next five tasks with publication, followed by a comparison; progress 0/5, both approvals retained.
 Two approvals: branch before repository edits; commit message and MR title before publication.
 No automatic transition on the deadline: the user decides after reviewing training results.
 Global entry point: `~/ai/AGENTS.md`. Baseline: [weekly review](../../log/2026-10-08-gitlab-ci-agent-git-workflow-review.md).
@@ -24,6 +24,18 @@ for the second approval, task-only staging, remote verification and training rec
 This map retains history and task evidence; do not maintain a competing operational policy here.
 Both supervised approvals remain active. The skill implementation does not authorize unattended publication.
 [Implementation and offline checks](../../log/2026-10-19-gitlab-ci-gitlab-workflow-skill.md).
+
+## Five-task follow-up approved on November 4
+
+The user approved observing the next five tasks with Git/MR publication after the November 4 report. Both approval gates remain active. This is an observation stage using existing controls, not permission to execute backlog tasks, publish, merge or deploy autonomously. There is no calendar deadline or background scheduler.
+
+For each task, use its existing work log to record the minimal requested deliverable and intended diff scope before editing; before publication inspect actual CI targets, inherited variables and automatic external effects; retain user corrections, original/final proposals, both approvals, validation or explicit scoped waivers, and actual publication/verification outcomes. Apply the existing canonical workflow; do not create additional skills or broaden task scope for this review.
+
+Count distinct user-requested tasks first published after this approval. Multiple commits, MRs or repositories for one continuing task count once. Count a published task even when CI later fails; record that failure separately. Cancelled/unpublished attempts remain evidence, but do not advance the five-published-task count. Do not turn missing approval evidence into a success. Record a source link and concise outcome here when each task qualifies; keep actionable remaining work only in the central TODO.
+
+Observed tasks: **0/5**. No qualifying task has yet been performed under this stage.
+
+After the fifth task, prepare a concise comparison with the November 4 baseline: repeated user interventions, scope corrections, approval compliance, naming changes, task-only staging, CI-effect predictions and verified publication outcomes. Assess what preparation can be automated; do not change permissions without an explicit user decision. The active review action is tracked in [central TODO](../../../../../TODO.md).
 
 ## Training corrections
 - 2026-10-08, DevOps-882: use the existing checkout rather than separate worktrees;
@@ -56,6 +68,9 @@ while operational corrections update the appropriate skill reference and global 
 in AGENTS.md when applicable. Task-specific exceptions do not broaden permissions.
 
 ## October 30 review
+
+Follow-up delivered on 2026-11-04: [report](../../log/2026-11-04-gitlab-ci-agent-git-training-followup-report.md). This supersedes the pending preparation/reminder status below, retaining its history. The report recommends keeping both approvals; no user permission change or new schedule is inferred.
+
 The user requested early delivery on 2026-10-19. The [early training report](../../log/2026-10-19-gitlab-ci-agent-git-training-early-report.md)
 covers October 8–19 and fulfills report preparation ahead of the original date. After discussing the report, the user explicitly chose to retain both approval gates while automating information gathering and review-material preparation.
 The next review is proposed for October 30 or the first active session after it, focusing on work since October 19: scope control, task-only staging, approvals, predicted CI effects, remote publication verification and corrections. The date is an assistant proposal; no background job was scheduled.

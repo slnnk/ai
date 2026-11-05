@@ -6,8 +6,12 @@ tags: [sentry, k8s, mks-infra, infra-tf]
 ---
 # Sentry (sentry.youdo.com)
 
+## Staleness review (2026-11-04)
+
+Local `infra-tf` commit `f57349d` contains the Sentry configuration change from `99b235c` (2026-10-06): `prod/sentry.tf` requests chart `33.8.0` with the source comment `AppVersion 26.8.0`, while `prod/config/sentry-values.yaml` retains S3 filestore. These files have no local uncommitted changes. The [October 2 filestore incident](../log/2026-10-02-sentry-business-frontend-sourcemaps-blockers.md) remains the last runtime evidence reviewed here. No fresh Helm revision, deployed application version, pipeline, storage health, or sourcemap upload was checked; the original runtime `checked` date is retained.
+
 ## Summary
-Self-hosted Sentry 25.9.0 in k8s cluster `mks-infra`, namespace `sentry`, Helm chart `sentry` `27.6.2`, deployed by `infra-tf/prod` (`prod/sentry.tf`, values `prod/config/sentry-values.yaml`). Filestore is Selectel S3 bucket `youdo-sentry` since 2026-10-02 (Helm revision 48, `infra-tf!175`). The old Yandex VM `sentry-prod01` was deleted 2026-09-17 and is unrelated.
+Self-hosted Sentry in k8s cluster `mks-infra`, namespace `sentry`, managed by `infra-tf/prod` (`prod/sentry.tf`, values `prod/config/sentry-values.yaml`). The October 2 runtime observation was Sentry `25.9.0` / chart `27.6.2`; local Terraform source at `f57349d` now requests chart `33.8.0` (commented AppVersion `26.8.0`). The later deployed version has not been verified. Filestore is Selectel S3 bucket `youdo-sentry` since 2026-10-02 (Helm revision 48, `infra-tf!175`). The old Yandex VM `sentry-prod01` was deleted 2026-09-17 and is unrelated.
 
 ## Access
 - kubectl context `admin@mks-infra`; this workstation's default current-context is `yc-kube-test-temp`, so local `terraform plan` in `infra-tf/prod` needs `-var kubeconfig_path=<minified admin@mks-infra kubeconfig>`. CI job `plan:prod` in `sysadmins/infra-tf` runs plans.

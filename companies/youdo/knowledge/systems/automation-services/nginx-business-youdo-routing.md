@@ -6,6 +6,10 @@ tags: [nginx, routing, traefik, business.youdo.com, public-docs, s3, youdo-busin
 ---
 # nginx business.youdo.com routing
 
+## Staleness review (2026-11-04)
+
+Local `automation-services` snapshot `ff104e33c385` still routes the generic `/` location to `$proxy_backend` and has the questionnaire exception, with no dedicated `/docs/terms` nginx location. This corroborates the nginx routing mechanism only. The application/S3 manifest contents and the specific PDF availability were not revalidated; June application findings remain a dated code investigation, not a live availability claim.
+
 Date: 2026-06-05
 Project: automation-services
 Repository: /home/slnnk/git/automation-services

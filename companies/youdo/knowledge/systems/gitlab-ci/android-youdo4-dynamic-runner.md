@@ -6,6 +6,10 @@ tags: [gitlab-runner, kubernetes, android, autoscaling, terraform, vault, yandex
 ---
 # android-youdo4 dynamic Kubernetes runner
 
+## Staleness review (2026-11-04)
+
+The runner proposal remains unimplemented/unverified as a live service. In the current `infra-tf` checkout (`f57349da0c36`, branch `DevOps-888-infra-state-a`, only `dev/main.tf` modified), the four Android runner files described as prepared below are absent. The September claim that these files are still present and untracked is therefore historical, not current local state. The [October backend recovery](../../log/2026-10-10-yandex-cloud-devops-888-vault-integration.md) also supersedes the old state assumptions. Do not infer removal from a remote branch or a deployment outcome from their local absence; a new implementation request must re-establish target, state ownership and source files.
+
 ## Summary
 
 - Plan to move all `team-youdo-android/android-youdo4` CI jobs from the fixed Docker VM runner (`gitlab-runner-android`, `172.28.0.175`, Runner `17.9.3`, live `concurrent=6` on 2026-09-16, earlier recorded 3) to an autoscaled Kubernetes-executor runner. Status is hypothesis; nothing is applied.

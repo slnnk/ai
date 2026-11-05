@@ -6,6 +6,10 @@ tags: [terraform, yandex-tf, prod, awx, sentry, hashi-master, base-image]
 ---
 # Yandex Terraform: prod
 
+## Staleness review (2026-11-04)
+
+Local source review at `yandex-tf` commit `43ff422` confirms the documented root and stable Ubuntu 22.04 image lookups with lifecycle protection. The September plans, image IDs, addresses, and apply outcomes remain dated historical evidence. Remote refs, Consul state, cloud resources, and a new plan were not checked; the original `checked` date is retained. Recovery-task closure after VK migration does not establish that this root or all its resources were retired. See [the base-image builder review](base-image.md) for its separate Ubuntu 24.04 configuration; this does not change these consumers.
+
 Last verified: 2026-09-17.
 
 ## Scope and access

@@ -1,10 +1,14 @@
 ---
 system: mail
-status: verified
-checked: 2026-08-12
+status: outdated
+checked: 2026-11-04
 tags: [postfix, smtp, queue, zabbix, sc-mta-01, fallback-relay]
 ---
 # sc-mta-01.youdo.corp: Postfix
+
+## Staleness review (2026-11-04)
+
+The [central backlog](../../../../../TODO.md) records that the user closed the SMTP burst/egress investigation without action on 2026-10-09 because it was no longer relevant. The August queue samples, trigger state and suggested actions below are historical evidence only; they do not establish a current incident or an active work request. No mail-host check was performed and the cancelled investigation is not reopened.
 
 ## Purpose and access
 
@@ -73,7 +77,7 @@ sysctl net.netfilter.nf_conntrack_count net.netfilter.nf_conntrack_max
 dmesg --since "30 minutes ago"
 ```
 
-### TODO / further actions
+### Historical proposals (closed without action on 2026-10-09)
 
 - Watch the queue until it drops below 10 000 and the trigger recovers; the speed depends on the continuing waves of the incoming mass mailing.
 - If the incident recurs, correlate the bursts with the initiator of the mass mailing behind `sc-lb-postfix-service`.

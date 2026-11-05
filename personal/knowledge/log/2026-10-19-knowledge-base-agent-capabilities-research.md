@@ -3,10 +3,22 @@ system: knowledge-base
 status: verified
 checked: 2026-10-19
 tags: [agents, skills, research, knowledge-base]
+decision_state: superseded
+decision_scope: Earlier pilot implementation and resumption status
+decision_summary: Claude evaluation is cancelled. Retrieval proposals 1-4 are implemented; other pilots remain proposals. Follow the current outcome.
+decision_date: 2026-11-04
+decision_source: 2026-11-04-knowledge-base-retrieval-context-decisions.md#current-outcome
 ---
 # Local agents: skills, rules and knowledge retrieval research
 
 ## Summary
+
+Latest decision (2026-11-04): the user selected step6 and authorized the local
+[retrieval baseline](2026-11-04-knowledge-base-retrieval-baseline.md), now complete.
+No search improvements or other pilots were implemented. The separate Claude
+evaluation was cancelled by the user; older blocked/resumption statements below
+are historical. Remaining optional directions are proposals in the central TODO.
+
 Research completed against official documentation and original repositories, with a bounded read-only local inventory. The most promising proposals are instruction loading/conflict audit, evaluation of existing skills, selected Terraform/DevOps guidance and bounded local review. A subsequent user-requested Context Awesome expansion added configuration lint, section-level search and explicit code/documentation dependency checks. The consolidated section below rates eight approaches and 21 implementations and records source-scoped popularity snapshots, without treating installation counts as quality ratings. Hooks and improved retrieval need focused pilots. These are fit-based recommendations, not a popularity ranking or measured performance results. No skill installation, runtime configuration change or evaluation model run was performed. The central TODO contains the single decision item for optional pilots.
 
 ## Task and context
@@ -190,3 +202,16 @@ The user subsequently authorized step2. The [evaluation record](2026-10-19-knowl
 
 ## Step3 completion (2026-10-19)
 The user subsequently authorized the audited local-rule fixes. The [correction record](2026-10-19-knowledge-base-local-rule-corrections.md) supersedes earlier pending/deferred statements for the stale Claude cache, ambiguous canonical paths and KB-cwd Codex duplication: all three were corrected and verified; five fresh regression sessions passed17/17 checks, native loading is one full policy copy in three directories, and agnix reports0errors. Approval policy and canonical skills remain intact. Claude model-backed evaluation remains blocked separately; later steps4-9 still require selection.
+
+## Retrieval baseline completed (2026-11-04)
+
+The user selected and requested the knowledge-search experiment. The
+[baseline report](2026-11-04-knowledge-base-retrieval-baseline.md) records 12 fixed
+questions, 84 conditions and 252 successful CLI runs against 566 unchanged notes.
+Exact and technical queries found all targets in the top five; constructed Russian
+queries found none. Technical snippets exposed a preselected answer line for 6/12
+questions, which is not a semantic answer-quality score. Historical supersession
+and clipped warning text remain interpretation risks. This completes selection
+of the next pilot and the bounded measurement portion of step6. Section-level
+search, multilingual support, further tests and steps4,5,7-9 remain unimplemented
+proposals; see central TODO for the only live decision item. No external changes.

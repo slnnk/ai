@@ -6,6 +6,10 @@ tags: [android, gitlab-ci, gradle, fastlane, google-play, huawei, rustore, nexus
 ---
 # YouDo Android: infrastructure and CI/CD map
 
+## Staleness review (2026-11-04)
+
+The local product checkout is now clean at `227f7518c341` on `DevOps-833-fix-hotfix`: the hotfix fixes are committed locally, but this does not establish merge or production execution. The 2026-10-12 image recovery is already recorded below. Newer [Maven recovery evidence](../../log/2026-10-22-nexus-cyberity-aar-publication-assessment.md) and [central backlog](../../../../../TODO.md) record restored Cyberity/Fotoapparat artifacts and the user confirmation on 2026-10-23 that Android builds work; SDK runtime remains unverified. August build/dependency details and suite counts must not be treated as a fresh November snapshot.
+
 ## Summary
 
 - Map of YouDo Android delivery: product build, store publication, and autotests on a device farm.
@@ -13,7 +17,7 @@ tags: [android, gitlab-ci, gradle, fastlane, google-play, huawei, rustore, nexus
 - Flows: `feature` (MR to `develop`, `assembleBeta`), `regress` (`staging`, beta/release APK and AAB), `hotfix` (branch `hot-fix`). Manual jobs `regress_publish_google`/`_huawei`/`_rustore` publish through `fastlane-docker` (`0.0.9`, Google Play 30% staged rollout).
 - Build-to-autotest: manual `publish_for_tests` jobs put the APK and version marker in Nexus `raw-private/android`; `youdo-android-testing` (project 69) runs on `gradle:12` via Selenium Grid `192.168.30.30:4444` and Appium hosts `.147`/`.148` in Kazan.
 - Runner host: `gitlab-runner-android-dind01.youdo.corp` (`172.28.0.175`, prod_selectel), privileged Docker executor, managed by `automation-services` (`gitlab-runners.yml`, role `roles/gitlab-runner`).
-- State: the hotfix CI fix (DevOps-833, branch `DevOps-833-fix-hotfix`: RuStore APK artifact, `fastlane-docker:0.0.9`) passed CI Lint but is not committed, merged or run in a real pipeline.
+- State: the hotfix CI fix (DevOps-833, branch `DevOps-833-fix-hotfix`: RuStore APK artifact, `fastlane-docker:0.0.9`) passed CI Lint and is committed in the local task branch; merge and execution in a real hotfix pipeline remain unverified.
 - Risks: manual store jobs have no `environment` or protected-environment controls; mutable image tags; `latest` of `fastlane-docker` moves on any Git tag; plaintext access material in runner host vars; an untracked Firebase JSON in the `fastlane-docker` worktree; credentials exposed in Nexus and report artifacts.
 - Read "End-to-end delivery routes" for the flows, "Main Android application pipeline" for jobs, "Dedicated Android build runner" for the host, and "Gradle build image" and "fastlane-docker publication image" for images.
 - Read "Google Play service-account key rotation" for the `GOOGLE_PLAY_JSON_KEY_DATA` procedure, "Autotest pipeline and farm" for tests, "Confirmed gaps and risks" for open issues, and "Change record: DevOps-833 hotfix CI fix" for the fix details.

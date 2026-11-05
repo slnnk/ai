@@ -6,6 +6,10 @@ tags: [gitlab-runner, kubernetes-executor, helm, cluster-autoscaler, scale-to-ze
 ---
 # Scale-to-zero GitLab runners on Kubernetes: keep the manager, scale the node group
 
+## Staleness review (2026-11-04)
+
+The [GitLab Kubernetes executor documentation](https://docs.gitlab.com/runner/executors/kubernetes/) still describes a runner requesting jobs and creating one pod per job, and exposes node selectors, tolerations, resource requests and `poll_timeout`. The [KEDA 2.20 scaler catalog](https://keda.sh/docs/2.20/scalers/) does not list a built-in GitLab queue scaler; this statement is version-scoped and is not a claim about every future KEDA release. These documentation checks support the design, but do not validate provider scale-from-zero behavior, cache delivery or end-to-end cold-start jobs. Keep hypothesis status until those deployment checks exist. Treat the PVC advice as a risk to evaluate, not a universal assertion that every bound PVC prevents node scale-down.
+
 ## Symptom
 
 You want CI capacity that costs nothing while idle, so you try to scale the GitLab Runner

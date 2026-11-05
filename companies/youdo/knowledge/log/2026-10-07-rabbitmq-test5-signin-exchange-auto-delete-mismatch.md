@@ -1,7 +1,7 @@
 ---
 system: rabbitmq
 status: verified
-checked: 2026-10-12
+checked: 2026-11-04
 tags: [rabbitmq, masstransit, test-stands, test5]
 ---
 # test5: validateemailcode slow due to youdo.user.signin exchange auto_delete mismatch
@@ -55,3 +55,7 @@ and the publisher redeclared the exchange. Re-probe confirmed `youdo.user.signin
 ## Follow-up status checked 2026-10-12
 
 The signin exchange correction was completed and verified on 2026-10-07, as recorded above and in [the central backlog](~/ai/TODO.md). The former deletion instruction is superseded. Checking other exchanges for similar mismatches is an unapproved follow-up proposal; its applicability is tracked in the central backlog.
+
+## Follow-up closed 2026-11-04
+
+The user reported no further problems and closed the broader exchange-check proposal as no longer relevant. The central backlog item is closed; no broader check was performed. This supersedes the pending proposal above and does not establish verification of other exchanges.

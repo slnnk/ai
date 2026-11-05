@@ -6,6 +6,10 @@ tags: [vault, ansible, hashi_vault, ldap, oidc, acl, workstation]
 ---
 # automation-services: local Ansible access to Vault
 
+## Staleness review (2026-11-04)
+
+The local `automation-services` snapshot still fetches KV v1 through `community.hashi_vault.vault_kv1_get` using `vault_addr` and `vault_groups` in `playbooks/vault_fetch_tasks.yml`. This corroborates the repository integration only. Workstation versions, token validity, LDAP policy mapping and cluster availability were not revalidated. The historical LDAP token expiry of 2026-10-20 has passed; it must not be relied upon. Credential/policy follow-up remains in the [central backlog](../../../../../TODO.md), without permission to rotate credentials or change Vault.
+
 ## Summary
 
 - What: local `ansible-playbook` runs from `/home/slnnk/git/automation-services` read inventory secrets from HashiCorp Vault KV v1 via `community.hashi_vault` (Ubuntu 20.04 workstation).

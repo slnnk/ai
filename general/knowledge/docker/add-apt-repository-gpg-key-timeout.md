@@ -1,10 +1,19 @@
 ---
 system: docker
-status: hypothesis
-checked: 2026-06-26
+status: outdated
+checked: 2026-11-04
 tags: [apt, ppa, gpg, add-apt-repository, keyserver, signed-by, ubuntu, libreoffice]
+decision_state: restricted
+decision_scope: Saved LibreOffice PPA key fix
+decision_summary: Saved PPA fix is not ready for reuse; a replacement key route and successful build must be verified.
+decision_date: 2026-11-04
+decision_source: #staleness-review-2026-11-04
 ---
 # `add-apt-repository ppa:...` fails with "retrieving gpg key timed out" in a Docker build
+
+## Staleness review (2026-11-04)
+
+The Dockerfile fix below is not ready for reuse: a read-only HTTP check on 2026-11-04 returned HTTP 404 for its `https://api.launchpad.net/1.0/~libreoffice/+archive/ubuntu/ppa/signing_key.asc` URL. No replacement URL or Docker build was validated in this review. The timeout's network mechanism remains a hypothesis; the note does not establish firewall, proxy, IPv6 or dirmngr as the cause. Retain the `signed-by` design principle, but require a supported key-retrieval source, fingerprint verification and a successful build before restoring this recipe to verified status.
 
 ## Symptom
 
@@ -24,18 +33,18 @@ Error: retrieving gpg key timed out.
 
 before the second `apt-get update` runs.
 
-## Cause
+## Suspected cause (unconfirmed)
 
-`add-apt-repository` fetches the signing key from `keyserver.ubuntu.com` over HKPS (443)
-using GnuPG's dirmngr. Build environments behind a corporate firewall/proxy, or with broken
-IPv6, frequently cannot complete that path even though plain HTTPS to Launchpad works; dirmngr
-has no proxy awareness unless configured and gives up after a fixed timeout. The result is a
-non-reproducible build that depends on network conditions at build time.
+The observed timeout is consistent with a failed signing-key retrieval path.
+Firewall, proxy, IPv6 and GnuPG/dirmngr behavior are possible mechanisms, but
+none was isolated in the original incident. Do not infer a fixed transport, port
+or proxy behavior without checking the software version and actual request path.
 
-## Fix
+## Historical workaround (broken URL; do not use)
 
-Stop depending on the implicit keyserver path. Fetch the key from Launchpad over HTTPS
-(regular proxy rules apply) and register the repository with `signed-by`:
+The following unvalidated proposal tried to replace implicit key retrieval with
+an explicit keyring and `signed-by`. Its key URL returned HTTP 404 on 2026-11-04;
+do not copy this Dockerfile as a working fix:
 
 ```dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg \

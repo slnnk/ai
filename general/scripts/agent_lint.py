@@ -75,7 +75,7 @@ def discover(root, runtime_home, extra):
                         add(resource, lint=False)
     add(root / '.agnix.toml', lint=False)
     add(root / 'general/knowledge/README.md', lint=False)
-    for name in ['agent_lint.py', 'ai-sync.sh']:
+    for name in ['agent_lint.py', 'agnix_update.py', 'ai-sync.sh']:
         add(root / 'general/scripts' / name, lint=False)
     for item in extra:
         path = Path(item).expanduser().absolute()
@@ -119,13 +119,13 @@ def atomic_json(path, data):
 
 
 def stale_service_tier_finding(item, version, root, entries):
-    """Recheck only 0.59.0's obsolete fast/flex allowlist; fail closed.
+    """Recheck verified versions with the obsolete fast/flex allowlist; fail closed.
 
     Official Codex schema explicitly includes default and priority:
     https://learn.chatgpt.com/docs/config-schema.json
     Keep every other value, version, severity and rule under native validation.
     """
-    if version != '0.59.0' or item.get('rule') != 'CDX-CFG-025' or item.get('level') != 'warning':
+    if version not in {'0.59.0', '0.60.3'} or item.get('rule') != 'CDX-CFG-025' or item.get('level') != 'warning':
         return False
     try:
         try:
@@ -151,9 +151,30 @@ def stale_service_tier_finding(item, version, root, entries):
         return False
 
 
+def accepted_instruction_finding(item, root):
+    """Local exceptions for the shared policy file, never for repository instructions."""
+    if item.get('level') != 'info' or item.get('rule') not in {'AGM-004', 'CDX-AG-008'}:
+        return False
+    try:
+        path = Path(item['file'])
+        if not path.is_absolute():
+            path = root / path
+        if path.resolve() != (root / 'AGENTS.md').resolve():
+            return False
+        # The shared policy intentionally delegates project context to CONTEXT.md.
+        if item['rule'] == 'AGM-004':
+            return True
+        # The root override prevents loading the shared policy twice in Codex.
+        return (root / 'AGENTS.override.md').is_file()
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+
+
 def check(args):
     watched, entries = discover(args.root, args.runtime_home, args.paths)
-    executable = args.agnix or str(args.runtime_home / '.local/share/agnix/v0.59.0/agnix')
+    managed = args.runtime_home / '.local/share/agnix/current/agnix'
+    pinned = args.runtime_home / '.local/share/agnix/v0.59.0/agnix'
+    executable = args.agnix or str(managed if managed.is_file() else pinned)
     if not Path(executable).is_file():
         if args.agnix:
             executable = shutil.which(args.agnix)
@@ -192,6 +213,8 @@ def check(args):
             if stale_service_tier_finding(item, raw.get('version'), args.root, entries):
                 corrections += 1
                 continue
+            if accepted_instruction_finding(item, args.root):
+                continue
             safe.append({k: item.get(k) for k in ('level', 'rule', 'file', 'line', 'column')})
         # An executable can exit1 for a crash too; require real diagnostics in that case.
         if process.returncode == 1 and not safe:
@@ -207,8 +230,6 @@ def check(args):
     atomic_json(args.state_dir / 'report.json', report)
     print('agent-lint: {} files; {} errors, {} warnings, {} info; report {}'.format(
         raw['files_checked'], counts['error'], counts['warning'], counts['info'], args.state_dir / 'report.json'))
-    if corrections:
-        print('agent-lint: CDX-CFG-025: {} valid default/priority values rechecked (agnix 0.59.0 compatibility)'.format(corrections))
     if counts['error'] or process.returncode:
         print('agent-lint: findings require review; no successful checkpoint saved; retry pending')
         return 1
@@ -227,7 +248,7 @@ def main():
     parser.add_argument('--root', type=Path, default=Path(os.environ.get('AI_ROOT', str(Path.home() / 'ai'))))
     parser.add_argument('--runtime-home', type=Path, default=Path.home(), help='override only for isolated tests/other profiles')
     parser.add_argument('--state-dir', type=Path, default=Path(os.environ.get('AI_LINT_STATE_DIR', str(Path.home() / 'ai-data/agnix'))))
-    parser.add_argument('--agnix', help='executable override, otherwise pinned install then PATH')
+    parser.add_argument('--agnix', help='executable override, otherwise managed install, legacy pin, then PATH')
     parser.add_argument('--force', action='store_true', help='check even if successful input hashes are unchanged')
     parser.add_argument('--timeout', type=float, default=30)
     args = parser.parse_args()

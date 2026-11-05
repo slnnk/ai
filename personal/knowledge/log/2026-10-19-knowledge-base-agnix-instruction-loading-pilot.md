@@ -80,3 +80,15 @@ The user subsequently authorized the audited local-rule fixes. The [correction r
 
 ## Adoption mode superseded (2026-10-19)
 The user subsequently explicitly requested mandatory post-edit agnix and the change-aware sync fallback. The [implementation record](2026-10-19-knowledge-base-agnix-enforcement.md) supersedes the optional/manual-only adoption direction above. Agents must run the report-only helper after changing agent instructions/skills/settings; normal sync also checks changed inputs before the same-day Git skip. Auto-fix and Git-blocking gates remain disabled. The prior personal learning record is historical/superseded; the current global rule points to AGENTS. This changes the adoption mode, not external publication permissions.
+
+## Portability documentation completed (2026-11-04)
+
+The user requested implementing the documentation follow-up. The portable
+[setup guide](../../../general/knowledge/knowledge-base/setup-another-pc.md)
+now covers prerequisites, private clone and remote configuration, the tracked
+company symlink, instruction and skill links, separate secret/generated-data
+restoration, pinned agnix and first-run checks. It was checked against local
+helper sources and the recorded binary provenance. The corresponding central
+TODO item is closed for documentation only. No software installation, secret
+transfer, client authentication or clean-PC execution was performed. No bootstrap
+implementation or infrastructure changes were added.

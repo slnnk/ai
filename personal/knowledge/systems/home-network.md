@@ -6,6 +6,10 @@ tags: [home, router, openwrt, trusttunnel]
 ---
 # Home network
 
+## Staleness review (2026-11-04)
+
+The home deployment remains a plan: local `home-infra/AGENTS.md` still records no deployment. Its version-3 `PLAN.md` and the explicit decisions in `AGENTS.md` specify podkop with TrustTunnel as a netifd interface, AmneziaWG UDP as backup, and encrypted DNS through the user's own VPS AdGuard Home with Unbound recursion; raw dnsmasq nftset routing is the fallback, not the selected primary design. Amend the planned-components paragraph accordingly and remove VPS AdGuard Home from the deferred list. Fail-open, FakeIP/upstream compatibility and actual tunnel egress still require the existing bench tests in the central backlog. No router, server, hardware purchase or client restart was checked during this review. StrongSwan's trial on the TrustTunnel host was removed on 2026-11-04, as recorded in the [removal log](../log/2026-11-04-vpn-gateway-strongswan-ansible-removal.md); the separate old gateway's current state remains unconfirmed.
+
 Status `hypothesis`: the target design is planned, not deployed. Verified facts are marked.
 
 ## Purpose
@@ -32,16 +36,18 @@ TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segme
   and PC keep their own TrustTunnel clients. Tunnel failure must be fail-open with a
   Telegram notification. Decided 2026-09-26.
 - Planned (hypothesis): OpenWrt router Cudy WR3000S v1 (MT7981, 256 MB RAM, 128 MB NAND;
-  not WR3000 v1 with 16 MB flash, not WR3000 v2 which is unsupported) with dnsmasq-full nftsets + policy routing into the
-  TrustTunnel `tun0`; 8-port unmanaged switch; Debian mini PC (N100 class) with docker
-  compose: AdGuard Home (DoH/DoT upstreams routed through the tunnel), TorrServer, Uptime
-  Kuma. TV Hisense 55U7S PRO (VIDAA U9.5, not bought yet): Lampa via Media Station X with
+  not WR3000 v1 with 16 MB flash, not WR3000 v2 which is unsupported) with podkop list-based routing, TrustTunnel as a netifd interface and
+  AmneziaWG UDP as backup; raw dnsmasq nftsets and policy routing are the fallback; 8-port unmanaged switch; Debian mini PC (N100 class) with docker
+  compose: AdGuard Home (encrypted upstream to the user's VPS AdGuard Home with Unbound
+  recursion; no public resolver upstreams), TorrServer, Uptime Kuma. TV Hisense 55U7S PRO (VIDAA U9.5, not bought yet): Lampa via Media Station X with
   start parameter `lampa.mx`; TorrServer must run on the home server. Browser-based
   playback on VIDAA has known issues; Homatics Box R 4K Plus is the planned fallback. Purchase order: TV,
-  then router, switch, server. Telegram bot credentials: `~/ai/personal/.env`. DNS chain: client -> dnsmasq on router (populates nftsets) -> AdGuard Home ->
-  encrypted upstream. Archer C64 retired or kept as access point.
+  then router, switch, server. Telegram bot credentials: `~/ai/personal/.env`. DNS plan: client -> router dnsmasq -> podkop resolver -> home AdGuard Home ->
+  encrypted upstream at the user's VPS AdGuard Home / Unbound. FakeIP compatibility
+  is a bench-test hypothesis. Archer C64 retired or kept as access point.
 - Deferred: own domain, remote access, Ansible Vault, merging the StrongSwan VPS, data
-  backups, AdGuard Home on the VPS with DoT 853 for phones outside home.
+  backups. VPS AdGuard Home with encrypted upstream access is part of the selected
+  plan, not a deployed service.
 - Planning repository: `/home/slnnk/mygit/home-infra` (`AGENTS.md` with state and rules for
   agents, `README.md`, `QUESTIONS.md`, `PLAN.md`, `docs/alternatives.md`).
 

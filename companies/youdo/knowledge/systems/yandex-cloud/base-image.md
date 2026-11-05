@@ -6,22 +6,26 @@ tags: [packer, base-image, ubuntu-22-04, yc-base-image, gitlab-ci]
 ---
 # Yandex Cloud base image
 
+## Staleness review (2026-11-04)
+
+Local source review at `yc-base-image` commit `8d05adb` confirms that the builder now targets Ubuntu 24.04 (`YC_OS_VERSION=ubuntu-24-04`, `YC_SOURCE_IMAGE_FAMILY=ubuntu-2404-lts`); the 22.04 build and naming incident below are historical. The actual CI job is `build image`. Existing Terraform consumers still reference the separate 22.04 image name; no consumer migration is implied. This review did not fetch remote refs, run Packer, inspect a new pipeline, or confirm a published cloud image. See the [Terraform consumer map](terraform-public-test.md).
+
 Last verified: 2026-09-17.
 
 ## Purpose and repository
 
 - Repository: `/home/slnnk/git/yc-base-image`.
 - Safe origin: `git@gitlab.youdo.sg:sysadmins/yandex/yc-base-image.git`.
-- Builds the shared Ubuntu 22.04 base image in Yandex Cloud with Packer and the `base_linux` Ansible role from `automation-services`.
-- GitLab job: `image_build` in `.gitlab-ci.yml`; it runs only for `master` and uses the `dind` runner tag.
+- Current local builder configuration targets Ubuntu 24.04 in Yandex Cloud with Packer and the `base_linux` Ansible role from `automation-services` (commit `8d05adb`); the 22.04 configuration and incident below are historical.
+- GitLab job: `build image` in `.gitlab-ci.yml`; see the local CI rules before running a build.
 
 ## Build flow
 
 1. GitLab CI uses `registry.youdo.sg/youdo/base-images/packer:1.10.2`.
 2. The job clones `sysadmins/automation-services` and obtains the `base_linux_login_user_password` value through the shared Vault login template. The secret value must not be copied into notes.
 3. Packer reads CI variables through `env()` defaults in `base_image.pkr.hcl`; no `packer -var` flags are required.
-4. `YC_IMAGE_NAME` is the project/group CI variable with the stable base name. Job variable `YC_OS_VERSION` is the OS suffix, and GitLab expands `YC_FULL_IMAGE_NAME` as `${YC_IMAGE_NAME}-${YC_OS_VERSION}`.
-5. Packer reads the final name from `YC_FULL_IMAGE_NAME`. The source YC family is supplied separately as `YC_SOURCE_IMAGE_FAMILY=ubuntu-2204-lts`; it is not derived from the display suffix.
+4. `YC_IMAGE_NAME` is the project/group CI variable with the stable base name. The current local job sets `YC_OS_VERSION=ubuntu-24-04`, and GitLab expands `YC_FULL_IMAGE_NAME` as `${YC_IMAGE_NAME}-${YC_OS_VERSION}`.
+5. Packer reads the final name from `YC_FULL_IMAGE_NAME`. The current local source family is supplied separately as `YC_SOURCE_IMAGE_FAMILY=ubuntu-2404-lts`; it is not derived from the display suffix.
 6. The output YC image family remains `base-images`, and the created image receives label `role=base`.
 7. Before building, CI deletes an existing image with the same full name; after building, it labels that same full name.
 
@@ -34,7 +38,7 @@ Last verified: 2026-09-17.
 - Shared Vault template: `sysadmins/devops-tools/gitlab-ci-templates/.vault_login.yml`; last inspected from `origin/master` at `fb09f3e3be28481d81fe2beaa1111c19a75a84ad` on 2026-09-17. It exports the requested field after OIDC login and leaves `errexit` and `pipefail` enabled.
 - YC folder, zone, subnet, service-account key and base image name are supplied by GitLab CI variables; access secrets are not stored in the repository notes.
 - Image status can be checked in the Yandex Cloud image list for the configured folder or with `yc compute image list` using the CI service-account context.
-- Merge request pipelines run `packer_validate` in the `validate` stage. YC setup is scoped to `image_build.before_script`, so linting does not clone `automation-services`, authenticate to Vault, or configure YC.
+- The local validation job is `validate packer`; YC setup is scoped to `build image.before_script`. Validation does not build or publish an image.
 
 ## Verification
 

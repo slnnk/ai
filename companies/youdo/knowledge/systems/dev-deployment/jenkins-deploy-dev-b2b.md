@@ -6,12 +6,16 @@ tags: [jenkins, jenkins-pipelines, deploy-dev-b2b, active-choices, helm, ephemer
 ---
 # B2B ephemeral development deploy pipeline (Jenkins)
 
+## Staleness review (2026-11-04)
+
+Local `jenkins-pipelines` commit `af3c6da` still uses `pipelines/deploy-dev-b2b.Jenkinsfile` and `node('AutoTest')`; namespace deployment now sets TTL `8d`, matching the [October TTL-controller rollout in the authoritative overview](overview.md). The seven-day GitLab auto-stop is a separate mechanism. Historical build results below are not a fresh Jenkins or cluster check; remote refs were not refreshed and the original `checked` date is retained. VK BuildAPI delivery is separate from this B2B ephemeral deployment path.
+
 ## Summary
 
 - What: Jenkins pipeline deploying a B2B service (plus catalog dependencies) into an ephemeral Kubernetes namespace for a task or MR. Component note; authoritative status is `~/ai/current/knowledge/systems/dev-deployment/overview.md`.
 - Files: `/home/slnnk/git/jenkins-pipelines` (`pipelines/deploy-dev-b2b.Jenkinsfile`, catalog `config/deploy-dev-b2b.groovy`), `helm-charts` (`ephemeral-namespace`, `microservice`), GitLab entry `gitlab-ci-templates/v3/.deploy-dev.yml`.
 - Flow: GitLab manual `deploy dev` posts `SERVICE`, `VERSIONS` (optional hidden `GITLAB_PROJECT_ID`) to Jenkins `buildWithParameters` -> Active Choices query GitLab API (`GITLAB_ACTIVE_CHOICES_TOKEN`, Jenkins global env) -> namespace chart -> `microservice` chart per service, images `nexus.youdo.com/<gitlab-project-path>:<tag>`; credential `kubeconfig-dev`.
-- Behavior: the ordered 13-entry `services` catalog is the only source of active services (commit `10ef2517`); any entry can be primary. Fresh namespace installs all missing releases; repeat deploy upgrades only the primary and keeps existing non-primary releases; non-primary default to `master`. Namespaces are named from the task id (`dev-devops-689`), TTL `7d`.
+- Behavior: the ordered 13-entry `services` catalog is the only source of active services (commit `10ef2517`); any entry can be primary. Fresh namespace installs all missing releases; repeat deploy upgrades only the primary and keeps existing non-primary releases; non-primary default to `master`. Namespaces are named from the task id (`dev-devops-689`); deployment sets controller TTL `8d` in local commit `af3c6da`, while GitLab auto-stop remains `7 days`.
 - Outputs: `generated/<service>-routing.yml` and `generated/ingress-urls.txt` (also in build description; `*.dev.youdo.sg` as `https://`, others `http://`); lifecycle jobs `2 extend dev`, `3 delete dev`.
 - Verified: full catalog (builds 140/142), ingress report (build 147), docvalidation-main lifecycle (builds 137/138, jobs 3095877/3095884/3095885/3095886, full cleanup). Not verified: `fns` as main; Jenkins form UI smoke test.
 - Risks: Active Choices scripts need In-process Script Approval after changes; form rendering queries open MRs for every enabled project; build 142 migration Job names of 64-68 chars broke billing, Tochka proxy and auth installs (label limit 63); `helm upgrade --atomic` failure leaves hook resources (see portable lessons).

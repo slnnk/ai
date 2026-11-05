@@ -6,7 +6,24 @@ tags: [gitlab-runner, kubernetes, autoscaling, scale-to-zero, yandex-cloud]
 ---
 # Dynamic GitLab runners in Kubernetes
 
-Last checked: 2026-09-09. Design document; no runner has been applied yet (see the 2026-09-16 update).
+## Staleness review (2026-11-04)
+
+This remains a design hypothesis, not a live runner map. Current `infra-tf` checkout has no `dev/gitlab-runner-android.tf` or associated Android runner values/documentation; see the [Android-specific review](android-youdo4-dynamic-runner.md). The [October state/backend recovery](../../log/2026-10-10-yandex-cloud-devops-888-vault-integration.md) supersedes the original Yandex state assumptions. Preserve the dated October DNS resolution evidence without presenting it as current service health; node-group, registration and autoscaling were not rechecked.
+
+## Summary
+
+- Design hypothesis; a deployed Kubernetes runner has not been verified.
+- Keep a small runner manager polling GitLab on permanent capacity.
+- Run job pods on a separate autoscaled worker group with minimum zero.
+- Worker scale-up depends on unschedulable pods and cloud capacity.
+- Preserve a bounded maximum and account for cold-start scheduling latency.
+- Use explicit job tags, node selectors, taints and tolerations for isolation.
+- Validate cache, DNS and corporate-service connectivity before adoption.
+- The Android-specific files are absent from the currently inspected checkout.
+- October backend recovery supersedes the September state assumptions.
+- Historical Docker-runner DNS recovery does not verify Kubernetes runners.
+
+Historical design snapshot: 2026-09-09, updated 2026-09-16; no runner deployment was verified.
 
 ## Context and feasibility
 

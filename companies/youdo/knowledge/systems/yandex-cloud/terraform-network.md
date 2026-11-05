@@ -6,6 +6,10 @@ tags: [terraform, yandex-tf, network, base-image, ansible-provider, nlb]
 ---
 # Yandex Terraform: network
 
+## Staleness review (2026-11-04)
+
+Local source review at `yandex-tf` commit `43ff422` confirms the documented root and stable Ubuntu 22.04 image lookups with lifecycle protection. The network root retains `ansible_host` inventory and no longer declares `ansible_playbook` or `time_sleep` resources in the inspected entry files. The September plans, image IDs, addresses, and apply outcomes remain dated historical evidence. Remote refs, Consul state, cloud resources, and a new plan were not checked; the original `checked` date is retained. Recovery-task closure after VK migration does not establish that this root or all its resources were retired. See [the base-image builder review](base-image.md) for its separate Ubuntu 24.04 configuration; this does not change these consumers.
+
 ## Summary
 
 - System: Terraform root `/home/slnnk/git/yandex-tf/network` (repo `sysadmins/yandex/yandex-tf`) managing shared Yandex Cloud networking plus gateway, test balancers, Postfix, IPsec and NAT MSSQL VMs.

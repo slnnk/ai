@@ -1,10 +1,14 @@
 ---
 system: vpn-gateway
-status: verified
+status: outdated
 checked: 2026-07-30
 tags: [strongswan, ikev2, eap-mschapv2, l2tp, letsencrypt, windows, vpn]
 ---
 # VPN gateway `91.218.141.22`
+
+## Staleness review (2026-11-04)
+
+This map is a historical July snapshot, not a current operating guide. The latest recorded attempt to access the old gateway on 2026-11-02 returned connection refused; its current service, certificate renewal and configuration are unconfirmed. The certificate validity quoted below ended on 2026-10-26, which does not establish whether renewal occurred. StrongSwan was subsequently tried on the TrustTunnel host and removed there on 2026-11-04 after the user chose TrustTunnel; that removal does not prove retirement of this separate old VPS. See the [November preparation and access evidence](../log/2026-11-02-vpn-gateway-strongswan-ansible.md) and [removal scope](../log/2026-11-04-vpn-gateway-strongswan-ansible-removal.md). No new access attempt was made for this review.
 
 ## 2026-07-30: StrongSwan check
 

@@ -6,9 +6,13 @@ tags: [resource-group, deploy-prod, child-pipeline, gitlab-ci-templates, seriali
 ---
 # GitLab CI: serialized production deploy (resource groups)
 
+## Staleness review (2026-11-04)
+
+Local template snapshot `126620d7100e` confirms the three auto parent triggers still use `strategy: depend` and `resource_group: $DEPLOY_PROD_RESOURCE_GROUP`; `.main-vars.yml` defaults that variable to `production`. Thus `production` is the default rather than a hard-coded group in each entrypoint. No current GitLab `process_mode`, consumer count or deployment status was queried; September acceptance evidence remains historical.
+
 ## Summary
 
-- What: shared `gitlab-ci-templates` (`v3`) serialize production deploys across parallel `master` pipelines with `resource_group: production` (DevOps-846).
+- What: shared `gitlab-ci-templates` (`v3`) serialize production deploys across parallel `master` pipelines with `resource_group: $DEPLOY_PROD_RESOURCE_GROUP`, defaulting to `production` (DevOps-846).
 - Mechanism: parent trigger job `deploy production` has `resource_group: production` and `trigger:strategy: depend` (GitLab 17.9.8; `mirror` only from 18.2). Deploy steps run in a child pipeline (`v3/child/`) without their own resource group (deadlock risk).
 - Locked: only the three auto entrypoints `v3/.deploy-prod-full-auto.yml`, `v3/.deploy-prod-only-web-auto.yml`, `v3/.deploy-prod-web-migrations-auto.yml`. Manual prod templates stay unlocked (user decision); manual rollback stays in the parent with the same group.
 - Variables: `DEPLOY_PROD_TEMPLATES_REF` (default `master`), `DEPLOY_PROD_CHILD_PROJECT`, `DEPLOY_PROD_CHILD_REF` (test harness); `APP_IMAGE_*` dotenv comes from `set-variables` via `needs:pipeline:job`.

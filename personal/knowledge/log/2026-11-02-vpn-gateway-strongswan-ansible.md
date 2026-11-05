@@ -137,3 +137,7 @@ successful connectivity, not an independently observed client traffic test.
 The TrustTunnel iPhone verification task is complete; no server configuration
 change was needed. Historical failed-authentication diagnostics above remain
 as evidence. The separate StrongSwan/IKE path-filtering issue remains unresolved.
+
+## Superseded by local removal, 2026-11-04
+
+The user chose working TrustTunnel on iPhone and requested removing StrongSwan from Ansible. Local removal is complete; IKEv2 client verification is cancelled. Earlier deployment and diagnostics remain historical evidence. No server cleanup was performed. See the [removal log](2026-11-04-vpn-gateway-strongswan-ansible-removal.md).

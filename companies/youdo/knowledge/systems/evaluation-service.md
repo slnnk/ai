@@ -6,6 +6,10 @@ tags: [evaluation-service, postgresql, data-map, sql, assessments]
 ---
 # YouDo Evaluation Service
 
+## Staleness review (2026-11-04)
+
+Local repository snapshot `f4ace6c6bbbc` still configures assessment relationships to subject/evaluator persons and a `deleted_at IS NULL` filter in `AssessmentConfiguration.cs`. This corroborates the basic query model, not current production rows, criteria weights or rank-band values. No database access was performed; historical score thresholds remain dated configuration evidence and operational SQL must continue joining the criteria set.
+
 Last checked: 2026-09-11.
 
 ## Purpose and repository

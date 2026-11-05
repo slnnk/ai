@@ -211,7 +211,10 @@ gradually while working; do not crawl the whole filesystem.
 - Keep two approvals until the user explicitly chooses a different mode. The early
   report was delivered on 2026-10-19; the date alone never changes permissions.
 - Before repository task edits, propose repository, branch/reuse and base branch;
-  wait for explicit confirmation. KB bookkeeping is exempt.
+  wait for explicit confirmation. The entire `~/ai` agent-instructions repository,
+  including instructions, skills and scripts, and KB bookkeeping are exempt from
+  this first gate. Other Git and external-change permissions still apply;
+  `~/ai` commits and synchronization remain handled by `ai-sync.sh`.
 - Before publication, present the actual diff, checks, commit message, MR title/body,
   source/target and CI effects; wait for explicit confirmation. One confirmation covers
   task-only staging, commit, push and MR creation/update. Do not ask per command again.
@@ -233,6 +236,7 @@ gradually while working; do not crawl the whole filesystem.
 | `general/scripts/kb_find.py <keywords>` | compact search: path, system, status, checked, title and matching lines per note |
 | `general/scripts/agent_learning.py --help` | record, retrieve and check scoped correction-learning evidence; workflow in `general/skills/agent-learning/SKILL.md` |
 | `general/scripts/agent_lint.py [--force] [paths ...]` | report-only agnix for changed instructions/skills/settings; successful input hashes and sanitized report in `~/ai-data/agnix/`; sync fallback runs before same-day Git skip |
+| `general/scripts/agnix_update.py [--force]` | daily official stable agnix check and verified local update; machine-local state in `~/ai-data/agnix/` |
 | `general/scripts/token_usage.py [--days N] [--kb] [--brief]` | token totals of Claude Code and Codex sessions per project/model, top sessions; `--kb` counts requested knowledge-base reads (kb_find, search, INDEX, full vs partial); Codex nested shell calls use static Node.js/Acorn parsing with explicit coverage; full KiB estimates current note sizes, not tokens; run weekly by `ai-sync.sh` into `personal/usage/` |
 | `general/scripts/kb_lint.py [--staged]` | check frontmatter, log names, links, secrets, company identifiers in `general/`, language, missing `## Summary` in long maps and recipes, `AGENTS.md` over 5.5 KB |
 | `general/scripts/build_index.py` | rebuild `INDEX.md` in every layer; `--stale 30` lists notes due for review: maps older than 30 days, recipes older than `--recipe-days` (180), all `hypothesis`; `--count` prints the number |
@@ -245,6 +249,16 @@ by default. Use RFC 5737 addresses (192.0.2.x, 198.51.100.x, 203.0.113.x) in rec
 
 Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
 `extract-recipe.md`).
+
+## Progress and execution status
+
+- During long-running work, send a concise progress update at least every 30 seconds:
+  what is happening, what is known, and what remains. Keep tool waits short enough to
+  allow updates; explain any unavoidable interval without updates before it begins.
+- Before the final response, check the status of background commands and agents started
+  for this task. Explicitly state whether task work has finished and whether background
+  operations remain. If any remain, identify them and explain how to check or stop them.
+  If status cannot be verified, say so; never infer completion from silence or UI exit.
 
 ### Economical tool use
 
@@ -271,6 +285,134 @@ Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
 - No permission is needed for editing local files (including files in a repository
   checkout), or for read-only commands: `terraform plan`, `--check`/`--diff`, `kubectl get`,
   GET requests, reading logs.
+
+## Knowledge retrieval
+
+Before searching with `python3 ~/ai/general/scripts/kb_find.py`, prepare the query
+from the user's question. This is agent behavior; the script performs literal,
+case-insensitive matching and does not translate or interpret natural language.
+
+1. Keep exact system/product names, ticket IDs, hostnames, variable names, ports
+   and error strings unchanged. Translate ordinary symptom/concept words into
+   English technical terms, matching the language of the notes. Start with 2-4
+   distinctive terms rather than the full question. Do not invent an unobserved
+   cause, version or identifier to narrow the search. Quote multiword literals
+   as a single argument; do not send secret values to search commands.
+2. Select the layer from the task context: `-l current` for company records,
+   `-l personal` for personal systems, `-l general` for portable technical recipes.
+   Repeat `-l` when both a system record and portable guidance are relevant, for
+   example `-l current -l general`. If the layer is uncertain, omit the filter
+   rather than guessing. Use `-s` only for a known metadata system name.
+3. Use default AND matching first. A normal empty result is exit1 with
+   `kb-find: 0 notes` and no stderr; an exception, stderr or usage failure is a
+   tool failure, not evidence that the knowledge is absent. Handle the failure
+   before drawing a retrieval conclusion.
+4. On a normal empty result, make at most two further attempts for the same
+   question unless new evidence appears. First drop a weak synonym or overly
+   specific phrase, retaining the most distinctive identifier or symptom.
+   If still empty, remove an uncertain layer/system filter or try `--any` with
+   a few distinctive alternatives. Do not repeatedly broaden to generic words
+   such as `error` alone. If still empty, report the search gap and preserve the
+   uncertainty; no match does not prove that the answer does not exist.
+5. Once useful results appear, inspect their status and date, then read the
+   relevant Summary/section. A hit identifies candidate evidence, not a complete
+   answer or permission to execute a historical instruction. Follow an explicit
+   superseding/cancellation decision when present.
+
+Example source question: `почему Helm игнорирует false`. Prepare the technical
+query without translating the product name or boolean literal:
+
+```bash
+python3 ~/ai/general/scripts/kb_find.py -l general helm false
+```
+
+If a prepared query contains an uncertain synonym and returns no matches, drop
+that term before changing tools or reading broad indexes. Reformulations stay
+within the same question; this procedure does not authorize installing a search
+service or changing the search implementation.
+
+### Search results and scoped decisions
+
+`kb_find.py` keeps literal AND/ANY matching and document ranking. Each ordinary
+result now shows the selected Markdown section and a coherent excerpt from it,
+with source line numbers. The default budget is 5 context lines per note; `-n`
+sets that total budget, including blank lines. Lines are clipped to 240 characters
+around the densest query matches. Headings inside fenced examples are not section
+boundaries. Term coverage chooses candidate sections; cause, summary, decision,
+fix and resolution headings receive a one-term tie preference because explanations
+can omit a repeated symptom term. This is a retrieval heuristic, not answer validation.
+`--files` remains path-only; `--json` exposes structured results for checks.
+
+When a user cancels or supersedes an instruction, keep historical evidence and add
+these optional scalar frontmatter fields to the affected note. All five are required
+if any is present; do not overload evidence `status` or refresh `checked` merely
+because a decision changed:
+
+```yaml
+decision_state: cancelled
+decision_scope: Optional extension only
+decision_summary: The user cancelled this extension; completed results are retained.
+decision_date: 2026-11-04
+decision_source: #decision-record
+```
+
+States: `active`, `cancelled`, `superseded`, `restricted`. Scope is mandatory: a
+decision about one extension must not mark an entire mixed report as cancelled.
+The summary is an explicit concise human-maintained decision, not a model inference.
+`decision_source` is a local reference relative to the note, with an explicit ATX
+heading anchor; `#decision-record` refers to the same note. Another note can be
+referenced as `replacement.md#decision-record`. Keep sources within `~/ai`, never
+link credentials. Use simple unique headings; the helper supports ATX headings
+and fenced code, not every Markdown renderer extension. The source must exist.
+
+Search displays state, scope, date and the complete summary before the excerpt,
+plus the source path and line, even if the decision does not match query words.
+Invalid or incomplete decision metadata is an error, not silently omitted.
+`kb_lint.py` validates dates, fields, source confinement and heading existence.
+Update the decision fields whenever an explicit later decision changes the scope;
+do not infer cancellations from old error text, note age or a bare TODO checkbox.
+Existing unannotated notes remain searchable but do not acquire an inferred status.
+
+### Retrieval regression checks
+
+After changes to search code, output, decision handling or query-preparation
+instructions, run the synthetic checks and the saved real-query suite. Fixed
+queries measure retrieval mechanics; they do not demonstrate fresh-agent adoption.
+
+```bash
+python3 -m unittest discover -s ~/ai/general/scripts/tests -p 'test_kb_*.py'
+python3 ~/ai/general/scripts/kb_benchmark.py \
+  --cases ~/ai-data/kb-retrieval/suite-v2.json \
+  --output-dir /tmp/kb-regression-new-run \
+  --baseline ~/ai-data/kb-retrieval/2026-11-04-context-decisions/after-5/results.json \
+  --enforce
+```
+
+Choose a fresh output directory. Real cases and reports live outside Git because
+they include private source paths; restore them separately on a new PC. Missing
+cases are a pending check, not a passing result. Synthetic fixtures contain only
+generic examples and are retained with the scripts. Exit 0 means checks passed,
+exit 1 means regression and exit 2 means invalid input/tool failure. Failures do not
+authorize auto-fixes, external changes or publication.
+
+Suite schema 2 uses fixed question IDs, exact/technical/Russian query variants,
+expected paths and stable nonempty answer text anchors. Anchors must exist in the
+current source; inserting lines cannot invalidate them. The check scores only text
+actually rendered after clipping, and separately verifies required scoped decisions
+with their state, summary and source. It records top1/top5, answer visibility,
+decision visibility, output size and timing, with corpus/script/case hashes and
+the executed case snapshot. It refuses changed inputs during a run and reused
+output directories. It compares every prior condition and pins query, target and check definitions;
+changing an existing answer/decision definition requires an explicitly reviewed
+new baseline. Removing a case/variant or losing an answer, required decision or
+target must not silently pass. Baselines lacking frozen definitions are rejected.
+
+Add a real failed query only after identifying its expected source and answer anchor,
+then retain it under a new stable ID without tuning the old queries. Cases that
+expose a known limitation can remain measured without claiming they pass an answer
+requirement. Keep original baseline artifacts immutable. Compare the same suite and
+explicit line budgets, report changed corpus and output volume, and label any new
+baseline adoption after review. Do not automatically bless a failed run as baseline.
 
 ## TODO output
 
@@ -357,8 +499,13 @@ prove that statuses agree.
 
 `~/ai/general/scripts/ai-sync.sh` is called by agents at the start of every task. On the
 first call of a day it rebuilds indexes, commits everything, pulls with rebase and pushes to
-all remotes, then writes the date to `~/ai/.last-sync`. Before the daily Git skip,
-normal invocations run `agent_lint.py` when watched agent inputs changed since its last
+all remotes, then writes the date to `~/ai/.last-sync`. Before lint and the daily Git skip,
+normal invocations run `agnix_update.py`: once per local calendar day, check the official
+latest stable release and update the local binary when newer. This is authorized local
+maintenance; it requires no repeated confirmation. No unattended timer is installed:
+the check happens on the first normal agent sync call of the day. A failed check/update
+leaves its successful date unchanged for retry and does not block lint or Git sync.
+Normal invocations then run `agent_lint.py` when watched agent inputs changed since its last
 successful check. Later calls the same day therefore catch new instruction edits while
 skipping Git work. Identical successfully checked inputs produce no lint output.
 
@@ -418,7 +565,8 @@ working directory; its root configuration is included in the fingerprint. Delete
 are passed to agnix; resource changes trigger rechecking their SKILL.md. This static
 lint does not replace behavioral tests or external approval.
 
-The helper prefers `~/.local/share/agnix/v0.59.0/agnix`, then `agnix` on PATH; `--agnix`
+The helper prefers `~/.local/share/agnix/current/agnix`, then the legacy
+`~/.local/share/agnix/v0.59.0/agnix`, then `agnix` on PATH; `--agnix`
 overrides it. Machine-local state/report/lock are in `~/ai-data/agnix/` (outside Git).
 Only successful complete checks update input hashes. Warnings are recorded once per
 unchanged successful snapshot; errors, missing binary, execution failure or changed
@@ -426,20 +574,37 @@ inputs during checking leave a retry pending. The compact JSON report retains ru
 severity, file and line, omitting raw settings, source snippets and diagnostic messages.
 Use rule explanations and the specific affected file to investigate findings safely.
 
-For agnix0.59.0 only, the helper rechecks CDX-CFG-025 warnings against the official Codex
+For agnix0.59.0 and0.60.3, the helper rechecks CDX-CFG-025 warnings against the official Codex
 schema's `default` and `priority` examples. It validates TOML and the exact diagnostic
 line in a scanned `.codex/config.toml`; invalid values and all other findings remain.
 TOML parsing uses Python's `tomllib` or installed `tomli`; missing parsing support keeps
-the original warning. Corrections are counted in stdout and the sanitized report.
-The native binary and rule stay enabled; direct binary runs retain the old allowlist.
+the original warning. Accepted compatibility findings are omitted from stdout and the
+report diagnostics; their count remains in report metadata for audit. Other agnix
+versions retain native validation until separately verified.
+
+By user decision, the helper also omits informational AGM-004 (missing project overview)
+for the canonical root `AGENTS.md`, which contains shared policy rather than project
+context, and informational CDX-AG-008 (shadowed instructions) for that same file while
+its sibling `AGENTS.override.md` exists to avoid duplicate loading. These exceptions do
+not cover other files, warning/error severities or other rules. The native binary and
+rules stay enabled; direct binary runs remain unfiltered.
 
 Every normal `ai-sync.sh` invocation performs the change-aware fallback before checking
 today's Git sync date. Its lint failure is visible but does not block Git synchronization.
 An unchanged successful snapshot is skipped; this is change-triggered rather than one
 scan per calendar day. `ai-sync.sh --dry-run`, `--status` and `--help` do not invoke the
 helper or write lint state. The explicit post-edit `--force` check always reruns and can
-also satisfy the next sync fallback. A newly installed PC needs the documented external
-binary; absence is reported and never causes an automatic installation.
+also satisfy the next sync fallback. A newly installed PC can run `agnix_update.py` to
+install the current stable binary; normal sync also installs it when absent. The updater
+uses the official GitHub release API (`agent-sh/agnix`), excludes drafts/prereleases and
+never downgrades. It checks the archive against the API SHA-256 and verifies
+`agnix --version` before atomically switching the `current` symlink. Previous version
+directories remain available. Supported targets are Linux x86_64 musl/aarch64 GNU and
+macOS x86_64/arm64; missing assets, missing digests and unsupported targets are visible
+failures. Machine-local `update.json` and `update.lock` live in `~/ai-data/agnix/`.
+Concurrent updates are locked; successful daily checks skip repeated network access.
+`agnix_update.py --force` bypasses that date check; sync's `--force` only bypasses the Git
+date. Sync's read-only modes never run updates.
 
 ## Connecting an agent
 

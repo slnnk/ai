@@ -6,6 +6,10 @@ tags: [devops-832, autotests, smoke, regression, gitlab-ci, tochka, billing, tkb
 ---
 # B2B dev-deployment: post-deploy autotests
 
+## Staleness review (2026-11-04)
+
+Local `gitlab-ci-templates` commit `126620d` confirms that `v3/.autotests-dev.yml` still emits `TARGET_ENV_SUFFIX=${DEV_NAMESPACE#dev-}` and keeps smoke/regression jobs `allow_failure: true`. The [authoritative overview](overview.md) retains the September three-service rollout evidence and pending main business suite. This source check does not retest suites, tag selection, current functional failures, application endpoints, secrets, or the cluster; no fresh runtime claims are made and the original `checked` date is retained.
+
 ## Summary
 
 - What: DevOps-832 feature that runs a service's existing API autotests against the task-specific Kubernetes namespace (`dev-<task-id>`, e.g. `dev-devops-832`) right after the manual GitLab job `1 deploy dev` (Jenkins-backed) succeeds. Sber is out of scope (service no longer current).

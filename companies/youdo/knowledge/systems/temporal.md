@@ -6,6 +6,10 @@ tags: [temporal, terraform, infra-tf, yandex-dev, kubernetes, postgresql, helm]
 ---
 # Temporal in Yandex dev Kubernetes
 
+## Staleness review (2026-11-04)
+
+Local `infra-tf` snapshot `f57349da0c36` retains `dev/temporal.tf` with chart `1.6.0`, embedded PostgreSQL chart `15.5.38` and `yc-network-ssd`. Its current modified `dev/main.tf` selects Consul state `terraform/yandex-dev-k8s-a`, corroborating the [October recovery record](../log/2026-10-10-yandex-cloud-devops-888-vault-integration.md); `terraform/yandex-k8s-dev` below is the historical September backend. No cluster, Helm release, database or PVC was queried, and the no-apply/live-unverified limitation remains. Existing plan/backup/image follow-up stays in the central backlog.
+
 Last verified: 2026-09-08. Status: Terraform changes prepared and validated;
 not applied to the cluster in this session (hence `status: hypothesis` — the described
 topology is the planned/rendered state, not a live-verified one).
@@ -17,7 +21,7 @@ topology is the planned/rendered state, not a live-verified one).
 - Safe origin: `git@gitlab.youdo.sg:sysadmins/infra-tf.git`.
 - Root configuration: `dev/temporal.tf` and `dev/namespaces.tf`.
 - Reusable module: `modules/temporal`.
-- Terraform state backend: Consul path `terraform/yandex-k8s-dev` at
+- Historical September Terraform state backend: Consul path `terraform/yandex-k8s-dev` at
   `consul.service.selectel.consul:8500`, datacenter `selectel`.
 
 ## Dev topology

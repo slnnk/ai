@@ -6,6 +6,10 @@ tags: [gitlab-ci-templates, nomad, canary, rollback, deploy-prod, job-revert, jo
 ---
 # Nomad canary rollback in GitLab CI templates
 
+## Staleness review (2026-11-04)
+
+The current local template snapshot `126620d7100e` still uses detached revert, a 60-second delay and a bounded 600-second promotion. However, `.deploy-prod-rollback` ends with `allow_failure: true`; the historical statement that rollback is no longer allowed to fail does not describe this snapshot. The command can fail while the enclosing pipeline tolerates failure. No live rollback or remote freshness check was performed; historical August live tests remain dated evidence.
+
 - Last checked: 2026-08-20
 - Repository: `/home/slnnk/git/gitlab-ci-templates`
 - Safe origin: `git@gitlab.youdo.sg:sysadmins/devops-tools/gitlab-ci-templates.git`
@@ -38,7 +42,7 @@ Updated `.deploy-prod-rollback` in `v3/.deploy-prod.yml`:
 - the job waits `DEPLOY_PROD_ROLLBACK_CANARY_DELAY` (default 60 seconds);
 - `nomad job promote` promotes the only active rollback deployment;
 - promotion is bounded by `DEPLOY_PROD_ROLLBACK_TIMEOUT` (default 600 seconds);
-- rollback is no longer `allow_failure`.
+- historical implementation intended rollback failure to fail the pipeline; the current local snapshot has `allow_failure: true` (see November review).
 
 Syntax was checked with Bash and Ruby/Psych. The available local Nomad v1.3.5 CLI and CI image Nomad v1.5.3 both support the used flags. A live test confirmed that promoting before canary health returns HTTP 500, so the startup delay remains necessary.
 
@@ -69,7 +73,7 @@ A second live test used `codex-canary-rollback-simple-20260820`: the first immed
 
 - The fixed canary delay must remain longer than the normal allocation startup time; increase it if test jobs regularly need more than 60 seconds.
 - The simplified flow is unsafe if another deployment can be active concurrently, because `nomad job promote` targets the job's latest deployment.
-- Current `.deploy-prod-rollback` fails the CI job when promotion times out or returns an error.
+- A promotion timeout or error fails the rollback command/job, but the current local snapshot sets `allow_failure: true`, so the pipeline may tolerate that failure.
 
 ## References
 

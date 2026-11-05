@@ -1,13 +1,18 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-09-26
+checked: 2026-11-04
 tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 ---
 # TrustTunnel endpoint it-garage-de-01
 
-Facts below come from the Ansible repository on 2026-09-26; the host itself was not
-inspected in that session.
+## Staleness review (2026-11-04)
+
+Reconciled with the current local Ansible defaults and VPN playbook and the [2026-11-04 server cleanup verification](../log/2026-11-04-vpn-gateway-strongswan-ansible-removal.md). TrustTunnel remains the configured VPN; StrongSwan is absent from both active Ansible configuration and the recorded VPS state. The latest recorded service checks show TrustTunnel, nftables, nginx and the CrowdSec bouncer active, with the shared certificate and TrustTunnel renewal hook retained and HTTPS `/tt_ping` returning HTTP 200. The [user confirmed iPhone TrustTunnel on 2026-11-02](../log/2026-11-02-vpn-gateway-strongswan-ansible.md); no new iPhone session or server probe was performed during this review. Use `.ansible-venv/bin/ansible-playbook` from the repository root for the delivery commands below.
+
+The original Ansible snapshot was recorded on 2026-09-26. Later dated sections
+record deployment and service checks; the current documented state was reconciled
+on 2026-11-04, with verification limits stated below.
 
 ## Purpose
 
@@ -31,7 +36,7 @@ Planned to also serve the home router (see [home-network](home-network.md)).
 
 ## Delivery path
 
-`cd /home/slnnk/mygit/ansible && ansible-playbook -i inventory/hosts playbooks/vpn.yml`
+`cd /home/slnnk/mygit/ansible && .ansible-venv/bin/ansible-playbook -i inventory/hosts playbooks/vpn.yml`
 (roles `ansible-user`, `common`, `nftables`, `sshd`, `crowdsec`, `trusttunnel`).
 Role docs: `roles/trusttunnel/README.md`. Syntax check with `--syntax-check` first.
 
@@ -93,3 +98,11 @@ verified against the running server without exposing values. Recent iPhone
 reconnection diagnostics found authentication failures; the user subsequently corrected the password and confirmed on 2026-11-02
 that TrustTunnel works on iPhone. The corresponding central TODO is closed. See the
 [diagnostic log](../log/2026-11-02-vpn-gateway-strongswan-ansible.md).
+
+## StrongSwan Ansible removal, 2026-11-04
+
+The user chose TrustTunnel on iPhone and retired StrongSwan from local Ansible. The role, playbook, dedicated Vault file, inventory settings and IPsec firewall/NAT additions are removed; previous StrongSwan preparation and deployment sections are historical. TrustTunnel settings remain unchanged. IKEv2 verification is cancelled in the central TODO. No VPS changes were made, so the deployed service and related server files may remain. See the [removal log](../log/2026-11-04-vpn-gateway-strongswan-ansible-removal.md).
+
+## StrongSwan server removal, 2026-11-04
+
+After a separate user request and explicit approval of the cleanup command, StrongSwan was also removed from the VPS. Its service, eight packages, credentials, chain copies, renewal hook, persistent sysctl file and IPsec firewall/NAT rules are absent; IPv4 forwarding is disabled. This supersedes the local-only removal limitation above. TrustTunnel, nftables, nginx and CrowdSec bouncer are active; the TrustTunnel renewal hook and shared certificate are preserved. HTTPS `/tt_ping` returned HTTP200. No actual iPhone session tested in this cleanup. See the [removal log](../log/2026-11-04-vpn-gateway-strongswan-ansible-removal.md).
