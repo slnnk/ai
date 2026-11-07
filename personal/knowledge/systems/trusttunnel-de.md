@@ -1,10 +1,53 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-04
+checked: 2026-11-06
 tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 ---
 # TrustTunnel endpoint it-garage-de-01
+
+## Summary
+
+- Personal TrustTunnel VPN on `it-garage-de-01`, `2.26.30.176`, in Germany.
+- Endpoint name: `2.26.30.176.nip.io`; TCP/UDP 443, nginx on TCP 80.
+- Managed by `/home/slnnk/mygit/ansible`, `playbooks/vpn.yml`.
+- Host nftables permits SSH and VPN; CrowdSec filters blocked sources first.
+- StrongSwan on this host was removed on 2026-11-04; dated sections retain history.
+- PC client configuration lives under `/home/slnnk/trusttunnel/`.
+- See Components, Delivery path and Access for configuration and access routes.
+- See Local PC client routing adjustment for corporate-VPN coexistence history.
+- On 2026-11-06, direct PC TCP 22/80/443 connections and ping time out.
+- Provider VNC shows active services and listeners; outbound ICMP works.
+- The user-approved alternative gateway reaches the VPS by ICMP, not TCP 22/443.
+- Captures show ICMP reaches the VPS but tested TCP does not; upstream loss point unknown.
+- Provider/path investigation remains proposed in the central TODO; no remote changes made.
+
+## Inbound access incident, 2026-11-06
+
+The user reports VPN failure on PC and phone. From the PC, DNS returns the
+expected `2.26.30.176` and the endpoint route bypasses the corporate VPN, but
+direct TCP 22/80/443 probes time out and ICMP receives no replies. A user-provided
+VNC screenshot shows the VPS interface up and successful outbound pings to
+`8.8.8.8`. Later VNC output confirms active TrustTunnel, SSH, nftables, CrowdSec
+and bouncer services; TCP 22/80/443 and UDP 443 listeners; and runtime input rules
+allowing those ports and ICMP. CrowdSec source blocking precedes these rules.
+The user-authorized alternative gateway reaches the VPS by ping with 0% loss,
+but TCP 22/443 still times out. Correlated VNC capture shows that gateway's ICMP
+requests and replies, but no TCP; a later gateway capture confirms SYN egress
+and retransmissions. Control TCP/443 to another public endpoint succeeds.
+The tested TCP path fails before the VPS interface capture; the exact upstream
+loss point and provider/transit filtering cause remain unconfirmed. Provider/path
+investigation is proposed; SSH to the VPS has not succeeded. No remote
+changes were made. These observations supersede the earlier access-health
+snapshot, not the documented configuration. See the
+[incident log](../log/2026-11-06-trusttunnel-de-inbound-unreachable.md) and
+[central TODO](../../../TODO.md), Personal / TrustTunnel endpoint.
+
+Subsequent UDP/443 QUIC Version Negotiation probes received no reply from the
+VPS from either source (three attempts each), while the same probes to
+`1.1.1.1:443` returned valid matching QUIC responses from both sources.
+UDP service reachability is not confirmed; packet arrival at the VPS remains
+unverified pending a user VNC capture with ICMP control. All agent probes exited.
 
 ## Staleness review (2026-11-04)
 
@@ -22,6 +65,9 @@ Planned to also serve the home router (see [home-network](home-network.md)).
 ## Components
 
 - Host `it-garage-de-01`, `ansible_host=2.26.30.176`, group `vpn`.
+- Global IPv6 `2a0d:d940:1a:9d0::2/64` on `ens3`, observed in user VNC output
+  on 2026-11-06. IPv6 SSH could not be tested from the PC or the authorized
+  alternative gateway because both lack an IPv6 route (`Network is unreachable`).
 - Domain `2.26.30.176.nip.io` (`inventory/host_vars/it-garage-de-01.yml`,
   `trusttunnel_domain`). Certificate from Let's Encrypt via host `certbot`, webroot on
   nginx port 80. Hypothesis: a real domain is preferable; nip.io depends on a third party.

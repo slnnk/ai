@@ -250,6 +250,12 @@ was made. API keys and secret values were not requested or printed.
 
 ## Status and risks
 
+On 2026-11-06 the user requested further experiment ideas merged with the older
+optional pilots. The [consolidated E01–E14 design](2026-11-06-knowledge-base-merged-agent-experiments.md)
+maps this recommendation ranking to controlled comparisons, including model costs,
+dialogue scope and concurrency. It introduces no installation or execution permission;
+the twenty-item ranking is retained as dated selection evidence.
+
 Research completed 2026-11-05. All twenty recommendations remain selection proposals;
 the next action needs an implementation request. Local effectiveness has not been
 measured for newly researched candidates. Tool upstream main branches and live docs
