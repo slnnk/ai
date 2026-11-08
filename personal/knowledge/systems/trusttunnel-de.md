@@ -1,28 +1,221 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-06
+checked: 2026-11-08
 tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 ---
 # TrustTunnel endpoint it-garage-de-01
 
 ## Summary
 
-- Personal TrustTunnel VPN on `it-garage-de-01`, `2.26.30.176`, in Germany.
-- Endpoint name: `2.26.30.176.nip.io`; TCP/UDP 443, nginx on TCP 80.
+- Personal TrustTunnel VPN on `it-garage-de-01`, `152.234.226.70`, in Germany.
+- Active server endpoint: `v.slnnk.com`; TCP/UDP 443, nginx on TCP 80.
+- Own domain deployed; external HTTPS `/tt_ping` returns 200 with valid TLS.
+- The user confirmed clients work after migration to `v.slnnk.com` on 2026-11-08; migration complete.
 - Managed by `/home/slnnk/mygit/ansible`, `playbooks/vpn.yml`.
 - Host nftables permits SSH and VPN; CrowdSec filters blocked sources first.
 - StrongSwan on this host was removed on 2026-11-04; dated sections retain history.
 - PC client configuration lives under `/home/slnnk/trusttunnel/`.
 - See Components, Delivery path and Access for configuration and access routes.
 - See Local PC client routing adjustment for corporate-VPN coexistence history.
-- On 2026-11-06, direct PC TCP 22/80/443 connections and ping time out.
-- Provider VNC shows active services and listeners; outbound ICMP works.
-- The user-approved alternative gateway reaches the VPS by ICMP, not TCP 22/443.
-- Captures show ICMP reaches the VPS but tested TCP does not; upstream loss point unknown.
-- Provider/path investigation remains proposed in the central TODO; no remote changes made.
+- On 2026-11-08, the user reported the previous IP was blocked, a replacement
+  was issued, and they updated Ansible and applied the role.
+- Local inventory confirms `152.234.226.70` and desired domain `v.slnnk.com`.
+- The user confirmed VPN recovery before domain migration; new-domain HTTPS was subsequently verified by the agent.
+- The old-address incident is closed; historical diagnostics remain below.
+
+## TrustTunnel upgraded to 1.1.0, 2026-11-08
+
+After separate approvals for local edits and deployment, updated the Ansible
+version default and README from 1.0.33 to 1.1.0. Syntax validation passed.
+The focused playbook targeted `it-garage-de-01` with `--skip-tags upgrade`,
+skipping apt package changes: `ok=21 changed=7 unreachable=0 failed=0`.
+The restart handler completed. Read-only checks confirmed binary version `1.1.0`,
+systemd `active/running`, TCP/UDP 443 listening, and external HTTPS `/tt_ping`
+HTTP 200 with successful TLS verification. No authenticated client session or
+second mutating run was performed. No commit/push or task background operations.
+See [upgrade and approval evidence](../log/2026-11-08-trusttunnel-de-upgrade-1-1-0.md).
+
+## HetrixTools warning policies active, 2026-11-08
+
+After approval of the concrete values, enabled CPU >=90 percent, RAM >=90 percent
+and disk `/` >=85 percent (each averaged over five minutes), agent silence over
+five minutes and service-down alerts for `trusttunnel`/`nginx`. Each repeats every
+30 minutes and explicitly uses `Contacts` (email and Telegram). A separate API
+read-back verified all saved values and targets. No deliberate failure test or
+new test notification was sent; earlier Telegram delivery was user-confirmed.
+See [approval and verification](../log/2026-11-08-trusttunnel-de-hetrixtools-ansible.md#warning-policies-enabled-and-verified-2026-11-08).
+
+## HetrixTools agent deployed, 2026-11-08
+
+After explicit user approval, the focused Ansible playbook installed agent
+`2.4.2` on `it-garage-de-01` (`ok=17`, `changed=8`, `failed=0`). The enabled
+`hetrixtools_agent.timer` collects every minute as user `hetrixtools`; both
+TrustTunnel and nginx remain active. HetrixTools MCP confirmed repeated metric
+snapshots and both monitored services `online`. Configuration-only check mode
+reported `changed=0`, `failed=0`; a second full mutating run was not performed.
+
+Resource and service-down warnings were disabled at deployment; the subsequent
+approved policy configuration above supersedes that state. See [deployment evidence](../log/2026-11-08-trusttunnel-de-hetrixtools-ansible.md#deployment-authorized-and-verified-2026-11-08).
+No task background commands remain; the timer is the intended recurring service.
+
+## HetrixTools agent Ansible role prepared, 2026-11-08
+
+Reusable local role `roles/hetrixtools` downloads agent `2.4.2` from the versioned
+upstream URL, templates private configuration and schedules it every minute with
+`hetrixtools_agent.timer`. It defaults to user `hetrixtools`; root, services,
+interfaces, connection ports and optional collectors are configurable. Unique
+SID is Vault-encrypted in host vars; `vpn` group selects `trusttunnel` and `nginx`.
+Both `playbooks/vpn.yml` and focused `playbooks/hetrixtools.yml` include the role.
+The existing Vault password is `ANSIBLE_VAULT_PASSWORD` in `personal/.env`.
+
+Local syntax, Vault, template/parser and validation checks passed; repeated
+template application reported no changes. Instruction lint had zero errors and
+one `CDX-AG-005` warning in repo `AGENTS.md`. No server deployment or publication
+was performed at this initial stage. The subsequent deployment above supersedes
+this status; live metrics are verified, while full mutating rerun idempotency is not.
+See [implementation and approval evidence](../log/2026-11-08-trusttunnel-de-hetrixtools-ansible.md).
+
+## HetrixTools MCP configured in Codex, 2026-11-08
+
+At the user's request, added local Codex server `hetrixtools` in
+`~/.codex/config.toml`: Streamable HTTP URL `https://mcp.hetrixtools.net`,
+header helper `python3 /home/slnnk/ai/personal/scripts/hetrixtools_mcp_headers.py`,
+startup timeout 30 seconds and tool timeout 60 seconds. The helper reads only
+`HETRIXTOOLS_API_KEY` from `personal/.env` and emits the `api-key` header to
+Codex; never run it with stdout exposed in chat or logs. No secret is stored
+in the config or helper. `default_tools_approval_mode = "writes"` preserves
+confirmation for tools not annotated read-only. Existing per-command external
+change approval rules still apply. A User-Agent header was configured after
+an initial urllib MCP handshake without one returned HTTP 403.
+
+Codex CLI 0.167.0 recognized the enabled configuration and its header helper.
+A direct MCP protocol smoke check initialized server `hetrixtools` 0.6.0,
+negotiated protocol `2025-03-26`, listed 48 tools, and called read-only
+`list_uptime_monitors`: `vpn` was `up` and `active`, target
+`https://v.slnnk.com/tt_ping`, SSL expiry `2027-02-05`.
+No HetrixTools settings or monitors were modified during that initial check.
+The initial conversation catalog had not reloaded; native adoption was pending.
+
+Native adoption verified later on 2026-11-08 in a fresh conversation: all 48
+`mcp__hetrixtools__*` tools are present. Native calls to `get_api_scope`,
+`list_uptime_monitors`, `get_server_agent_metrics` and
+`get_server_agent_warning_policies` all succeeded. Monitor `vpn` is `up` and
+`active`, target `https://v.slnnk.com/tt_ping`; agent `2.4.2` reports
+`trusttunnel` and `nginx` online. Warning read-back confirms the approved
+CPU/RAM 90 percent, root disk 85 percent, five-minute windows and agent-silence
+threshold, service alerts and 30-minute repeats. The adoption item in the
+[central TODO](../../../TODO.md) is complete. Only read operations were tested;
+mutating tools were not exercised. No task background process remains.
+Report-only agent lint passed: 9 files, 0 errors, 0 warnings, 0 info.
+
+Sources: [HetrixTools connection guide](https://docs.hetrixtools.com/hetrixtools-mcp-connection-guide/)
+and [official Codex MCP configuration](https://learn.chatgpt.com/docs/extend/mcp).
+
+## HetrixTools monitoring and API access, 2026-11-08
+
+The user created an external website monitor and added `HETRIXTOOLS_API_KEY`
+to `personal/.env`. Read the key only from that file and pass it as the Bearer
+token in the Authorization header to `https://api.hetrixtools.com/v3/`.
+Never print the key or put it in command arguments, notes or request URLs.
+
+A read-only `GET /uptime-monitors` returned HTTP 200 with one monitor:
+`vpn`, target `https://v.slnnk.com/tt_ping`, type `website`, monitor status
+`active`, accepted HTTP codes `[200]`, locations New York, Amsterdam,
+Frankfurt and Warsaw. The API reports SSL expiration date `2027-02-05`.
+This confirms authentication and monitor-list access, not write permissions,
+notification delivery or configured certificate-expiration reminders. No
+external settings were changed. The official API specification URL returned
+HTTP 403 during discovery; the API request itself succeeded. All checks exited.
+
+## Client migration confirmed, 2026-11-08
+
+Following server deployment on `v.slnnk.com`, the user confirmed:
+`Клиенты проверил - работает`. Client operation is user-confirmed; no additional
+agent client edits, VPN sessions or remote checks were performed. The remaining
+client migration task in the [central TODO](../../../TODO.md) is closed.
+The own-domain migration is complete; no task background operations remain.
+
+## Certificate ordering fixed locally, 2026-11-08
+
+The user requested fixing the previously proposed certificate ordering issue.
+Proposal: reuse `/home/slnnk/mygit/ansible`, branch `master`, base `b857c7e`,
+change role task ordering and README, and syntax-check both VPN playbooks.
+The user explicitly approved with `Да`. The implementation moves binary
+installation and service configuration rendering after certificate issuance,
+so neither can enqueue a TrustTunnel restart before the nginx handler flush.
+Existing task bodies and tags are preserved. Updated the role README to explain
+hostname migration, failure behavior and focused installation/configuration runs.
+
+Both `playbooks/trusttunnel.yml` and `playbooks/vpn.yml` syntax checks passed.
+A local YAML inspection verified ordering and absence of TrustTunnel restart
+notifications before certificate issuance, plus role-wide tags on all tasks.
+No new-domain runtime migration was performed for this code fix; the already
+working server was left unchanged. No commit, push or publication was performed.
+This completed the role ordering proposal. Client migration was subsequently
+confirmed by the user above and is closed in the [central TODO](../../../TODO.md).
+
+## Own domain deployed, 2026-11-08
+
+After Google and Cloudflare DNS-over-HTTPS both returned `152.234.226.70`
+for `v.slnnk.com`, the user authorized deployment with `Сделай` in response
+to the proposed role application and certificate issuance.
+
+Read-only preflight confirmed TrustTunnel and nginx active, nginx serving
+the existing ACME webroot `/data/webroot`, and no new-domain certificate.
+Role inspection found that `meta: flush_handlers` restarts TrustTunnel after
+rendering the new TLS paths but before initial certificate issuance. To avoid
+restarting with missing certificate files, one temporary playbook
+`/tmp/trusttunnel-domain-migration.yml` first issued the certificate using
+the existing nginx webroot (guarded by `creates`), then ran the existing
+role with `--tags trusttunnel-config`. No role-code changes were made.
+The temporary playbook syntax check passed. The authorized execution completed
+with `ok=17 changed=5 unreachable=0 failed=0 skipped=2`.
+
+Post-deployment verification: external HTTPS to `v.slnnk.com/tt_ping` pinned
+to `152.234.226.70` returned HTTP 200 and certificate verification result 0.
+TrustTunnel, nginx and `certbot.timer` are active. Certificate CN and SAN are
+`v.slnnk.com`, expiry `2027-02-05 22:00:59 UTC`. This verifies server HTTPS,
+not an authenticated client VPN session. PC and phone client configurations
+were not modified by the agent. All agent commands exited. Client operation was
+subsequently confirmed by the user above; both migration and the local role
+ordering fix are closed in the [central TODO](../../../TODO.md).
+
+## Own domain prepared locally, 2026-11-08
+
+The user purchased `slnnk.com`, configured an A record for `v.slnnk.com`,
+reported propagation still pending, and requested local Ansible preparation.
+Proposal: reuse `/home/slnnk/mygit/ansible`, current branch `master`, base
+`b857c7e`, and change only `inventory/host_vars/it-garage-de-01.yml` from
+`152.234.226.70.nip.io` to `v.slnnk.com`. The user approved with `Да`.
+The proposed one-line edit was applied; the server address remains
+`152.234.226.70`. Full VPN playbook syntax check passed using the repository
+venv. The initial sandbox run could not create `~/.ansible/tmp`; the same
+syntax check passed with approved escalation.
+
+At the preparation stage, no DNS propagation check, deployment, certificate issuance, client edit,
+staging, commit, push or publication was performed. Last user-confirmed working
+VPN configuration uses the nip.io name. After DNS propagation, deploying the
+role for the new domain and updating clients were pending and required their
+respective authorization; see Personal / TrustTunnel endpoint in the
+[central TODO](../../../TODO.md). Existing untracked repository files were preserved.
+
+## Address replacement and recovery, 2026-11-08
+
+The user reported that the old address `2.26.30.176` was blocked and a new
+address was issued. They updated Ansible and applied the role, then explicitly
+confirmed VPN works. Local `inventory/hosts` now has
+`ansible_host=152.234.226.70`; `inventory/host_vars/it-garage-de-01.yml` has
+`trusttunnel_domain: 152.234.226.70.nip.io`. These files were read on 2026-11-08.
+Recovery and blocking are user-reported; the agent did not independently verify
+the new endpoint, the deployment, or the exact filtering mechanism. Further
+old-address UDP capture and provider/path investigation are closed without
+execution following recovery. No server or Ansible changes were made by the
+agent in this update. See the [incident resolution](../log/2026-11-06-trusttunnel-de-inbound-unreachable.md#resolution-2026-11-08).
 
 ## Inbound access incident, 2026-11-06
+
+Historical diagnostics for the old address; superseded by recovery above.
 
 The user reports VPN failure on PC and phone. From the PC, DNS returns the
 expected `2.26.30.176` and the endpoint route bypasses the corporate VPN, but
@@ -64,14 +257,14 @@ Planned to also serve the home router (see [home-network](home-network.md)).
 
 ## Components
 
-- Host `it-garage-de-01`, `ansible_host=2.26.30.176`, group `vpn`.
+- Host `it-garage-de-01`, `ansible_host=152.234.226.70`, group `vpn`.
 - Global IPv6 `2a0d:d940:1a:9d0::2/64` on `ens3`, observed in user VNC output
   on 2026-11-06. IPv6 SSH could not be tested from the PC or the authorized
   alternative gateway because both lack an IPv6 route (`Network is unreachable`).
-- Domain `2.26.30.176.nip.io` (`inventory/host_vars/it-garage-de-01.yml`,
+- Domain `v.slnnk.com` (deployed and HTTPS verified; `inventory/host_vars/it-garage-de-01.yml`,
   `trusttunnel_domain`). Certificate from Let's Encrypt via host `certbot`, webroot on
   nginx port 80. Hypothesis: a real domain is preferable; nip.io depends on a third party.
-- TrustTunnel `1.0.33`, native binary under `/data`, systemd service, listens `0.0.0.0:443`
+- TrustTunnel `1.1.0`, binary `/usr/local/bin/trusttunnel_endpoint`, configuration under `/data/trusttunnel`, systemd service, listens `0.0.0.0:443`
   TCP and UDP (QUIC on), forward mode `direct`, log `/var/log/trusttunnel.log` at level
   `debug`, metrics disabled.
 - Three client accounts in `inventory/group_vars/vpn.yml` (`trusttunnel_clients`):

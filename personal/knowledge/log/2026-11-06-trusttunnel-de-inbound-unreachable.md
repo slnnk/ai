@@ -1,7 +1,7 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-06
+checked: 2026-11-08
 tags: [vpn, trusttunnel, network, access]
 ---
 # TrustTunnel endpoint: inbound access times out
@@ -118,9 +118,25 @@ or prove that the target implementation must answer this probe. A bounded VNC
 UDP capture with ICMP control was requested to distinguish arrival from silence.
 No VPN credentials, client routing changes or server changes were used.
 
+## Resolution, 2026-11-08
+
+The user reported that the previous VPN address was blocked and a replacement
+was issued. They updated Ansible and applied the role, then confirmed:
+`vpn сейчас работает`. Local inventory read on 2026-11-08 confirms the new
+`ansible_host=152.234.226.70` and domain `152.234.226.70.nip.io`.
+Recovery and blocking are user-reported; no new agent network probes or remote
+changes were performed. The exact filtering mechanism remains unverified.
+The incident is closed after address replacement. The previously proposed
+old-address VNC UDP capture and provider/transit investigation are closed
+without execution; historical findings above are retained.
+
 ## Status and risks
 
-2026-11-06: access diagnostics completed, access not restored. The user provided
+2026-11-08: VPN restored according to the user; local inventory matches the
+replacement address. The related central TODO is closed. No agent background
+operations remain. Independent new-endpoint health checks were not performed.
+
+Historical status, 2026-11-06: access diagnostics completed, access not restored. The user provided
 VNC evidence; no SSH session to the VPS succeeded. Upstream TCP-path/provider
 investigation is proposed and tracked in
 [central TODO](../../../TODO.md) under Personal / TrustTunnel endpoint.
