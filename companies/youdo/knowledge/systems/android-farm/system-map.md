@@ -166,3 +166,23 @@ Newest first, all under `~/ai/current/knowledge/log/`:
 - `2026-08-12-android-farm-autotests-report-3063278.md` — report 3063278 failure analysis.
 - `2026-08-04-android-farm-avd-template-transfer.md` — AVD template transfer M-K0057 -> M-K0058, sparse `userdata-qemu.img`, Nexus archive, Ansible bootstrap.
 - `2026-07-22-automation-services-adb-devices-ca-certificates.md` — `roles/adb_devices` CA certificate tasks.
+
+## Samsung A55 live status — 2026-11-10 12:57 MSK
+
+Read-only SSH on inventory-confirmed M-K0057 (`192.168.30.31`) found Samsung A55 `RZCY20AXJHN` physically visible over USB (`usb:1-1`) but ADB `unauthorized`; targeted `get-state` returned `device unauthorized`. `phone_samsung_galaxy_a55.service` is `inactive/dead`, MainPID0, UnitFileState`enabled`, inactive since2026-09-22 16:27:01MSK. Fresh Enabled Selenium inventory and Hub collector at09:57:24UTC confirm7registered/7idle slots,queue0, A55 absent. No restart, authorization reset, device operation or other external change performed. Existing state confirmed; no new follow-up or central TODO change required. All check commands finished; no background operation remains.
+
+## Samsung A55 returned to Grid — 2026-11-10 13:19 MSK
+
+Supersedes the12:57MSK inactive/unauthorized snapshot above. User reported USB authorization recovery after phone-side troubleshooting, then reported starting Appium. Agent read-only verification: `RZCY20AXJHN` ADB state`device`; `phone_samsung_galaxy_a55.service` active/running/MainPID916251. Fresh Enabled inventory and Hub check10:19:02UTC confirm A55 registered at M-K0057 `192.168.30.31:15003`, slotidle, Appium1.22.3 HTTP200/ready. Whole Grid8registered/8idle/0busy, all8Appium endpointsready. No diagnostic or product test session created, so session/UiAutomator2 execution is untested in this check. The exact phone-side recovery action is not independently established. No agent external changes; no new central TODO action. All verification commands finished; no background operation remains.
+
+## Samsung A55 isolated failure — 2026-11-10 15:08 MSK
+
+Supersedes the13:19MSK readiness-only snapshot for session health. User stopped production Appium at14:59:08MSK. Read-only ADB identified model SM-A556E/Android15, bootcomplete, available Android services and registered UnicodeIME. A user-approved localhost-only Appium canary failed its first session at15:06:33MSK: installation of UiAutomator2 androidTest APK exceeded20000ms. Server4.27.0 is installed but server.test remains absent. No Grid routing or target parallelism was involved. Temporary Appium removed, no sessions/forwards/15903listener remain; production staysstopped, A55 absent from7-slotGrid. Underlying installer failure and recovery remainunproven. [Evidence and authorization](../../log/2026-11-10-android-farm-a55-isolated-check.md).
+
+## Samsung A55 Play Protect blocker and isolated recovery — 2026-11-10 15:19 MSK
+
+Supersedes the15:08MSK unknown-installer snapshot above. Read-only metadata confirms bundled UiAutomator2 androidTest APK targetsAPI30 on Android15. After separately approved wake/swipe, Play Protect visibly blocked io.appium.uiautomator2.server.test due to its older Android target; identical direct install stillwaited120s. User reported disabling Play Protect; agent did not change protection. Same20sinstall-timeout localhost canary then passed3/3create/command/quit cycles (create7.449/4.749/3.904s), both helper APKs installed, each quit released15903. Temporary Appium removed, sessions/forwards0, production Appium remainsintentionallystopped. Grid-path/product tests and production return remainunverified; disabling protection is a retained user change. [Evidence and approvals](../../log/2026-11-10-android-farm-a55-isolated-check.md).
+
+## Samsung A55 production return verified — 2026-11-10 15:22 MSK
+
+User started Appium at15:20MSK. Read-only fresh-inventory/Hub check12:21:57UTC confirmed A55 registeredidle at192.168.30.31:15003; Appium active/running/ready, ADBdevice and Android services responding. Grid8registered/8idle/queue0. Supersedes the intentionallystopped state in15:19MSK section above. Earlier3/3isolated sessions passed after user disabled Play Protect; no new Grid-path session or product job was launched. [Evidence](../../log/2026-11-10-android-farm-a55-isolated-check.md#user-started-production-return--2026-11-10-1522-msk).

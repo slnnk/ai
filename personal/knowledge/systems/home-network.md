@@ -6,6 +6,22 @@ tags: [home, router, openwrt, trusttunnel]
 ---
 # Home network
 
+## Summary
+
+- The target router-level VPN and encrypted-DNS design remains a plan.
+- The existing Archer C64 supplies the home LAN.
+- Media Station X and Lampa startup on the TV are user-confirmed as of 2026-11-10.
+- TorrServer MatriX.150 runs in Docker on the existing Linux PC.
+- The current TV endpoint is `http://192.168.192.107:8090`.
+- Host-side HTTP health passed; TV connectivity and playback remain pending.
+- TorrServer data persists in `/home/slnnk/ai-data/torrserver`.
+- Jackett runs on TCP 9117; working Lampa integration is user-confirmed after the CORS fix.
+- Current Russian-language sources are RuTor, NNM-Club and RuTracker.org; the latter passed Test after FlareSolverr integration.
+- FlareSolverr 3.5.2 runs privately on `home-media`; Jackett uses `http://flaresolverr:8191`.
+- The PC must stay on for playback; its DHCP address can change.
+- Components and Operations describe the current deployment and checks.
+- Historical VPN diagnostics remain below; open work is tracked in central TODO.
+
 ## Staleness review (2026-11-04)
 
 The home deployment remains a plan: local `home-infra/AGENTS.md` still records no deployment. Its version-3 `PLAN.md` and the explicit decisions in `AGENTS.md` specify podkop with TrustTunnel as a netifd interface, AmneziaWG UDP as backup, and encrypted DNS through the user's own VPS AdGuard Home with Unbound recursion; raw dnsmasq nftset routing is the fallback, not the selected primary design. Amend the planned-components paragraph accordingly and remove VPS AdGuard Home from the deferred list. Fail-open, FakeIP/upstream compatibility and actual tunnel egress still require the existing bench tests in the central backlog. No router, server, hardware purchase or client restart was checked during this review. StrongSwan's trial on the TrustTunnel host was removed on 2026-11-04, as recorded in the [removal log](../log/2026-11-04-vpn-gateway-strongswan-ansible-removal.md); the separate old gateway's current state remains unconfirmed.
@@ -20,6 +36,14 @@ domains (YouTube, Instagram, torrent trackers, ...) through the user's TrustTunn
 TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segments.
 
 ## Components
+
+- Current verified media setup (2026-11-10): RuTor, NNM-Club and RuTracker.org are configured in Jackett. The user's RuTracker UI setup saved the account configuration; the agent did not read credentials. After explicit approval, deployed FlareSolverr 3.5.2 (`ghcr.io/flaresolverr/flaresolverr:latest`) on private Docker network `home-media`, connected Jackett to that network and set its solver URL to `http://flaresolverr:8191`; timeout remains 55000 ms and CORS true. FlareSolverr has restart `unless-stopped`, RAM-backed `/tmp` capped at 256 MB and no published host port. Solver health, the RuTracker login-page challenge (HTTP 200) and Jackett RuTracker Test (HTTP 204) passed. This supersedes the pending account/solver status below. See [installation and checks](../log/2026-11-10-home-network-pc-flaresolverr.md).
+
+- Current media source choice (2026-11-10): user requested Russian-language releases after confirming the setup works. RuTor and NNM-Club (`noname-club`) are configured; NNM-Club save and Test returned HTTP 204. The previously configured English sources The Pirate Bay and YTS were removed for this request. The user has a RuTracker.org account and will add `RuTracker.org` through Jackett UI with personal credentials. No credential entry or RuTracker configuration by the agent. This supersedes the earlier source set below; see [source selection](../log/2026-11-10-home-network-jackett-indexers.md#russian-language-sources-selected).
+
+- Verified 2026-11-10: user-approved Jackett container `jackett`, image `lscr.io/linuxserver/jackett:latest` (`v0.24.3042-ls32`), restart `unless-stopped`, configuration `/home/slnnk/ai-data/jackett` mounted at `/config`. TCP 9117 is published only on the PC LAN address: `http://192.168.192.107:9117`. Cookie-aware root/dashboard HTTP checks passed. RuTor, The Pirate Bay and YTS were subsequently configured at the user's request; all passed Jackett Test. The failed 1337x configuration was removed after it required FlareSolverr; no extra service was installed. TV-side parser integration and playback remain pending. See [deployment and approval](../log/2026-11-10-home-network-pc-jackett.md) and [indexer setup](../log/2026-11-10-home-network-jackett-indexers.md).
+
+- Verified 2026-11-10: the user installed Media Station X on the TV and confirmed Lampa opens. TorrServer now runs on the existing Ubuntu Linux PC instead of waiting for the planned mini PC: Docker container `torrserver`, image `ghcr.io/yourok/torrserver:latest`, version `MatriX.150`, restart `unless-stopped`, data `/home/slnnk/ai-data/torrserver` mounted at `/opt/ts`. TCP 8090 is published on the PC's LAN IP only; `http://192.168.192.107:8090/echo` returned HTTP 200. TV access and playback are pending; the address may change with DHCP. See [deployment and approval](../log/2026-11-10-home-network-pc-torrserver.md).
 
 - ISP Elit-TV: Ethernet cable into the flat, WAN by DHCP, up to 1 Gbit/s, no IPv6.
   WAN address `100.64.6.13` is in `100.64.0.0/10`, so CGNAT. ISP blocks by DNS spoofing,
@@ -67,12 +91,25 @@ See [diagnostic evidence](../log/2026-10-11-trusttunnel-client-kickstarter-routi
 
 ## Control points
 
-Not yet. Planned: OpenWrt `/etc/config/*`, procd service for the TrustTunnel client,
+TorrServer on the PC: `http://192.168.192.107:8090`, Docker container `torrserver`.
+Jackett on the PC: `http://192.168.192.107:9117`, Docker container `jackett`.
+FlareSolverr: Docker container `flaresolverr`, reachable from Jackett at `http://flaresolverr:8191` on `home-media`, no host-published port.
+Planned: OpenWrt `/etc/config/*`, procd service for the TrustTunnel client,
 dnsmasq nftsets and policy routing table for VPN traffic.
 
 ## Operations
 
-Not yet. Open questions and deployment plan live in the repository above.
+TorrServer cache inspection (2026-11-10): persisted `BitTorr` settings specify 64 MiB (`CacheSize: 67108864`) and RAM storage (`UseDisk: false`). Downloaded video pieces use a bounded cache rather than a permanent whole-film library. No cache tuning was applied; see [inspection](../log/2026-11-10-home-network-pc-torrserver.md#cache-configuration-inspected).
+
+FlareSolverr: `docker ps --filter name=flaresolverr` checks its state; `docker exec jackett curl --max-time 15 http://flaresolverr:8191/` verifies readiness from Jackett. Stop only when requested with `docker stop flaresolverr`; Cloudflare-protected indexers depend on it. The user's RuTracker.org is now configured and its Test passed. Earlier download diagnostics showed DNS timeouts for NNM-Club; no DNS change was authorized or applied, and NNM-Club was not retested in the final solver-install turn.
+
+Jackett: check with `docker ps --filter name=jackett`; open its root URL in a browser. Direct dashboard requests without cookies may return HTTP 400 (`Cookies required`); browser-style cookie support passed HTTP 200. Stop only when requested with `docker stop jackett`. Use the UI to transfer the generated API key into Lampa manually; do not copy it into notes. Scripted credential access belongs in the personal `.env`.
+
+Lampa parser correction on 2026-11-10: the user confirmed the LAN URL, working Jackett UI in the TV browser and correct API key. After explicit approval, `AllowCORS` was changed from false to true through Jackett's settings API, which restarts its web host. Post-change settings and an authenticated API request with `Origin: http://lampa.mx` confirmed HTTP 200 and `Access-Control-Allow-Origin: *`. The three indexers remain configured and the container is running. TV-side retry after restarting Lampa and playback remain unverified; see [approved correction](../log/2026-11-10-home-network-pc-jackett.md#cors-correction-applied).
+
+Subsequent user confirmation: Lampa now works. Current sources were then changed to Russian-language RuTor and NNM-Club; RuTracker.org awaits the user's manual credential entry. The earlier pending TV parser retry and three-source list are superseded. Specific movie audio/seek behavior has not been independently tested.
+
+TorrServer: inspect with `docker ps --filter name=torrserver` and `docker logs --tail 30 torrserver`; host-side health check `curl --max-time 10 http://192.168.192.107:8090/echo`. Stop only when requested with `docker stop torrserver`. The PC must remain powered on during TV playback. Other open questions and the target deployment plan live in the repository above.
 
 ## Boundaries
 
@@ -85,6 +122,10 @@ Router LAN only, from the user's PC. No remote access yet.
 
 ## Related log entries
 
+- [2026-11-10 FlareSolverr installed and RuTracker Test passed](../log/2026-11-10-home-network-pc-flaresolverr.md)
+- [2026-11-10 three public Jackett indexers configured and tested](../log/2026-11-10-home-network-jackett-indexers.md)
+- [2026-11-10 PC Jackett deployed for Lampa torrent discovery](../log/2026-11-10-home-network-pc-jackett.md)
+- [2026-11-10 Lampa startup confirmed and PC TorrServer deployed](../log/2026-11-10-home-network-pc-torrserver.md)
 - [2026-09-26 questions and deployment plan](../log/2026-09-26-home-network-initial-plan.md)
 
 ## PC TrustTunnel corporate VPN exclusion (2026-10-11)

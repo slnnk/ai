@@ -60,3 +60,7 @@ Proposed next work: preserve leftover-session evidence onM-K0058, identify/test 
 ## Superseding Xiaomi recovery — 2026-11-09 18:57 MSK
 
 User-approved reboot followed by3UnicodeIME-enabled serial cycles passed with existing Settings3.4.0; production Appium started and Xiaomi registeredidle in Grid. Earlier isolated/broken state is historical. See [recovery and limits](2026-11-09-android-farm-devops-912-xiaomi-recovered.md).
+
+## YouTrack summary publication — 2026-11-10
+
+User requested a Markdown comment with links and explicitly approved publication after reviewing the final text. Created DevOps-912 comment `74-125404` as `a.solonenko`; independent GET confirmed exact equality with the approved Markdown and both MR1390/job3285160 links. User-requested omissions were preserved: no element-error/15-worker paragraph and no final-validation paragraph. Evidence: `~/ai-data/android-dig/DevOps-912/comment.md` and `comment-published-verified.json`. No issue state or infrastructure changes. Existing android-farm follow-ups in the central TODO remain unchanged; this action publishes the historical November 9 results, without a new runtime check. Publication completed; all task commands exited and no background operation remains.
