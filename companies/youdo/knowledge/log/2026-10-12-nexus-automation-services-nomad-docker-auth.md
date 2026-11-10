@@ -95,3 +95,7 @@ User approved commit/push/MR update by replying Yes. Staged only .gitlab-ci.yml 
 ## Manual CI start declined
 
 User explicitly replied Not needed to the proposed manualstart of job3219872. Job not played; no other CI action executed. Latest MR1371/f4018c2b remains published with static checks passed and full Molecule validation unexecuted. Record this as declined, never as CI success. Publication task complete; merge/deploy still user-controlled.
+
+## Merge readiness review on November 9
+
+[Current review](2026-11-09-nexus-mr1371-merge-review.md) confirms mergeable state but identifies duplicate no_log keys when merged with current master. Controller secret injection and full Molecule verification limits remain. Existing central MR1371 review/merge entry stays open; no merge or repository correction performed.

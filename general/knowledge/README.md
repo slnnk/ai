@@ -264,8 +264,10 @@ Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
 
 - Check `<layer>/scripts/` before improvising. A sequence of three or more commands run
   twice becomes a script (CLI args or env, `--help`, compact summary output).
-- Reading more than three files or a long log: delegate to a subagent that returns a few
-  lines of conclusions.
+- Use one Sol agent by default. Add helpers only when explicitly authorized for the
+  current task; do not automatically route ordinary work to same-model or cheaper helpers.
+- For multiple files or long logs, read relevant sections and bounded output locally;
+  file count or log length alone does not authorize delegation.
 - Never print a whole file or raw output when a line will do: `head`, `grep -c`, `wc -l`,
   `--quiet`.
 - Reusable prompts go to `<layer>/prompts/<name>.md` with a `model:` tier line.

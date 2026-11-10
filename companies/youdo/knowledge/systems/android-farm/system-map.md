@@ -48,11 +48,14 @@ tags: [android, appium, selenium-grid, adb, emulator, zabbix, loki, alloy, ansib
 
 ## Test execution route
 
+- Recovery verified2026-11-09 18:57MSK: Xiaomi `x4pf5l5haegykni7` on M-K0058:15003 returned to Grid after reboot and3UnicodeIME-enabled serial cycles without Settings reinstall. All7registered slotsidle, queue0 at check. [Recovery evidence](../../log/2026-11-09-android-farm-devops-912-xiaomi-recovered.md).
+
 `GitLab test runner -> Selenium Grid hub 192.168.30.30:4444 -> Appium node on farm host -> ADB -> emulator or physical device`
 
 - Tests run from `/home/slnnk/git/youdo-android-testing`; environments are selected by `STAND` (currently test through test17 in CI), suites by `SUITE`, and two logical jobs select separate Selenium/Appium pools.
 - The framework is Java 11 + Gradle + TestNG 7.7.1 + Selenium 3.141.59 + Appium Java client 7.6.0, with shared internal `autotest-core` and `youdo-api-testing` artifacts from Nexus.
 - CI restarts emulator services and invokes `/opt/adb/adb.sh` plus package cleanup on Appium hosts before running tests.
+- Verified2026-11-09, DevOps-912: live `/opt/adb/adb.sh` on M-K0057/M-K0058 now preserves `io.appium.settings`; normal cleanup still removes UiAutomator2 helpers and the deployed test APK. Matching Ansible template published as [MR1390](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1390), commit8dbbec31, user-merged6d467c2e on2026-11-09; MRpipeline142579skipped. Settings uninstall/reinstall reproducibly breaks Xiaomi UnicodeIME; preserving the helper avoids this verified trigger but does not repair existing IME state or resolve broader session failures. [Change and backups](../../log/2026-11-09-android-farm-devops-912-preserve-appium-settings.md).
 - Reports and artifacts are uploaded under report/job IDs. The investigated report path used `reports.youdo.com` and a Yandex Object Storage mirror.
 - Static suite audit dated 2026-08-12 found 577 active application-regression tests. `MindBoxTestSuite` had zero active tests and the configured `InfoMessagesTestSuite` XML/class was absent.
 
@@ -143,6 +146,12 @@ tags: [android, appium, selenium-grid, adb, emulator, zabbix, loki, alloy, ansib
 ## Related log entries
 
 Newest first, all under `~/ai/current/knowledge/log/`:
+
+- `2026-11-09-android-farm-devops-912-grid-parallel-canary.md` —60/60nativeGridcycles at2/4/6workers passed, real concurrency and clean final state verified; real-test/oversubscribed cases untested.
+
+- `2026-11-09-android-farm-devops-912-grid-serial-canary.md` — all7activeAppium restarted;35serialGridcycles/5peractualnode passed with session/port cleanup, concurrency still untested.
+
+- `2026-11-09-android-farm-devops-912-preserve-appium-settings.md` — Settings preserved on both Appium hosts; matching Ansible template publishedMR1390/8dbbec31 and user-merged6d467c2e; backups and checks recorded.
 
 - `2026-09-08-android-farm-android-dig-loki-endpoint.md` — Loki read endpoint for `android-dig` changed to `http://loki.dev.youdo.corp`.
 - `2026-09-08-android-farm-android-dig-job-3121092.md` — port `15903` busy race on M-K0057 Samsung A55; missing `adb_pkg.sh`; direct SSH verification.

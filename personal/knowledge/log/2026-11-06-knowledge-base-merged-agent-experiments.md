@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-11-06
+checked: 2026-11-09
 tags: [agents, experiments, evaluation, model-routing, planning]
 ---
 # Merged agent-methodology experiment proposals
@@ -17,8 +17,13 @@ total accepted-task cost includes the coordinator, retries and verification.
 Old completed steps 1/2/3/6 and the F1 fix stay completed, and the Claude-specific
 extension stays cancelled. Technical defects already established by reproduction
 remain ordinary fixes, not questions of whether to tolerate them for lower cost.
-No experiment, model invocation, install or permanent rule change was authorized or
-performed. Central TODO remains the sole live action list; this is its design evidence.
+At the planning checkpoint no experiment, model invocation, install or permanent rule
+change was authorized or performed. On 2026-11-09 the user-selected bounded E01 pilot
+was completed; see the [measured outcome](2026-11-09-knowledge-base-e01-model-delegation-pilot.md).
+E02–E14 remain proposals. Central TODO remains the sole live action list; this is its
+design evidence.
+
+The user later authorized the [second E01 stage](../../../current/knowledge/log/2026-11-09-knowledge-base-e01-stage2-comparison.md), completed on 2026-11-09 with 36 historical-task attempts and 114 invocations. Raw cost fell with Luna helpers, but equal quality was not demonstrated; no model-default change was adopted. Method/rubric limits are recorded with that outcome. The user subsequently retained one Sol agent and closed E01 follow-ups without further runs; E02–E14 remain proposals.
 
 ## Task and context
 
@@ -143,10 +148,13 @@ external systems were changed. No benchmark or experiment was executed.
 
 ## Status and risks
 
-Plan prepared on 2026-11-06. All E01–E14 remain proposals referenced from central TODO;
-the user has not selected or authorized their implementation. Pilot size, runtime
-support, model availability and budget need to be concrete before any run. Design
-review and KB checks completed; no background research or experiment remains running.
+Plan prepared on 2026-11-06; all E01–E14 were proposals at that checkpoint. The user
+subsequently selected E01. Its [bounded pilot](2026-11-09-knowledge-base-e01-model-delegation-pilot.md)
+finished on 2026-11-09: 42 calls, full participant usage and verification, no permanent
+model-routing changes. Luna helpers reduced delegated cost but did not beat solo on
+the tested short tasks; one strict next-action mismatch has a documented rubric
+ambiguity. E02–E14 remain proposals referenced from central TODO. No background
+research or experiment remains running.
 
 ## Portable lesson
 

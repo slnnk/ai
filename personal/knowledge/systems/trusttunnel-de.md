@@ -1,7 +1,7 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-08
+checked: 2026-11-09
 tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 ---
 # TrustTunnel endpoint it-garage-de-01
@@ -23,6 +23,102 @@ tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 - Local inventory confirms `152.234.226.70` and desired domain `v.slnnk.com`.
 - The user confirmed VPN recovery before domain migration; new-domain HTTPS was subsequently verified by the agent.
 - The old-address incident is closed; historical diagnostics remain below.
+- Russian relay deployed to `dline-spb-01`; authenticated HTTP/2 and HTTP/3 probes passed. User switched DNS to Russia; authoritative servers confirm, recursive caches still retain Germany.
+
+## Russian nginx relay deployed, 2026-11-09
+
+Latest outcome: separate tt.slnnk.com TLS support has been approved and deployed
+on Germany (`ok18 changed5 failed0 unreachable0`). Both main_hosts and separate
+certificate lineages are active; original v certificate is unchanged. tt's
+certificate expires 2027-02-06 22:23:39 UTC and has webroot renewal configured.
+Pinned HTTPS checks returned HTTP200/valid TLS for tt direct, v direct and v
+through Russia. Both HetrixTools monitors are now UP. The failure and pending
+preparation statuses below are historical and superseded by this outcome.
+Subsequent home Wi-Fi reconnection and approved LE renewal checks passed, as
+recorded below. Only cellular-data testing remains in central TODO; all task
+commands completed.
+
+Phone-path log check at02:29 Moscow found recent Android TrustTunnel sessions
+direct to Germany (household public egress, not Russian relay IP), SNI v.slnnk.com.
+No iOS-labelled sessions appeared in the inspected tail. This does not establish
+phone relay cutover; DNS/client caching is only a hypothesis. See the relay log.
+
+Latest HetrixTools check (02:11 Moscow): vpn-proxy UP with nginx online and fresh
+Russian host metrics. German monitor vpn now targets tt.slnnk.com and is DOWN
+in all four locations due to TLS handshake failures, while its agent reports
+TrustTunnel/nginx online. Pinned checks on the same German IP confirm tt TLS
+failure and v.slnnk.com HTTP200/valid TLS. Dedicated tt hostname/certificate
+configuration is proposed, not applied; see central TODO and the relay log.
+
+After user approval, local role preparation for tt is complete:
+trusttunnel_additional_domains now supports independently named certificates,
+and German host vars add tt.slnnk.com while retaining v.slnnk.com. Syntax,
+offline certificate/template checks and remote check-mode passed (ok15,
+changed4, failed0). Google/Cloudflare resolve tt to Germany with no AAAA.
+Actual certificate issuance and config deployment await explicit approval;
+the live TLS-host limitation and monitor DOWN remain unresolved at this stage.
+
+After explicit approval, `playbooks/vpn-proxy.yml --limit dline-spb-01` completed
+with `ok=80 changed=45 failed=0 unreachable=0`. Relay nginx, SSH, rsyslog,
+nftables, CrowdSec/bouncer and monitoring timer are active. Both TCP/443 and
+UDP/443 are forwarded to Germany, and HTTP ACME requests reach the German
+nginx. TLS stays end to end; no certificate or Certbot was installed in Russia.
+
+Pinned HTTPS `/tt_ping` returned 200 with verified TLS. Temporary authenticated
+TrustTunnel HTTP/2 and HTTP/3 SOCKS probes returned German egress 152.234.226.70.
+These local probes used the pre-existing VPN route to Russia; direct home/mobile
+reachability is not established. HetrixTools `vpn-proxy` reports the Russian IP,
+hostname, nginx online and repeated samples. At deployment time website probes
+still checked Germany through unchanged DNS; subsequent user cutover is recorded
+below. No monitoring-policy changes.
+
+The nonfatal sudo hostname-resolution warning was subsequently fixed with the
+user's hosts-only approval: added `127.0.1.1 dline-spb-01` to /etc/hosts using
+the same parameters as the prepared common-role fix. getent and sudo checks
+passed without the warning; nginx and the monitoring timer remain active.
+Locale normalization was not applied. DNS propagation, client checks and actual
+LE renewal validation remain pending in [central TODO](../../../TODO.md).
+See [deployment evidence](../log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md#deployment-approved-and-verified-2026-11-09).
+Historical preparation/preflight statuses below are superseded by this section.
+
+User subsequently changed v.slnnk.com A to 48.103.180.18. Both REG.RU
+authoritative servers confirmed the new A with TTL86400 and no AAAA. Google,
+Cloudflare and ordinary local HTTPS still used the cached German IP during
+verification; propagation is incomplete. The PC client already connects by
+domain, so no fixed-IP edit is required. Home/mobile reconnection and an approved
+Certbot renewal test remain pending. The agent did not change DNS.
+After a user-requested local DNS cache flush, resolvectl on the PC returned
+48.103.180.18 for v.slnnk.com. The VPN still needs reconnection and path
+verification; no client configuration change was made by that cache operation.
+Subsequent phone test at02:35 Moscow confirmed Android traffic arriving in
+Germany from the Russian relay IP, with paired nginx TCP443 connections on the
+relay. The phone path now works through Russia; Wi-Fi versus mobile data was
+not specified by the user. Earlier direct-phone observations are historical.
+At02:39 Moscow, fresh Linux sessions also reached Germany from48.103.180.18,
+confirming PC relay use after reconnection. User clarified the phone test used
+Wi-Fi. At02:44, the approved v.slnnk.com Certbot staging renewal succeeded;
+seven matching HTTP200 challenge requests on Russia/Germany confirm the full
+relay validation path. The production certificate fingerprint/validity and
+TrustTunnel activation time were unchanged; both monitors stayed UP. Manual
+dry runs should include --no-random-sleep-on-renew to avoid the observed
+444-second Certbot delay. The only remaining client check is cellular data.
+
+## Russian nginx relay prepared locally, 2026-11-09
+
+User selected client -> nginx in Russia -> public TrustTunnel IP in Germany, without IPsec. User created `playbooks/vpn-proxy.yml` and group `vpn_proxy`, then authorized local role preparation on existing `master`/`b857c7e`. Added `roles/trusttunnel-proxy`, relay group/host vars and repo architecture guidance. Local inventory target is `dline-spb-01` (`48.103.180.18`), backend derived from `it-garage-de-01` (`152.234.226.70`). TCP/UDP 443 are passed through; HTTP ACME requests go to Germany with the TLS hostname as Host. Certificate and renewal automation remain in Germany.
+
+Both functional playbooks passed syntax checks. Isolated nginx tests passed TCP, UDP, ACME and redirects; no authenticated client or remote host test. Instruction lint has no errors and one existing missing-reference warning. The user subsequently supplied the relay SID and authorized encrypting it in `inventory/host_vars/dline-spb-01.yml` using the existing Vault password; persisted decryption and proxy playbook syntax passed. Agent deployment and monitor association/telemetry remain unverified. Deployment/DNS remain a separately approved proposal in [central TODO](../../../TODO.md). See [implementation and verification](../log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md).
+
+Later deployment preflight confirmed `dline-spb-01` runs Debian 13.4 x86_64.
+Backend TCP/80, TCP/443 and validated TLS `/tt_ping` succeeded from Russia;
+UDP/QUIC is not yet verified. Ports 80/443 on the relay are free. Minimal-image
+sudo and rsyslog prerequisites were added locally to bootstrap/CrowdSec roles;
+both playbook syntax checks passed. No server changes or DNS switch; the full
+relay playbook deployment remains pending explicit approval. See the relay log.
+
+## Russian relay provider research, 2026-11-09
+
+Discussion only: a Russian nginx stream relay could use cross-country private connectivity to a foreign endpoint. Timeweb documents custom routed networks across countries; its standard cloud VPC is within one location. Suitability and price for two small VMs remain unconfirmed. No purchase, outreach or deployment. See [provider research](../log/2026-11-09-trusttunnel-de-russian-relay-provider-research.md).
 
 ## TrustTunnel upgraded to 1.1.0, 2026-11-08
 
