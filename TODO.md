@@ -62,6 +62,8 @@ Paths below are relative to `~/ai/`.
 
 ### dev-deployment (B2B ephemeral dev, DevOps-832, DevOps-A-50)
 
+- [x] DevOps-917: verify user-started release 0.5.14 pipeline142721 and runtime cache clear after separately authorized deployment; approved publication bb23b95/MR41 completed, user merged332bcd1, 5 local tests passed (2026-11-11) — [src](current/knowledge/log/2026-11-11-dev-deployment-buildapi-cache-dns-search.md) — User confirmed deployment and working cache clear; closed based on user acceptance, no independent runtime verification. Requested problem/solution comment74-125488 published and GET-verified (2026-11-11).
+
 Post-deploy autotests (DevOps-832), state checked in GitLab 2026-09-28:
 - [ ] Tochka tests: 121 failures from removed `/v1/beneficiaries/createPerson`/IE (Site-24856); hand to QA to switch steps to v2 before relying on the Tochka suite (2026-09-29) — [src](companies/youdo/knowledge/systems/dev-deployment/post-deploy-autotests.md)
 - [ ] Main `youdo.business` + `youdo-business-tests` + `youdo-business-ui-tests`: plan proposed 2026-09-28, awaiting decisions (endpoints, plugin `precondition` and `lib` in `youdo-business-tests-plugin`, test-client, UI template, memory); see the map section "youdo.business suite" — [src](companies/youdo/knowledge/systems/dev-deployment/post-deploy-autotests.md) Consultation requested 2026-10-21 on combining API/UI tests and their launch; user confirmed topic 2026-10-23, answer still pending. — [rp clarification](/home/slnnk/ai-data/rp/daily/2026-10-23.md)
@@ -94,6 +96,8 @@ Deferred, decide later: Adminer / DB discovery; `youdo-business-tickets` onboard
 QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billing `GetYouDoBalanceHistoryTest` assertions; Tochka hard-coded token fallback — [src](companies/youdo/knowledge/log/2026-09-04-dev-deployment-devops-832-handoff.md)
 
 ### nomad-test / Consul (Yandex test)
+
+- [x] DevOps-916: Publish prepared CallMasking HTTP scheme MR after second supervised approval (2026-11-11; completed as MR132, commit 5ef9e2a) — [src](current/knowledge/log/2026-11-10-nomad-test-devops-916-call-masking-config.md)
 
 - [x] DevOps-916: Publish prepared InternalApi secret MR after second supervised approval (2026-11-10; completed as MR131, commit b0693d4) — [src](current/knowledge/log/2026-11-10-nomad-test-devops-916-call-masking-config.md)
 
@@ -236,6 +240,11 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [x] DevOps-909 Zabbix: runtime/UI/API/Selenium inventory recovered; approve persistent Docker dependency on /data mount and verify ordering; reboot test not authorized, backup skipped by user (2026-11-05) — [src](companies/youdo/knowledge/log/2026-11-05-zabbix-docker-before-data-mount.md) — Completed: host-local Docker RequiresMountsFor=/data applied, daemon-reload and loaded Requires/After verified; container starts unchanged; user explicitly declined reboot testing (2026-11-05).
 
+### web-autotests / Selenium
+
+- [x] DevOps-920: approve publication of prepared automation-services Ansible persistence for per-upstream BIND edns no; branch DevOps-920-fix-private-dns-edns from master4385a463, two-file diff and checks saved; runtime workaround already user-approved/applied on10.18.20.3, kube-dns negative response7–8ms and fresh Chrome acquisition469ms verified; second approval for task-only commit/push/ready MR remains pending (2026-11-11) — [src](current/knowledge/log/2026-11-11-web-autotests-geolocation-suggest-assessment.md) — Completed: user approved publication; commit1cbb9476 pushed, ready MR1394 created and exact SHA/title/body verified, pipeline142790skipped. No merge performed.
+- [x] Proposed: review and merge DevOps-920 automation-services MR1394 to persist the verified per-upstream BIND EDNS workaround; runtime fix already active and DNS/Chrome checks passed; no agent merge authorized (2026-11-11) — [src](current/knowledge/log/2026-11-11-web-autotests-geolocation-suggest-assessment.md) — Closed2026-11-11 based on user report that DevOps-920 is closed. Accepted complete; no further follow-up requested. MR merge was not independently checked and no agent merge occurred.
+
 ### android-farm
 
 - [x] Proposal: investigate and revalidate Samsung A55 RZCY20AXJHN on M-K0057 after job3287595 UiAutomator2 install timeouts, missing Android settings/activity services and transient device absence; reserve device before any approved canary/recovery, avoid broad resets, preserve io.appium.settings; current Appium HTTP status does not prove recovery (2026-11-10) — [src](current/knowledge/log/2026-11-10-android-farm-dig-job-3287595.md) — Approved isolated canary2026-11-10 15:06MSK failed first create: UiAutomator2 androidTestAPK install timeout20s; Android15services/UnicodeIME healthy, test packageabsent; temporary Appium removed, production remainsstopped; next proposed bounded installer diagnosis requires separate approval, no recovery claimed — [src](current/knowledge/log/2026-11-10-android-farm-a55-isolated-check.md) — Installer diagnosis completed2026-11-10: Play Protect blocked old-targetAPI30 testAPK; after user disabled protection, same20stimeout isolated canary3/3create/command/quit passed and helpersinstalled, own sessions/forwards cleared. Production Appium remainsintentionallystopped; remaining proposal is separately approved production return and Grid-path verification, no restart authorized — [src](current/knowledge/log/2026-11-10-android-farm-a55-isolated-check.md) — Completed2026-11-10 15:22MSK: user started production Appium15:20MSK; fresh read-only check confirms active/running, A55registeredidle/ready and Grid8free/queue0, following3/3isolated lifecycle passes. No fresh Grid session or real autotest claimed; broader real-test canary remains in the separate existing lifecycle proposal.
@@ -287,7 +296,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [x] Verify actual Jenkins job launch and controller credentialed GitLab checkout: test-git4 SUCCESS, revision a240575a6a360a908005fb3f1814fca13ee6e065; agent checkout remains pending (2026-10-13) — [src](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-892-git-smoke.md)
 
-- [ ] Finish Jenkins VK recovery: controller/AutoTest restored, public HTTPS and controller checkout verified; dynamic_deploy5826 SUCCESS with Restore/ES/monolith/static/Suggestions. Remaining: AutoTest actual checkout/workflow; Airflow backup source/SSH/staging and verified fresh off-controller backup; align canonical Ansible image/DNS with working overrides, including verified controller/agent Moscow timezone runtime settings (2026-10-22). Monitoring and Git publication deferred by user. Public WebSocket forwarding only needed if agent uses public endpoint (2026-10-15) — [plan](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-892-vk-recovery-plan.md), [latest acceptance](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-plan-reconciliation.md), [agent timezone](current/knowledge/log/2026-10-22-jenkins-autotest-agent-timezone-moscow.md)
+- [ ] Finish Jenkins VK recovery: controller/AutoTest restored, public HTTPS and controller checkout verified; dynamic_deploy5826 SUCCESS with Restore/ES/monolith/static/Suggestions. Remaining: AutoTest actual checkout/workflow; Airflow backup source/SSH/staging and verified fresh off-controller backup; finish canonical DNS/timezone alignment with working runtime overrides, including verified controller/agent Moscow timezone settings (2026-10-22). Monitoring remains deferred by user. Jenkins inventory, selected images, Vault agent secret, WebSocket and reviewed recovery-role source published/merged as MR1396/457cf622 on2026-11-11, superseding Git-publication deferral for that scope only; no runtime apply, workflow/backup/monitoring acceptance implied. Public WebSocket forwarding only needed if agent uses public endpoint (2026-10-15) — [plan](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-892-vk-recovery-plan.md), [latest acceptance](companies/youdo/knowledge/log/2026-10-15-jenkins-build5826-plan-reconciliation.md), [agent timezone](current/knowledge/log/2026-10-22-jenkins-autotest-agent-timezone-moscow.md)
 
 - [x] Persistent controller Git correction DevOps-891 complete: .dockerignore MR17 merged96a754a6, master pipeline140773SUCCESS, digest458ac695… deployed by approved recreation; root .git/key absent, stored-credential lookup205/master and API acceptance pass (2026-10-13) — [src](companies/youdo/knowledge/log/2026-10-13-jenkins-devops-891-fixed-image-recreation.md)
 
@@ -377,7 +386,8 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [x] Restore raw/raw-private blob/repositories/role/raw identity; configuration/auth verified, done2026-10-12 (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-raw-recovery-plan.md)
 
-- [ ] Review/merge MR1371 common Nomad Nexus Docker auth and DinD28.5.2; user declined manual CI, controller must provide NEXUS_DOCKER_PASSWORD (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-automation-services-nomad-docker-auth.md)
+- [x] Review/merge MR1371 common Nomad Nexus Docker auth and DinD28.5.2; completed 2026-11-11: user merged as a8b70e01, VK inventories read the Nexus password from yandex Vault secrets; pipeline142819 failed in toolset lint/dependency stages, tracked separately — [src](current/knowledge/log/2026-11-09-nexus-mr1371-merge-review.md)
+- [x] Verify actual Vault secret delivery through vkcloud and vkcloud_public_test Nomad inventories; user-supplied live Ansible output verifies nonempty password and equality to the yandex Vault key for 11 VK Nomad hosts and public-test-linux, changed0/failed0/unreachable0, no runtime apply (2026-11-11) — [src](current/knowledge/log/2026-11-09-nexus-mr1371-merge-review.md)
 
 - [x] Recover circular Maven bootstrap dependencies between youdo-business-tests and TKB/Sber test snapshots; full snapshots, builds and approved latest tags verified; done2026-10-12 — [src](companies/youdo/knowledge/log/2026-10-12-nexus-youdo-business-tests-maven-recovery-diagnosis.md)
 
@@ -387,7 +397,7 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [x] Configure Nexus docker account on requested Nomad clients172.24.0.11/.12/.13; saved config and node-side service manifest200 verified on all, no restart (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-sorm-runner-image-auth.md)
 
-- [ ] Persist approved runtime Nexus DOCKER_AUTH_CONFIG entries for171/172 in configuration management after separate repository approval (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-sorm-runner-image-auth.md)
+- [x] Persist runner171/172 Nexus auth in configuration management: publishedb6ae6699/MR1396 after explicit approval, using user-selected docker identity and production Vault references; source SHA/body verified, user merged MR1396 as457cf622, no runtime apply; running identity not changed by source merge (2026-11-11) — [src](current/knowledge/log/2026-11-11-automation-services-local-changes-audit.md)
 
 - [x] Add Nexus image-pull auth to all runner entries on172.28.0.171/.172; files and automatic reload verified, no CI retry (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-sorm-runner-image-auth.md)
 
@@ -421,13 +431,15 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 ### GitLab recovery
 
+- [x] Complete runner synchronization on automation-services sync: all agreed Jenkins/runner changes published throughb6ae6699 in MR1396, exact SHA/title/body verified, worktree clean; two-host Terraform selection and seven rendering fixtures passed, pipelines142829/142830 skipped. Live Vault verification waived by user; user merged MR1396 as457cf622; no runtime apply performed (2026-11-11) — [src](current/knowledge/log/2026-11-11-automation-services-local-changes-audit.md)
+
 - [ ] If requested separately, persist the Ansible5.10.0 Ubuntu package-manager adaptation upstream; the historical tag recipe fails on its mutable Ubuntu Nomad parent (2026-10-19) — [src](companies/youdo/knowledge/log/2026-10-19-gitlab-ansible-playbook-3236157-local-build.md)
 
 - [x] Manual Molecule job3219872 start declined by user after f4018c2b DinD28.5.2 publication in MR1371; not run, no CI-success claim (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-nexus-automation-services-nomad-docker-auth.md)
 
 - [x] Publish reviewed ansible-molecule-toolset Dockerfile recovery after approval;81f3a8e/[MR1](https://gitlab.youdo.sg/sysadmins/ansible-molecule-toolset/-/merge_requests/1) published, remote SHA/MR verified, local build passed (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md)
 - [x] Restore ansible-molecule-toolset master/latest through master release; user-supplied pipeline140669/jobs3219854/3219855 GET-verified successful, existing DevOps-891 comment updated as requested (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md)
-- [ ] Retry automation-services molecule-nomad after authorization; previous job3219595 failed before tests because image was missing, toolset master/latest now published (2026-10-12) — [src](companies/youdo/knowledge/log/2026-10-12-gitlab-ansible-molecule-toolset-recovery.md)
+- [x] Molecule compatibility follow-up closed without repair by user on 2026-11-11: failed tests do not require further work now; resume only on an explicit user request. Pipeline142819 failures remain historical evidence, not CI success. Supersedes the October12 missing-image retry, which was performed — [src](current/knowledge/log/2026-11-09-nexus-mr1371-merge-review.md)
 
 - [x] GitLab registry enabled/reconfigured after explicit approval; user DNS update to `138.16.203.174`, JWT and authenticated `/v2/` HTTP200 verified; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
 - [x] Bootstrap `youdo/base-images/docker:git` and `docker:dind` built/pushed after explicit approval; authenticated manifest/config hashes and container checks pass; done 2026-10-11 — [src](companies/youdo/knowledge/log/2026-10-11-gitlab-restored-server-verification.md)
@@ -449,7 +461,11 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 
 - [x] Prepare requested Git/MR training follow-up report for October 20–November 4; review delivered 2026-11-04, both approvals retained and no permission change inferred — [src](companies/youdo/knowledge/log/2026-11-04-gitlab-ci-agent-git-training-followup-report.md)
 
-- [ ] Observe the next five Git/MR publication tasks after the November 4 approval (0/5), then prepare a comparison of scope corrections, both approvals, task-only staging, CI effects and verification; retain both approvals and no autonomous execution (2026-11-04) — [src](companies/youdo/knowledge/systems/gitlab-ci/agent-git-workflow.md#five-task-follow-up-approved-on-november-4)
+- [x] Prepare the Git/MR training comparison with the November 4 baseline: five-task threshold reached, at least six distinct published tasks reconciled on November 11; compare scope corrections, both approvals, task-only staging, CI effects and verification; retain both approvals (2026-11-11) — Completed: publication comparison supplemented by [correction-application audit](current/knowledge/log/2026-11-11-gitlab-ci-correction-application-audit.md); partial application observed, repeated scope errors and measurement failure retained; no permission changes. [report](current/knowledge/log/2026-11-11-gitlab-ci-agent-git-training-comparison.md) — [src](companies/youdo/knowledge/systems/gitlab-ci/agent-git-workflow.md#five-task-follow-up-approved-on-november-4)
+
+- [x] Implement the user-authorized continuous discussion capture/retrieve/evaluate cycle in shared instructions and company Git/YouTrack workflows; five scoped learning rules linked, first-attempt failures preserved, confirmations retained; no background evaluator installed (2026-11-11) — [implementation](current/knowledge/log/2026-11-11-gitlab-ci-continuous-learning-supervised.md) — [src](current/knowledge/log/2026-11-11-gitlab-ci-correction-application-audit.md)
+
+- [ ] due 2026-11-20: Review continuous agent learning since November 11: compare repository diffs, branch/commit/MR names and YouTrack comments, first-attempt outcomes, repeated user corrections, rule retrieval/read evidence and approvals; retain confirmation mode until explicit user decision (2026-11-11) — [src](current/knowledge/log/2026-11-11-gitlab-ci-continuous-learning-supervised.md)
 
 ### youdo-chat-agent (DevOps-882)
 
@@ -493,7 +509,7 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 - [x] User-approved hosts-only hostname correction applied to dline-spb-01: 127.0.1.1 entry added, getent and sudo passed without warning, nginx/monitoring active; locale normalization excluded by scope (2026-11-09) — [src](personal/knowledge/log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md#hosts-only-correction-applied-2026-11-09)
 - [x] User changed v.slnnk.com A to Russian relay 48.103.180.18; both REG.RU authoritative servers confirm TTL86400 and no AAAA. Recursive caches still used Germany at inspection; no agent DNS write (2026-11-09) — [src](personal/knowledge/log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md#user-dns-cutover-published-2026-11-09)
 - [x] Approved Certbot dry run for v.slnnk.com succeeded through the Russian relay: seven matched HTTP200 ACME requests, production certificate and service activation unchanged, monitors UP; PC and phone relay use confirmed on home Wi-Fi. Original combined follow-up split: cellular test remains below (2026-11-09) — [src](personal/knowledge/log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md#pc-relay-path-and-renewal-dry-run-verified-2026-11-09)
-- [ ] Verify the phone VPN through cellular data; user-confirmed successful phone and PC tests so far used home Wi-Fi, relay path and LE renewal are already verified (2026-11-09) — [src](personal/knowledge/log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md#pc-relay-path-and-renewal-dry-run-verified-2026-11-09)
+- [x] Phone VPN through cellular data works, confirmed by the user on 2026-11-11; home Wi-Fi, relay path and LE renewal were previously verified — [src](personal/knowledge/log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md#phone-cellular-test-confirmed-2026-11-11)
 
 - [x] HetrixTools Ansible agent deployed to the VPN host after explicit approval; repeated metrics and trusttunnel/nginx online verified, config check changed=0; full mutating rerun not performed (2026-11-08) — [src](personal/knowledge/log/2026-11-08-trusttunnel-de-hetrixtools-ansible.md#deployment-authorized-and-verified-2026-11-08)
 - [x] HetrixTools VPN warnings enabled after concrete approval: CPU/RAM 90%, root disk 85% over 5 minutes, agent silence 5 minutes, trusttunnel/nginx down; repeats every 30 minutes via Contacts; separate API read-back verified (2026-11-08) — [src](personal/knowledge/log/2026-11-08-trusttunnel-de-hetrixtools-ansible.md#warning-policies-enabled-and-verified-2026-11-08)
@@ -516,6 +532,11 @@ stored unencrypted in `data_protection_keys` (no `ProtectKeysWith*`). See the re
 - [ ] Home network phase 1: TV and Lampa via Media Station X, C64 backup, device list, tunnel speed test (2026-09-26) — [src](personal/knowledge/log/2026-09-26-home-network-initial-plan.md)
 - [ ] Bench tests: podkop fail-open on `ifdown tun0`, FakeIP DNS with AdGuard Home DoT upstream, VPS public IP from inside the tunnel (2026-09-26) — [src](personal/knowledge/log/2026-09-26-home-network-initial-plan.md)
 - [ ] `home-infra`: choose where to host the git repo; move the router password out of the plaintext inventory once Vault is ready (2026-09-26) — [src](personal/knowledge/log/2026-09-26-home-network-initial-plan.md)
+
+### Media indexers
+
+- [x] Shared nginx/certbot extraction and local HTTPS preparation for tv.slnnk.com completed after explicit user approval; VPN/relay behavior retained, local syntax/rendering/rollback/hook checks passed; no DNS or runtime changes (2026-11-11) — [src](personal/knowledge/log/2026-11-11-home-network-shared-nginx-certbot.md)
+- [ ] Proposed deployment of prepared Docker/Jackett roles to dline-pl-01 after host startup, real ansible_host, unique Vault monitoring SID and protected TV/API access are supplied; remote changes require explicit approval (2026-11-11) — [src](personal/knowledge/log/2026-11-11-home-network-ansible-jackett-roles.md)
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 system: gitlab-ci
 status: verified
-checked: 2026-10-19
+checked: 2026-11-11
 tags: [agents, gitlab, training, workflow]
 ---
 # GitLab: supervised agent workflow and training
@@ -10,10 +10,13 @@ tags: [agents, gitlab, training, workflow]
 Supervised policy approved on 2026-10-08; the original review date was 2026-10-30.
 Local-first workflow, two approvals and detailed conventions are maintained in the
 [gitlab-workflow skill](../../../skills/gitlab-workflow/SKILL.md), implemented on 2026-10-19.
-The user received the early review and chose on 2026-10-19 to retain both approvals while automating information gathering and preparation of review materials. The follow-up review was delivered on 2026-11-04. The user approved observing the next five tasks with publication, followed by a comparison; progress 0/5, both approvals retained.
+The user received the early review and chose on 2026-10-19 to retain both approvals while automating information gathering and preparation of review materials. The follow-up review was delivered on 2026-11-04. The user approved observing the next five tasks with publication, followed by a comparison; the five-task threshold was reached, retrospectively reconciled on 2026-11-11; [comparison delivered on November 11](../../log/2026-11-11-gitlab-ci-agent-git-training-comparison.md); both approvals are retained.
 Two approvals: branch before repository edits; commit message and MR title before publication.
 No automatic transition on the deadline: the user decides after reviewing training results.
 Global entry point: `~/ai/AGENTS.md`. Baseline: [weekly review](../../log/2026-10-08-gitlab-ci-agent-git-workflow-review.md).
+
+## Continuous supervised learning from November 11
+The [user decision and implementation](../../log/2026-11-11-gitlab-ci-continuous-learning-supervised.md) require ongoing learning from all available substantive discussions, especially repository scope, branch/commit/MR naming and YouTrack comment content. Apply the shared agent-learning capture/retrieve/evaluate cycle in each relevant task, retaining first-attempt failures and source evidence. Both repository approvals and exact-comment confirmation remain active. Review the evidence on **2026-11-20**; the date does not automatically change permissions. The central TODO holds the due reminder; the earlier five-publication experiment remains historical and complete.
 
 ## Active workflow
 The canonical executable instructions are now the [gitlab-workflow skill](../../../skills/gitlab-workflow/SKILL.md).
@@ -33,9 +36,23 @@ For each task, use its existing work log to record the minimal requested deliver
 
 Count distinct user-requested tasks first published after this approval. Multiple commits, MRs or repositories for one continuing task count once. Count a published task even when CI later fails; record that failure separately. Cancelled/unpublished attempts remain evidence, but do not advance the five-published-task count. Do not turn missing approval evidence into a success. Record a source link and concise outcome here when each task qualifies; keep actionable remaining work only in the central TODO.
 
-Observed tasks: **0/5**. No qualifying task has yet been performed under this stage.
+Observed threshold: **5/5 reached**. Reconciled on 2026-11-11 after the user challenged the stale initial 0/5. At least six distinct published tasks are supported by the existing logs below. This is a conservative retrospective lower bound, not a claim that these are the exact first five publications in chronological order. DevOps-904 work is grouped once despite multiple repositories/MRs; continuing DevOps-908 and DevOps-916 publications each count once. The old zero was a bookkeeping omission, not absence of publication evidence.
 
-After the fifth task, prepare a concise comparison with the November 4 baseline: repeated user interventions, scope corrections, approval compliance, naming changes, task-only staging, CI-effect predictions and verified publication outcomes. Assess what preparation can be automated; do not change permissions without an explicit user decision. The active review action is tracked in [central TODO](../../../../../TODO.md).
+| Task | Publication evidence | Recorded result |
+| --- | --- | --- |
+| DevOps-904 | [Android cache MR2922](../../log/2026-11-05-nexus-devops-904-android-product-cache-proposal.md), [Business gates MR3918](../../log/2026-11-05-nexus-business-gates-recent-cache-check.md) | November 5: approved publication, task-only staged diff and remote verification; grouped conservatively as one task. |
+| DevOps-907 | [DNS forwarder MR1388](../../log/2026-11-05-corporate-network-public-test-consul-stale-forwarder.md) | November 5: both approvals, one-file commit, separate MR verification; pipeline skipped. |
+| DevOps-908 | [Autotest MR1163](../../log/2026-11-05-gitlab-ci-devops-908-gradle-image-18.md) | November 5: approved initial publication and separately approved endpoint/cache scope extensions; one task. Later two successful warm-cache runs recorded. |
+| DevOps-912 | [Appium Settings MR1390](../../log/2026-11-09-android-farm-devops-912-preserve-appium-settings.md) | November 9: both approvals, one-template commit and remote verification; skipped CI distinguished from test success. |
+| DevOps-913 | [Client headers MR1391](../../log/2026-11-10-automation-services-devops-913-client-headers.md) | November 10: user corrected initial port-forwarding proposal; final three-line diff, both approvals, scoped checks and verified publication. |
+| DevOps-916 | [Stand settings MR130/MR131](../../log/2026-11-10-nomad-test-devops-916-call-masking-config.md) | November 10: user corrected template placement; branch-base conflict handled with renewed approval, unrelated files preserved, both publications verified; one task. |
+
+This reconciliation reads existing records only; it is not a new GitLab/API audit or the full comparison. The initial prospective counter was never updated despite these task logs. The [comparison with the November 4 baseline](../../log/2026-11-11-gitlab-ci-agent-git-training-comparison.md) was delivered on November 11 at the user request; the central TODO action is closed. Both approvals remain active; no additional five publications are required.
+
+Original observation deliverable, completed on November 11: prepare a concise comparison with the November 4 baseline: repeated user interventions, scope corrections, approval compliance, naming changes, task-only staging, CI-effect predictions and verified publication outcomes. Assess what preparation can be automated; do not change permissions without an explicit user decision. The completed review action is retained in [central TODO](../../../../../TODO.md).
+
+## Correction-application audit on November 11
+The [audit](../../log/2026-11-11-gitlab-ci-correction-application-audit.md) traces seven correction families to later applicable work. Checkout preservation, naming/MR text and master-based base-images tags have distinct-task application evidence; scope expansion recurred. Local builds and clickable links have within-task application evidence. Historical rule-read evidence is unknown. The zero counter and zero registered outcome evaluations before this audit demonstrate failed ongoing measurement. Publication counts are not learning scores; both approvals remain active.
 
 ## Training corrections
 - 2026-10-08, DevOps-882: use the existing checkout rather than separate worktrees;

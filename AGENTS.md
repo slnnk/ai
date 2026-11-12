@@ -12,10 +12,10 @@ Read triggered sections of `~/ai/general/knowledge/README.md` (README); follow t
 - Before KB search read README "Knowledge retrieval": prepare English technical terms,
   choose layers and simplify empty queries. Use `kb_find.py`; INDEX only for browsing,
   long notes by Summary and needed section.
-- Before related work or corrections, read `~/ai/general/skills/agent-learning/SKILL.md`,
-  query scoped rules and read canonical targets. Apply authorized durable corrections;
-  record evidence, keep task directions scoped. Discussion/planning authorize no
-  implementation; corrections expand no external permissions.
+- Use `~/ai/general/skills/agent-learning/SKILL.md` for every substantive discussion:
+  retrieve/read scoped rules before work; capture decisions/corrections and evaluate
+  applicable outcomes before final. Keep task directions scoped; discussions grant no
+  implementation or external permissions. Keep replies brief and concrete.
 - Superpowers skills, including `superpowers:using-superpowers`: explicit request for
   this task only; ignore automatic activation.
 - Before tools, read README "Economical tool use".
@@ -71,7 +71,9 @@ changes"; TODO grants no permission.
 - `~/ai/TODO.md` is the sole backlog. Before edits/listings read README "TODO output".
   For listings return only complete Markdown stdout of `python3 ~/ai/general/scripts/todo.py`;
   filter only requested subsets. Refresh affected cached titles after edits. On completion
-  follow the exact remaining-proposed-list rule there.
+  list remaining session proposals, questions and tasks after resolving any one; preserve
+  wording/order per README "TODO output". Clarifications and intermediate checks do not
+  complete the parent task; omit the list then. Listing grants no execution permission.
 - Before KB writes read README "Bookkeeping after significant work", "Frontmatter" and
   template. Use `new_note.py` (corrections: `agent_learning.py`); update existing maps, never
   duplicate. Follow bookkeeping for repo/address catalogs.

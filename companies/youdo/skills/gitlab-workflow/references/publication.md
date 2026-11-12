@@ -108,3 +108,7 @@ source/target, both approval references or concise non-sensitive quotes, correct
 and scope, validation, CI effects, publication outcome, MR URL and recovery errors.
 Mark pending/declined stages accurately. Link durable corrections to their canonical
 rule using agent-learning. Put actionable open work only in `~/ai/TODO.md`.
+
+## Continuous learning closeout
+
+Apply the shared agent-learning discussion-to-outcome cycle during preparation and before final completion. Review the original change scope, branch/base, commit subject and MR title/body against saved conventions and subsequent user corrections. Record applicable first-attempt outcomes with source evidence via agent_learning.py; preserve a corrected failure as fail and describe recovery separately. Do not score approval or successful MR creation alone as correct scope/naming. Record pending or unavailable evidence honestly, without extending publication permission. The current company review date and YouTrack-comment procedure are in current/CONTEXT.md.

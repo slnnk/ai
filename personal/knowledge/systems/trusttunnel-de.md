@@ -1,7 +1,7 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-09
+checked: 2026-11-11
 tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 ---
 # TrustTunnel endpoint it-garage-de-01
@@ -35,8 +35,8 @@ Pinned HTTPS checks returned HTTP200/valid TLS for tt direct, v direct and v
 through Russia. Both HetrixTools monitors are now UP. The failure and pending
 preparation statuses below are historical and superseded by this outcome.
 Subsequent home Wi-Fi reconnection and approved LE renewal checks passed, as
-recorded below. Only cellular-data testing remains in central TODO; all task
-commands completed.
+recorded below. On 2026-11-11, the user also confirmed the phone VPN works
+through cellular data; the remaining client check is complete in central TODO.
 
 Phone-path log check at02:29 Moscow found recent Android TrustTunnel sessions
 direct to Germany (household public egress, not Russian relay IP), SNI v.slnnk.com.
@@ -101,7 +101,9 @@ seven matching HTTP200 challenge requests on Russia/Germany confirm the full
 relay validation path. The production certificate fingerprint/validity and
 TrustTunnel activation time were unchanged; both monitors stayed UP. Manual
 dry runs should include --no-random-sleep-on-renew to avoid the observed
-444-second Certbot delay. The only remaining client check is cellular data.
+444-second Certbot delay. Cellular-data testing was pending at that time;
+the user confirmed success on 2026-11-11. See the relay log's
+[cellular test outcome](../log/2026-11-09-trusttunnel-de-russian-nginx-relay-role.md#phone-cellular-test-confirmed-2026-11-11).
 
 ## Russian nginx relay prepared locally, 2026-11-09
 

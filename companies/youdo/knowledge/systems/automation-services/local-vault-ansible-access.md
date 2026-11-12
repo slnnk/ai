@@ -6,6 +6,12 @@ tags: [vault, ansible, hashi_vault, ldap, oidc, acl, workstation]
 ---
 # automation-services: local Ansible access to Vault
 
+## Repository secret policy (user decision, November 11)
+
+All real secrets consumed by automation-services must be stored in HashiCorp Vault and referenced through the existing inventory secret-fetch mechanism. This includes registry credentials, runner registration/authentication tokens, S3 cache credentials and service/agent connection secrets. Repository files contain references and nonsecret configuration only, not plaintext, base64-encoded credentials or new encrypted secret files. Application-secret environment fallback is not an alternative source. Existing Vault authentication/bootstrap routes remain separate from application secret storage.
+
+The user explicitly set this repository-wide requirement during runner Nexus persistence planning. Existing legacy literals are migration work, not evidence that the policy is already satisfied. Migrate them within reviewed task scope, preserving consumers and current credentials; the policy alone does not authorize bulk rewrites, credential rotation, Vault writes, publication or deployment. The older project AGENTS.md recommendation to add encrypted Ansible Vault files conflicts with this newer user decision and must be reconciled as part of the approved sync work. Do not follow that older recommendation for new secrets.
+
 ## Staleness review (2026-11-04)
 
 The local `automation-services` snapshot still fetches KV v1 through `community.hashi_vault.vault_kv1_get` using `vault_addr` and `vault_groups` in `playbooks/vault_fetch_tasks.yml`. This corroborates the repository integration only. Workstation versions, token validity, LDAP policy mapping and cluster availability were not revalidated. The historical LDAP token expiry of 2026-10-20 has passed; it must not be relied upon. Credential/policy follow-up remains in the [central backlog](../../../../../TODO.md), without permission to rotate credentials or change Vault.

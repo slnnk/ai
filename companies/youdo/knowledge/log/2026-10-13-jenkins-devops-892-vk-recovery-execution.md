@@ -39,6 +39,10 @@ Cached CLI token denied documents on initial vault.service.consul endpoint. New 
 
 Repository task changes: jenkins.yml host selector; inventories/vkcloud/jenkins-recovery.ini; inventories/vkcloud/group_vars/jenkins-vkcloud; roles/jenkins/tasks/{docker-auth,install-jenkins,install-jenkins-agent}.yml; roles/jenkins/templates/docker-compose-agent.j2. Added runtime registry mapping, WebSocket agent secret injection, protected secret file/rendering and explicit startup toggle (false for recovery). No unrelated files edited; user-file hashes verified.
 
+November11 local follow-up: user approved moving the recovery inventory into the main VK hosts and neutral Ansible names on branch sync. Temporary inventory/group_vars were replaced by jenkins and jenkins-agent in inventories/vkcloud/hosts, with common settings in group_vars/jenkins_servers; full validation and current status are in the [local-change audit](2026-11-11-automation-services-local-changes-audit.md). This supersedes the old temporary-inventory paths only; historical runtime actions remain unchanged. No publication or deployment in that follow-up.
+
+Subsequent November11 publication approved and completed: Jenkins changes committed as1a29e8a1a2f3c8ee47ff15c822b7b1433b1f49b5 and pushed on sync, with [MR1396](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1396) targeting master. Remote metadata verified; no merge or runtime apply. Runner work remains excluded from this publication.
+
 External local helpers/receipts/logs in ~/ai-data/jenkins-recovery; this log and existing plan/system/backlog will reflect final stage results. Credentials remain in memory or protected runtime files. No git publication yet.
 
 ## Verification

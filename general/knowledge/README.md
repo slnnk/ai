@@ -465,9 +465,25 @@ Use filters only when the user requests a subset: `--layer` matches the top head
 are case-insensitive literal substrings; combined filters use AND. Query also searches
 cached Russian descriptions. Return the complete
 script stdout as the final Markdown answer without a code fence or extra commentary.
-After completing a task from a list you initially proposed to the user, show the remaining
-unfinished items in the final response, preserving the original wording, order, numbering,
-grouping and formatting; remove only completed items. If none remain, say so.
+Within a session, track proposals, questions and tasks raised by either participant,
+including items introduced in prose or across several turns, not only an initial list.
+After resolving any one item, show all remaining unresolved session items in the final
+response, preserving their original wording, order, numbering, grouping and formatting
+where present. Trigger this only when the underlying question is actually settled or work
+on a task/proposal is completed. Explaining details, answering a clarification, reporting
+status, or discussing a possible approach does not resolve the underlying item; omit the
+remaining-items list in those replies. Use the agreed parent task/question as the unit
+of completion, not each user message, tool call or verification step. A requested check
+inside an ongoing discussion (for example, confirming a credential works while deciding
+how to supply it) remains intermediate work and must not trigger the list. Before appending
+one, identify which agreed parent item actually closed; if none closed, omit it.
+When the trigger applies, render the remaining action items as an explicit list. A file
+count, a broad statement that work remains, or a promise to list it later is not a substitute.
+Do not treat recording a correction during such a
+discussion as completion of the underlying work. Remove resolved or explicitly cancelled items; retain deferred items with
+their deferral context. If none remain, say so. Do not add unrelated backlog items or treat
+listing as permission to execute. The complete-stdout-only rule above still applies to
+explicit backlog listing requests; it does not authorize adding session items to that output.
 
 ## Indexes
 

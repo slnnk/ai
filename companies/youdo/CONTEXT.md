@@ -38,7 +38,17 @@ and diagnostics.
 - sorm (incl. its RabbitMQ) is handed over to another engineer (2026-09-30). Do not work on
   it without the user's explicit request.
 
+## Continuous learning and supervised review
+
+User decision 2026-11-11: learn from all available substantive discussions and evaluate application during subsequent tasks. Prioritize actual repository changes, branch/commit/MR naming and YouTrack comments. Use the shared agent-learning cycle; retain both repository approvals and explicit confirmation of the exact YouTrack comment before posting/updating. Review results on 2026-11-20; the date does not automatically change permissions.
+
+For each repository task, keep original/final scope, branch/base, commit subject, MR title/body, user corrections, approvals, actual staged diff and publication verification in the existing task log. Apply gitlab-workflow conventions; before completion record applicable first-attempt rule outcomes, including failures, using agent_learning.py. Several commits/MRs for one task do not inflate its evaluation count.
+
+For each YouTrack comment, read the issue and relevant existing comments, retrieve task-scoped preferences, and prepare concise Russian Markdown with the requested content, factual outcomes and clickable MR links where relevant. Follow the latest user-approved format for that task; do not impose another task's format. Check task identity, omissions, links and unverified claims before showing the exact draft for approval. Update an existing matching summary instead of duplicating it; preserve prior performed-work evidence. Post/update only after explicit confirmation, read back the exact text and URLs, and record original/final wording, user edits and applicable rule outcomes in the task log. Drafting is not publication or issue closure.
+
 ## Conventions
+
+- automation-services secrets (user decision, 2026-11-11): all real service/runner/cache credentials belong in HashiCorp Vault; repository configuration references them through the existing inventory fetch mechanism, without literals or application-secret environment fallback. Migrate legacy values within agreed scope; this grants no Vault writes, rotation, publication or deployment. [Policy](knowledge/systems/automation-services/local-vault-ansible-access.md#repository-secret-policy-user-decision-november-11).
 
 - CI deployment target selection (verified 2026-10-16): inherited project/group `NOMAD_ADDR` and `NOMAD_TOKEN` override job YAML variables. Inspect effective inheritance and pass the reviewed target explicitly to Nomad CLI using the intended deploy-token variable; test with conflicting generic inherited placeholders before publication. [Incident](knowledge/log/2026-10-16-nomad-test-devops-898-houstonv2mock-vk-assessment.md).
 

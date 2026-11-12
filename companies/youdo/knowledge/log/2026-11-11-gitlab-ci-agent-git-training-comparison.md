@@ -1,0 +1,52 @@
+---
+system: gitlab-ci
+status: verified
+checked: 2026-11-11
+tags: [agents, gitlab, training, review]
+---
+# GitLab supervised training: November publication comparison
+
+## Summary
+The five-task observation threshold approved on November 4 has been reached. Six distinct task groups have publication evidence after that decision. Recorded approval, staged-diff and remote-verification controls are consistent across the reviewed groups. User intervention remains necessary for initial technical choices, branch-base conflicts and report content. Retain both supervised approvals; the evidence does not justify changing permissions. The stale 0/5 was an additional bookkeeping failure discovered by the user, corrected before this comparison.
+
+## Correction-application review supersedes the learning interpretation
+The user clarified that the requested result concerns applying prior corrections, not only publication-process compliance. The [correction-to-outcome audit](2026-11-11-gitlab-ci-correction-application-audit.md) is now complete: later distinct-task application is demonstrated for checkout preservation, naming/MR format and master-based release tags; scope expansion recurred; build/link application is demonstrated within continuing work; ongoing evaluation and counter maintenance failed. This publication comparison alone was insufficient to answer the learning question. Earlier completion claims referred to preparing this document, not establishing reliable learning.
+
+## Task and method
+Prepare the requested comparison against the [November 4 baseline](2026-11-04-gitlab-ci-agent-git-training-followup-report.md). Review the existing publication logs for November 5–11 and the [workflow map](../systems/gitlab-ci/agent-git-workflow.md#five-task-follow-up-approved-on-november-4). This is a retrospective bounded record review, not a fresh GitLab, CI or transcript audit. No project checkout or remote state was changed for this review.
+
+The six task groups are a conservative lower bound, not a reconstructed chronological first-five cohort or a census of every publication. Group all reviewed DevOps-904 work once and count continuing DevOps-908/916 work once each. Multiple commits/MRs are not independent task successes. The latest DevOps-916 follow-up is included as November 11 evidence, without increasing the task count. Missing recorded corrections are not proof that no intervention occurred.
+
+## Reviewed task evidence
+| Task and source | Recorded controls and corrections | Recorded outcome and limits |
+| --- | --- | --- |
+| DevOps-904: [Android cache and SDK image](2026-11-05-nexus-devops-904-android-product-cache-proposal.md), [Business cache](2026-11-05-nexus-business-gates-recent-cache-check.md) | Both approvals for initial patches and later publication changes; staged patches and exact MR readback. SDK installation needed a license-order adjustment after local build evidence. Initial commentary later needed user wording and clickable-link corrections. | Android MR2922, SDK MR2 and Business MR3918 published. Same-runner warm request reductions measured: Android 2596 to 0; Business gates 1367 to 0 npm requests. Android pipeline failed on the previously disclosed AND-only notification convention; successful cache jobs are not full-pipeline success. User merges recorded separately. Cross-runner/sustained effects remain outside completed measurements. |
+| DevOps-907: [DNS MR1388](2026-11-05-corporate-network-public-test-consul-stale-forwarder.md) | Both approvals; one-line inventory replacement, full staged diff, preserved unrelated changes; independent remote verification. | MR pipeline skipped. Later manual DNS application separately authorized and checked; publication alone was not described as deployed recovery. |
+| DevOps-908: [Android autotest MR1163](2026-11-05-gitlab-ci-devops-908-gradle-image-18.md) | Both approvals for image update; user-requested endpoint and cache extensions received renewed publication approvals. Three publication sequences remain one task. MR title/body expanded with approved scope; not a naming rejection. | Push/MR workflow creates no pipeline. Later user-launched successful runs and measured 316 to 8 requests (97.47%) recorded separately. Device/IME work explicitly deferred rather than silently included. |
+| DevOps-912: [Appium Settings MR1390](2026-11-09-android-farm-devops-912-preserve-appium-settings.md) | Both approvals; names accepted unchanged; one-template staged diff; 23 unrelated paths preserved. Remote lookup uncertainty investigated read-only. | Pipeline skipped. An open-only helper lookup failed because the user had already merged; direct GET confirmed the merged MR without repeating creation. Device recovery and role deployment are distinct from publication. |
+| DevOps-913: [Headers MR1391](2026-11-10-automation-services-devops-913-client-headers.md) | User corrected initial treatment of jarvis source port using Servicepipe context. Final approved diff adds three lines in two templates. Both approvals, scoped rendering/nginx/HTTP tests, task-only commit and remote readback recorded. | Pipeline skipped. Manual host applications separately approved; later real-request evidence demonstrated jarvis preserves the incoming source-port header. Initial proposal needed correction before edits. |
+| DevOps-916: [Stand settings MR130/131/132](2026-11-10-nomad-test-devops-916-call-masking-config.md) | User corrected overly categorical common-template advice. Branch switch stopped on unrelated MSSQL edits; changed base received explicit approval. Later InternalApi and HTTP-scheme requests separately approved, with renewed publication approval and 22-stand rendering checks. Sixteen unrelated paths preserved. | All three publications verified; no CI pipeline expected. User merges/closure of earlier work distinguished from later follow-ups. Endpoint initially preserved exactly as supplied; later HTTP scheme is a new user request, not retrospectively classified as an unauthorized omission. |
+
+## Comparison with November 4
+| Dimension | November 4 baseline | November 11 observation | Assessment |
+| --- | --- | --- | --- |
+| Approvals | Both gates recoverable for 10 of 11 reviewed MRs; one incomplete fine-grained record. | Both gates recorded in each of six reviewed task groups, including renewed approval for material scope/base changes. | More consistent records in this bounded cohort; not a comparable population-wide compliance percentage. |
+| Initial scope and technical choices | User removed unnecessary defaults/image pinning; optional publication guard withdrawn after scope clarification. | User corrected header forwarding and template placement; image build exposed necessary installation-order change. | Initial correctness still needs review. No evidence supporting autonomous implementation/publication. |
+| Names | Selected evidence-complete sequences retained proposed names; overall acceptance rate unknown. | No user rejection of branch/commit/MR names found in reviewed logs. DevOps-908 title changes followed approved scope extensions. | No observed naming regression; no statistically supported improvement claim. |
+| Task-only staging | Full staged-diff review and preservation of unrelated changes recurring; one branch/base conflict explicitly handled. | Each reviewed group records task-only staging. DevOps-912/916 give explicit unrelated-path preservation; DevOps-916 renewed base approval. | Controls are demonstrated again, including conflict handling. |
+| CI effects and checks | S3 writes considered; cache success separated from whole pipeline; inherited deploy credentials remained a known readiness limit. | Automatic image pushes/notification attempts disclosed; AND-only notify failure anticipated before publication; skipped/no-pipeline states not called test passes; runtime measurements remain scoped. | Useful evidence of prediction and distinction between publication, CI and deployment. Does not establish all inherited variables correct in every project. |
+| Remote verification | SHA/title/body readback and source snapshots recurring. | Same checks recur; uncertain DNS/API attempts reconciled before retry; user-merged MRs recovered by direct GET after open-only lookup failed. | Verification is consistently recorded and avoids duplicate writes in the reviewed cases. |
+| Reporting and training bookkeeping | Formal applicable evaluation counts absent; no population-wide acceptance rate. | User had to correct missing MR links and stale 0/5. Exact text readback had accepted text with bare MR numbers; aggregate counter did not follow task logs. | Explicit weakness remains: verified transport/text equality does not guarantee useful content or accurate aggregate status. |
+
+## Conclusions and preparation that can be automated
+Retain both approval gates. Publication mechanics are consistently documented across the six reviewed groups, but technical proposal corrections and reporting omissions still require user attention. No unauthorized publication was established by these records; this is not a command-by-command finding of zero violations.
+
+Existing snapshot, diff-check and readback tools already automate much of the deterministic preparation. Potential next improvements are deriving the observation ledger from linked task records and validating required MR URLs in prepared report/comment text, alongside exact text checks. These are assessment conclusions only: no scripts, skills, permission rules or integrations were changed, and no additional implementation task is authorized by this report. The comparison alone does not authorize autonomous publication, merge or deployment.
+
+## Changes, completion and risks
+Created this comparison, updated the existing workflow map to mark the review delivered and closed only the corresponding central TODO action. Other operational backlog items and verification limits remain unchanged. The earlier report's initial 0/5 is historical; the workflow map records its correction and the six source groups.
+
+The observation/comparison task is complete. The remaining permission mode is the existing two approvals until the user explicitly changes it. No new experiment, scheduler or additional publication quota was created. Checks and task execution status are reported in the final response; no background commands or agents were started for this review.
+
+## Portable lesson
+None created; existing approval, minimal-scope and verification rules cover the observed cases.

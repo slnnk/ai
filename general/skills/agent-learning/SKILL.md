@@ -1,11 +1,29 @@
 ---
 name: agent-learning
-description: Learn from user corrections, retrieve applicable shared rules before related work, and diagnose repeated violations. Use for corrected answers or workflows, explicit future preferences, recurring mistakes, and requests to review learned rules. Preserve task-specific scope and existing permissions.
+description: Learn continuously from substantive discussions and user corrections, retrieve applicable shared rules before work, evaluate outcomes, and diagnose repeated violations. Use for corrected answers or workflows, explicit future preferences, recurring mistakes, and requests to review learned rules. Preserve task-specific scope and existing permissions.
 ---
 
 # Learning from corrections
 
 Use the shared knowledge base at `~/ai`; runtime skill folders are links, not separate memories. This workflow changes durable instructions and evidence, not model weights. User instructions and existing repository/permission rules take precedence. Discussion and planning authorize investigation and the requested plan; implementation starts after a request to implement. If the user forbids writes, retain the correction in conversation and report that persistence was deferred.
+
+## Mandatory discussion-to-outcome cycle
+
+Apply this cycle to every substantive discussion available in the current task, including clarification, approved examples, rejected proposals and corrections. Do not wait for an explicit request to learn or for a repeated mistake. Do not claim access to unseen conversations or collect complete transcripts.
+
+1. Before acting, retrieve applicable rules with the correct layer, repository and task ID; read canonical targets. If query output is truncated, increase its limit so relevant rules are not silently skipped.
+2. Before finalizing each substantive turn, extract new explicit decisions, preferences, corrections and verified lessons. Update their existing canonical home and record/link evidence in this turn. Reuse existing keys; no duplicate records for unchanged discussion or routine approval. Task instructions stay task-scoped; agent guesses remain hypotheses. Discussion alone authorizes knowledge bookkeeping, not the implementation being discussed.
+3. In the next applicable task, compare the original proposal/actions with the saved expectation. Use `agent_learning.py verify` for an existing record, a stable event ID and a source pointing to the task evidence. Record `pass` only with observable supporting behavior, `fail` for a repeated mismatch, and rule-loaded yes/no only when observable; otherwise unknown. Approval, silence, successful retrieval or a green unrelated test alone is not a pass. Unknown outcomes stay pending in the task log; unrelated rules require no synthetic evaluations.
+4. Evaluate the first applicable attempt once per rule/task. Keep a user-corrected failure as fail and describe the recovered final result separately; do not erase it with a second pass or inflate the count with multiple commits/MRs. Evaluate newly introduced corrections on a subsequent attempt, not by scoring the mistake that created the rule. For a missing record, recover its actual correction source and scope before recording; never invent an explicit user instruction to obtain a score.
+5. Reconcile applicable outcomes, repeated mistakes and open work in the existing task log and central TODO. Do this before declaring the task complete; no future promise replaces the current bookkeeping. Keep user-facing status brief: result, material limit and required next action only.
+
+Give repository change scope, branch/commit/MR names and issue-tracker comment content special attention. Apply their project/company conventions and supervised approval process; capture original/final artifacts and user edits in the task log. This is ongoing agent work at task boundaries, not a background trainer or a permission change.
+
+## Proactively find patterns across tasks
+
+Agents own detecting recurring problems and useful generalizations; do not require the user to label a problem as recurring, state that it applies beyond the current task, or repeat the same correction. Before preparing related artifacts and during discussion closeout, compare relevant prior decisions, accepted examples, rejected proposals and correction evidence across tasks. Use scoped retrieval and bounded knowledge search by topic; read the source context. Task-only query isolation remains intact: cross-task comparison does not make another task's directions automatically applicable.
+
+Identify common intent and contextual differences, including problems visible in the artifacts even without a new user complaint. If the evidence suggests a reusable improvement, proactively present a concise proposed rule, its intended scope and the supporting examples for user confirmation. Record agent-derived generalizations as inferred, not active instructions, until confirmed. Repetition alone is insufficient to promote a rule, and absence of complaints is not approval. Explicit durable user directions already authorize their scoped canonical update without asking again. Reuse or revise existing rules instead of adding one for every edit; do not collect complete transcripts or claim access to unavailable discussions.
 
 ## Before related work
 

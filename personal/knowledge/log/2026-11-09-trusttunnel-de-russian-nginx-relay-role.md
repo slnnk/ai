@@ -1,7 +1,7 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-09
+checked: 2026-11-11
 tags: [nginx, ansible, relay]
 ---
 # Russian nginx relay role prepared locally
@@ -330,7 +330,8 @@ During the wait, user reported reconnecting the PC. Read-only German logs at
 02:39 showed fresh Linux sessions from48.103.180.18 with SNI v.slnnk.com,
 confirming the PC now uses the Russian relay. User clarified through the
 async question that the successful phone test was over Wi-Fi. Thus home Wi-Fi
-works for both PC and phone; cellular-data testing is still unperformed.
+works for both PC and phone; cellular-data testing was still unperformed at
+that time (completed by the user on 2026-11-11, below).
 
 Actual staging HTTP-01 validation at02:44:15-16 Moscow produced seven requests
 on the Russian nginx and seven matching German webroot requests, all HTTP200.
@@ -344,5 +345,13 @@ with original validity unchanged (expires2027-02-05 22:00:59UTC). TrustTunnel
 ActiveEnterTimestamp remained02:22:25Moscow, so the dry run did not restart it.
 TrustTunnel/nginx/certbot.timer and Russian nginx remained active. Both
 HetrixTools monitors were UP in the final readback. No DNS or client settings
-were modified. Only a phone test through cellular data remains in central TODO.
+were modified. The phone cellular-data follow-up was subsequently completed
+by the user on 2026-11-11, below.
 All task commands completed; no task background operations remain.
+
+## Phone cellular test confirmed, 2026-11-11
+
+The user confirmed that the phone VPN works through mobile internet:
+`проверил, работает`. Closed the cellular-data check in central TODO and
+updated the system map. This is a user-reported functional result; no additional
+agent network checks or external changes were performed. No task follow-ups remain.

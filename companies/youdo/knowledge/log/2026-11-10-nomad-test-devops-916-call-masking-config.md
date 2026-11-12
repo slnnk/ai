@@ -53,3 +53,15 @@ This supersedes the pending-publication status above. Publication request comple
 ### User-confirmed final closure
 
 2026-11-10: User reports MR131 merged and DevOps-916 closed, including the InternalApi follow-up. Accepted on the user report; no additional remote verification, tracker write, deployment or runtime check performed. Central publication TODO already completed; no remaining task actions or background operations.
+
+## HTTP endpoint follow-up (2026-11-11)
+
+User requested adding `http://` to CallMasking.Endpoint, approved branch `DevOps-916-call-masking-http` from current HEAD `b0693d4b921d23f9284199562b09d452ea84615f` targeting `master`, and requested immediate MR preparation. Created approved branch and changed only the endpoint scheme in the Nomad overlay. All16unrelated MSSQL paths preserved; index empty. StrictUndefined render/JSON and endpoint-only comparison passed for all22stand files; `git diff --check` passed. Read-only project GET verified empty ci_config_path and Auto DevOps disabled; no tracked GitLab CI configuration, no pipeline/deployment expected.
+
+Prepared ready MR title `DevOps-916 add http scheme to call masking endpoint`, commit `add http scheme to call masking endpoint`; Russian body and proposal snapshot saved under `~/ai-data/gitlab-workflow/DevOps-916/call-masking-http/`. Publication awaits the second supervised approval; no commit, push, MR creation or deployment performed. Central TODO tracks publication. No background operations remain.
+
+### HTTP endpoint publication completed (2026-11-11)
+
+User explicitly approved the full publication proposal with `Да`. Snapshot check matched, complete staged diff contained only the reviewed one-line endpoint change. Committed `5ef9e2ab5fb0f125bde347b5d3ecc7b4c9134ec2` with approved message and verified resulting commit; pushed only `DevOps-916-call-masking-http`. Initial sandbox DNS failures prevented network access; escalated push succeeded, read-only MR inspection confirmed no existing MR, then authorized publication created ready [MR132](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/132) targeting `master`. Helper verified SHA/title/body/source/target, assignee a.solonenko, squash false and source deletion on merge true. Pipelines empty, verification available.
+
+This supersedes the pending-publication status above. Task publication complete; central TODO item closed. All16unrelated MSSQL paths preserved, index empty, final diff whitespace check passed. No merge, deployment or runtime validation performed. All task commands finished; no background operations remain.
