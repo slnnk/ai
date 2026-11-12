@@ -49,3 +49,11 @@ none
 ## Device identity correction and isolation — 2026-11-09
 
 Direct read-only ADB and systemd inspection confirmed `x4pf5l5haegykni7` is Xiaomi model `23117RA68G`, Android13, `phone_redmi_note_13_pro.service`, Appium15003/systemPort15903. Earlier user-facing TECNO attribution was wrong. TECNO is `15888255AE004773`, `phone_tecno_cm7.service`, Appium15002/systemPort15902; its numerous cleanup warnings are separate evidence. User explicitly requested restoring TECNO and stopping the problematic Xiaomi service; both state changes were executed and verified. See [direct diagnosis](2026-11-09-android-farm-xiaomi-unicodeime-device-check.md).
+
+## Resource follow-up cancelled — 2026-11-12
+
+The user cancelled the separate M-K0057/M-K0058 memory/iowait/free-disk check because Zabbix already monitors these hosts. Historical resource measurements above remain observations, not an active follow-up or a proven cause of test failures. The central TODO entry is closed as cancelled; no new diagnostics or remediation performed. [Scoped decision](../systems/android-farm/system-map.md#resource-monitoring-decision--2026-11-12).
+
+## DEBUG reduction proposal withdrawn — 2026-11-12
+
+The user clarified that test logs are emitted only in DEBUG mode. Preserve DEBUG; the agent withdrew the blanket logging-reduction follow-up and closed its central TODO entry. Historical trace overflow remains evidence, not a current mandate to suppress required logs. No logging change or replacement task. [Scoped constraint](../systems/android-farm/ci-cd.md#autotest-debug-logging-constraint--2026-11-12).

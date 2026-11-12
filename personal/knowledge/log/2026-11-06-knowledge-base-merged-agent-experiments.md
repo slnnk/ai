@@ -25,6 +25,10 @@ design evidence.
 
 The user later authorized the [second E01 stage](../../../current/knowledge/log/2026-11-09-knowledge-base-e01-stage2-comparison.md), completed on 2026-11-09 with 36 historical-task attempts and 114 invocations. Raw cost fell with Luna helpers, but equal quality was not demonstrated; no model-default change was adopted. Method/rubric limits are recorded with that outcome. The user subsequently retained one Sol agent and closed E01 follow-ups without further runs; E02–E14 remain proposals.
 
+## ECC follow-up recorded November 12
+
+The user requested retaining the [ECC recommendations](2026-11-12-agents-ecc-local-approaches.md) for future pilots. Map compact resumption state to E08, behavioral regression cases to E02/E03/E05, and one targeted supported lifecycle hook to E12. Preserve the existing experiment IDs and central TODO entry; this records future candidates without authorizing a run, installation or configuration change. The suggested E08-first order remains an engineering recommendation, not a user-selected execution order.
+
 ## Task and context
 
 Prepare a consolidated experiment selection plan within this dialogue. Sources:

@@ -76,3 +76,7 @@ backfilled (not checked).
 ## Portable lesson
 
 none
+
+## Cleanup ownership transferred — 2026-11-12
+
+The user stated that another employee will handle the Gate_K legacy-configuration cleanup. Closed the associated cleanup/documentation entry in this agent backlog as transferred, not implemented. Earlier DNS recovery remains complete; historical cleanup suggestions above no longer represent agent-owned work. No employee identity or completion date was provided. No external changes or background operations.

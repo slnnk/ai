@@ -1,7 +1,7 @@
 ---
 system: git
 status: verified
-checked: 2026-11-11
+checked: 2026-11-12
 tags: [agents, learning]
 ---
 # Agent learning: preserve-unrelated-checkout-changes
@@ -36,6 +36,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "Sync Jenkins publication: complete staged and committed diff contained exactly seven approved Jenkins paths; all nine runner worktree hashes matched before branch switch and after publication, index empty. Evidence current/knowledge/log/2026-11-11-automation-services-local-changes-audit.md section Sync Jenkins publication approved and completed.",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-12T12:05:47.694572+00:00",
+      "cause": "",
+      "event_id": "devops-918-env-mr-publication-20261112",
+      "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/current/knowledge/log/2026-11-12-ai-qa-devops-918-vk-helm-deployment-plan.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
@@ -60,7 +71,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "git",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-11T19:36:59.299563+00:00",
+  "updated": "2026-11-12T12:05:47.694572+00:00",
   "version": 1
 }
 ```

@@ -1,7 +1,7 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-11
+checked: 2026-11-12
 tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 ---
 # TrustTunnel endpoint it-garage-de-01
@@ -24,6 +24,54 @@ tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 - The user confirmed VPN recovery before domain migration; new-domain HTTPS was subsequently verified by the agent.
 - The old-address incident is closed; historical diagnostics remain below.
 - Russian relay deployed to `dline-spb-01`; authenticated HTTP/2 and HTTP/3 probes passed. User switched DNS to Russia; authoritative servers confirm, recursive caches still retain Germany.
+
+## Current availability after authorized reboot, 2026-11-12
+
+User reported a panel forced reboot; read-only verification at23:55:50 confirmed a new
+bootID, `qxl.modeset=0`, no QXL driver bound, and persistent `sr0` polling0. SSH/nginx
+active, failed units0, relay HTTPS200/TLS0. Earlier total-unreachable status below is
+superseded by this recovery. HetrixTools recovered UP in all four locations at23:56:35.
+New-boot journal has21sAHCI/SATA reset and87sUSB/runtime-PM lockups at23:54:14 despite
+QXL disable; no later lockup through23:56. This does not prove identical causality to
+prior runtime freezes. Host/QEMU versus guest-kernel cause unresolved; recurrence
+assessment was subsequently stopped by user decision: user prefers changing provider rather than further diagnostics. Migration planning is a proposal in central TODO; no destination or deployment authorization. No further agent reset or remote changes.
+See [verified outcome](../log/2026-11-12-trusttunnel-de-proxy-kernel-stall.md#access-recovered-and-boot-settings-verified).
+
+## Relay kernel stalls, 2026-11-12
+
+At 15:58 Moscow both hosts and HTTPS monitors were healthy. Neither VM rebooted today.
+Relay monitor outages at 15:37–15:42 and 15:43–15:52 coincided with guest kernel
+soft lockups, RCU starvation and systemd watchdog recovery. German VPN service
+remained active with no recorded downtime today. Current load/resources and direct/relay
+HTTPS checks were normal. Kernel versus provider/hypervisor cause is unresolved;
+no remote changes were performed. See [diagnostic evidence](../log/2026-11-12-trusttunnel-de-proxy-kernel-stall.md).
+
+Evening recurrence: relay outage 23:19:51–23:21:34 Moscow (103 seconds) coincided
+with a 77-second CPU0 soft lockup in disk/CD-ROM polling and monitoring-agent timeout.
+At 23:22 nginx had not restarted; relay/direct HTTPS returned200 with valid TLS.
+Both monitors were UP, with New York still listed as failing for the relay in the
+latest snapshot. Root cause remains unresolved; no remote changes or repair proposed.
+
+Deep read-only follow-up found five lockups: four CD-ROM stacks and one QXL stack,
+all at interrupt restoration. QEMU/KVM execution/emulation stalls are the leading
+hypothesis; CD-ROM alone is not established as the cause. Low pre-outage guest load,
+post-daytime steal14.17%, missing agent samples, and the482.838-second timer gap support
+host investigation but do not prove a specific host defect. All four monitor locations
+later recovered. Exact cause remains open in central TODO, pending host/provider data;
+support-request draft exists locally, not sent. No remote changes.
+
+At23:32:14 Moscow the user-approved temporary `/sys/block/sr0/events_poll_msecs=0`
+was applied; independent readback at23:32:27 confirmed0. Nginx remained active without
+restart; two relay HTTPS checks200/TLS0; monitor UP in all four locations. New outage
+23:28:55–23:31:28 preceded the change and included both QXL and CD-ROM stacks.
+Recurrence assessment remains pending; no persistent setting or reboot. QXL boot-time
+disable is only a proposed next experiment, not authorized or performed.
+
+Observation superseded by recurrence: at23:42:01 `sr0` polling still0, but QXL
+lockups41/53seconds and anRCU stall occurred after the change. HetrixTools outage
+23:40:48–23:41:35; relay HTTPS later200/TLS0 and nginx active/no restarts. CD-ROM
+disable alone is insufficient. QXL boot-disable is the next proposed test, still
+unapproved; exact QXL-versus-hypervisor cause remains unresolved. See diagnostic log.
 
 ## Russian nginx relay deployed, 2026-11-09
 

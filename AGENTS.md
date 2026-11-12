@@ -5,6 +5,7 @@ Read triggered sections of `~/ai/general/knowledge/README.md` (README); follow t
 
 ## Before a task
 
+- Read README "Material assumptions" first.
 - Run `~/ai/general/scripts/ai-sync.sh`; relay output/reminders. Read README "Daily sync"
   for monthly review proposals; offer once per month and wait for agreement.
   Normal runs also check the latest stable agnix daily and update the local install.
@@ -31,6 +32,7 @@ Read triggered sections of `~/ai/general/knowledge/README.md` (README); follow t
 
 ## Local code and Git
 
+- Prefer the simplest sufficient solution; read README "Simplicity" before proposing changes.
 - Keep changes within the request, including removals; propose unrelated improvements
   in TODO without implementing/deleting them.
 - Before repo searches read `~/ai/current/knowledge/repos.md` (company) or

@@ -53,3 +53,7 @@ User asked whether infrastructure errors exist now; prior snapshot was explicitl
 - Current Hub7busy/0free,8queuedrequests,7Appiumendpointsreachable/ready. Capacity saturation with configured15threads, not confirmed Hub outage. Existing nonfatal missingemulator_2service preparation drift remains a separate known issue and is not erased by zero signature counts.
 - Metadata18:27:07UTC /21:27:07MSK stillrunning, no finished_at/failure_reason. No final execution/report outcome yet. No intervention or background watcher started; all recheck tool sessions completed.
 Verdict remains: no confirmed recurrence of the earlier Appium/Grid/ADB infrastructure failure chain in the checked snapshot. This does not establish product/test-code root cause, absence of every possible infrastructure defect, or successful final job completion. Evidence files end `-latest.json` under generated job directory; older counts/snapshots above remain historical.
+
+## Final outcome supersedes pending snapshot status — 2026-11-12
+
+Final job review is complete: November9 22:21:25MSK `failed/script_failure`;469tests,384passed,76failed,9skipped. Gradle failed on test results; HTML/archive/JUnit publication succeeded. No confirmed recurrence of the earlier session/IME/systemPort/proxy chain. Generic request-retry timeouts remain unclassified. See [full final review](2026-11-12-android-farm-dig-job-3285160.md); earlier running-job limits above are historical, not the current status.

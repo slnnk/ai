@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-11
+checked: 2026-11-12
 tags: [agents, learning]
 ---
 # Agent learning: proactive-cross-task-patterns
@@ -14,7 +14,19 @@ Correction evidence and scoped application history. Canonical instructions remai
 {
   "created": "2026-11-11T18:01:49.746720+00:00",
   "decisions": [],
-  "evaluations": [],
+  "evaluations": [
+    {
+      "at": "2026-11-12T08:21:35.257381+00:00",
+      "cause": "Initial adaptation recommendation omitted material-assumption clarification despite identifying its usefulness; corrected only after user challenge.",
+      "event_id": "karpathy-review-20261112",
+      "expected": "Proactively compare relevant discussions and artifacts across tasks, identify recurring or independently visible problems, and propose evidence-backed scoped generalizations for confirmation; preserve task isolation and keep inferred rules inactive until confirmed.",
+      "outcome": "fail",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-12-knowledge-base-karpathy-guidelines-review.md",
+      "target": "/home/slnnk/ai/general/skills/agent-learning/SKILL.md"
+    }
+  ],
   "expected": "Proactively compare relevant discussions and artifacts across tasks, identify recurring or independently visible problems, and propose evidence-backed scoped generalizations for confirmation; preserve task isolation and keep inferred rules inactive until confirmed.",
   "key": "proactive-cross-task-patterns",
   "kind": "explicit",
@@ -37,7 +49,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/general/skills/agent-learning/SKILL.md",
   "task_id": "",
-  "updated": "2026-11-11T18:01:49.746720+00:00",
+  "updated": "2026-11-12T08:21:35.257381+00:00",
   "version": 1
 }
 ```

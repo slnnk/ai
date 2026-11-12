@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-04
+checked: 2026-11-12
 tags: [agents, learning]
 ---
 # Agent learning: progress-30s-and-background-status
@@ -14,7 +14,19 @@ Correction evidence and scoped application history. Canonical instructions remai
 {
   "created": "2026-11-03T22:47:24.189335+00:00",
   "decisions": [],
-  "evaluations": [],
+  "evaluations": [
+    {
+      "at": "2026-11-12T16:33:39.491500+00:00",
+      "cause": "",
+      "event_id": "incident3296907-progress-status",
+      "expected": "During long work update progress at least every 30 seconds; before final response verify task background commands and agents, state completion and remaining operations, and give check or stop instructions when needed. Disclose unverifiable status.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "current/knowledge/log/2026-11-12-corporate-network-job3296907-vpn-nexus-diagnostics.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    }
+  ],
   "expected": "During long work update progress at least every 30 seconds; before final response verify task background commands and agents, state completion and remaining operations, and give check or stop instructions when needed. Disclose unverifiable status.",
   "key": "progress-30s-and-background-status",
   "kind": "explicit",
@@ -37,7 +49,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-03T22:47:24.189335+00:00",
+  "updated": "2026-11-12T16:33:39.491500+00:00",
   "version": 1
 }
 ```

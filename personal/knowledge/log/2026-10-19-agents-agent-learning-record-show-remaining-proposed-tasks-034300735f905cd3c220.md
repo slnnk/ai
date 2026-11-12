@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-11
+checked: 2026-11-12
 tags: [agents, learning]
 ---
 # Agent learning: show-remaining-proposed-tasks
@@ -88,6 +88,28 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "After completing approved Jenkins push to MR1396, assistant replaced the remaining action list with a count of nine runner files. User explicitly corrected the missing remaining-items list.",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-12T11:38:04.315759+00:00",
+      "cause": "Loaded rule was not applied after completing explicitly requested plan item 1; response omitted remaining plan items.",
+      "event_id": "devops-918-item1-remaining-plan-20261112",
+      "expected": "After completing an agreed parent task/proposal or settling the underlying question, explicitly list remaining session action items with original wording/order. A count of files or vague remaining-work statement is not a substitute. Intermediate checks, explanations and corrections do not themselves close the parent task. Listing grants no execution permission.",
+      "outcome": "fail",
+      "revision": 6,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/current/knowledge/log/2026-11-12-ai-qa-devops-918-vk-helm-deployment-plan.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-12T16:22:14.687474+00:00",
+      "cause": "Rule was retrieved/read, but the agent incorrectly excluded discussed backlog items from the remaining-session list and repeatedly returned only closure acknowledgments.",
+      "event_id": "remaining-list-20261112-closure-omission-evaluation",
+      "expected": "After completing an agreed parent task/proposal or settling the underlying question, explicitly list remaining session action items with original wording/order. A count of files or vague remaining-work statement is not a substitute. Intermediate checks, explanations and corrections do not themselves close the parent task. Listing grants no execution permission.",
+      "outcome": "fail",
+      "revision": 6,
+      "rule_loaded": "yes",
+      "source": "Current conversation 2026-11-12: closure replies omitted remaining items; user corrected omission; full remaining list restored in recovery.",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "After completing an agreed parent task/proposal or settling the underlying question, explicitly list remaining session action items with original wording/order. A count of files or vague remaining-work statement is not a substitute. Intermediate checks, explanations and corrections do not themselves close the parent task. Listing grants no execution permission.",
@@ -103,6 +125,24 @@ Correction evidence and scoped application history. Canonical instructions remai
       "expected": "After completing a task from a list initially proposed to the user, show the remaining unfinished tasks in the final response; if none remain, say so.",
       "source": "User instruction in the local-agent TODO discussion on 2026-10-19, following implementation of nested Codex accounting.",
       "summary": "After completing the classifier task, the user requested showing remaining tasks from the originally proposed list after each completion."
+    },
+    {
+      "agent": "codex",
+      "at": "2026-11-12T15:12:14.605250+00:00",
+      "cause": "User highlighted that only namespace had been discussed while earlier kubeconfig, Vault/registry, S3 and retention questions were omitted from later session summaries.",
+      "event_id": "devops-918-full-session-inventory-correction-20261112",
+      "expected": "After completing an agreed parent task/proposal or settling the underlying question, explicitly list remaining session action items with original wording/order. A count of files or vague remaining-work statement is not a substitute. Intermediate checks, explanations and corrections do not themselves close the parent task. Listing grants no execution permission.",
+      "source": "/home/slnnk/ai/current/knowledge/log/2026-11-12-ai-qa-devops-918-vk-helm-deployment-plan.md#full-session-audit-outcome-2026-11-12",
+      "summary": "User broadened the remaining-items rule to all session proposals, questions and tasks, including prose and multiple turns."
+    },
+    {
+      "agent": "codex",
+      "at": "2026-11-12T16:22:22.292036+00:00",
+      "cause": "",
+      "event_id": "remaining-list-20261112-closure-omission",
+      "expected": "After completing an agreed parent task/proposal or settling the underlying question, explicitly list remaining session action items with original wording/order. A count of files or vague remaining-work statement is not a substitute. Intermediate checks, explanations and corrections do not themselves close the parent task. Listing grants no execution permission.",
+      "source": "Current conversation 2026-11-12: user asked why the remaining list was omitted after an item was closed.",
+      "summary": "User broadened the remaining-items rule to all session proposals, questions and tasks, including prose and multiple turns."
     }
   ],
   "repo": "",
@@ -112,7 +152,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-11T19:49:30.800640+00:00",
+  "updated": "2026-11-12T16:22:22.292036+00:00",
   "version": 1
 }
 ```

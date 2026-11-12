@@ -89,3 +89,7 @@ No state was changed over SSH.
 ## Portable lesson
 
 none
+
+## A55 follow-up status superseded — 2026-11-12
+
+The separate A55 race-reproduction backlog proposal is closed as superseded by the accepted November10recovery and3/3immediate create/command/quit checks with systemPort15903released after each quit. See [A55 evidence and reconciliation](2026-11-10-android-farm-a55-isolated-check.md#historical-race-backlog-reconciliation--2026-11-12). Historical September observations above remain valid; the original race mechanism is not claimed permanently fixed or newly reproduced. Other preparation/resource tasks remain separate.

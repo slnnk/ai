@@ -77,3 +77,7 @@ Read-only infrastructure diagnosis of GitLab autotest job `3120554` (retry suite
 ## Portable lesson
 
 none
+
+## Resource follow-up cancelled — 2026-11-12
+
+The user cancelled the separate M-K0057/M-K0058 memory/iowait/free-disk check because Zabbix already monitors these hosts. Historical resource measurements above remain observations, not an active follow-up or a proven cause of test failures. The central TODO entry is closed as cancelled; no new diagnostics or remediation performed. [Scoped decision](../systems/android-farm/system-map.md#resource-monitoring-decision--2026-11-12).

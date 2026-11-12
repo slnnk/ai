@@ -136,6 +136,10 @@ Router LAN only, from the user's PC. No remote access yet.
 - [2026-11-10 Lampa startup confirmed and PC TorrServer deployed](../log/2026-11-10-home-network-pc-torrserver.md)
 - [2026-09-26 questions and deployment plan](../log/2026-09-26-home-network-initial-plan.md)
 
+## PC Russian domain bypass check (2026-11-12)
+
+Read-only tests of client 1.0.49 confirmed direct Wi-Fi upstream TCP/TLS connections for `yandex.ru`, `mail.ru`, `ozon.ru` and `vk.ru`, despite application-side flows entering TrustTunnel tun0/table 880. Control `example.com` stayed in the tunnel. `2ip.ru` timed out but also showed direct Wi-Fi sockets; `gosuslugi.ru` was inconclusive. General bypass failure was not reproduced; browser-specific traffic was not captured. Configuration and services unchanged. See [diagnostic evidence](../log/2026-11-12-trusttunnel-client-ru-bypass-check.md).
+
 ## PC TrustTunnel corporate VPN exclusion (2026-10-11)
 
 Verified corporate OpenVPN endpoint `msk-vpn.youdo.sg:1194` UDP resolves45.159.210.228. Before change, it routed through TrustTunnel tun1/table880, nesting the corporate tunnel. User authorized one local route exclusion `45.159.210.228/32` in `[listener.tun].excluded_routes`; parse and exact-only diff assertions passed, mode0600 and private local backup retained. User restarted the client; public corporate VPN endpoint route bypasses TrustTunnel via WiFi as verified. Corporate VPN reconnection and controlled Nexus transport verification subsequently passed; no remote endpoint/firewall changes. See [client log](../log/2026-10-11-trusttunnel-client-corporate-vpn-exclusion.md).

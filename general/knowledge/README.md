@@ -178,6 +178,23 @@ Extends the system map for Android autotest infrastructure. Cover where possible
 - verified recovery procedure, criteria for returning a device to the Grid, rollback for
   non-standard changes.
 
+## Material assumptions
+
+Before acting, check material assumptions against the available context. If different
+interpretations remain that affect the result, scope of work or permissions, state
+them explicitly and clarify what is needed before acting on that choice. Do not
+silently choose such an interpretation. Make routine reversible decisions independently.
+
+Before nontrivial changes, also read "Verifiable results" below.
+
+## Verifiable results
+
+Before nontrivial changes, define the expected result and a proportionate way to
+verify it. Before completion, check the result against those criteria and report
+confirmed facts and remaining limitations. Do not substitute changed files or a
+successful unrelated check for verification of the required behavior. Verification
+does not expand the authorized scope of actions.
+
 ## repos.md
 
 One table per layer, one row per local clone: absolute path, origin without credentials,
@@ -186,6 +203,14 @@ purpose, related system, date checked. Link related clones in the system map
 gradually while working; do not crawl the whole filesystem.
 
 ### Repository workflow details
+
+#### Simplicity
+
+Prefer the simplest solution that meets the request and verified system constraints.
+Add conditions, exceptions, configuration options or abstractions only for a concrete
+requirement or demonstrated need, not hypothetical scenarios or future flexibility.
+Before presenting a change, check whether each added complication is necessary;
+omit it if removing it preserves the required behavior and existing safeguards.
 
 - For company GitLab work, use `~/ai/current/skills/gitlab-workflow/SKILL.md`.
   Inspect code in an existing local checkout first; consult `current/knowledge/repos.md`

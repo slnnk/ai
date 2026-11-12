@@ -16,7 +16,7 @@ tags: [android, appium, selenium-grid, adb, emulator, zabbix, loki, alloy, ansib
 - Monitoring: Zabbix group `Selenium` (Enabled hosts) is the current scope for `android-dig`; Agent 2 on `10050` via NAT `192.168.30.1`; token `ZABBIX_PROD_TOKEN` in `~/ai/current/.env`.
 - Loki (2026-09-30): Loki moved to the dev cluster; `loki-read`/`loki-write.yandex-test.youdo.local` are retired (user, 2026-09-30). Read = `http://loki.dev.youdo.corp` (`/loki/api/v1/labels` 200; used by `android-dig` since 2026-09-08). Push in `automation-services` `origin/master` = `http://loki.dev.youdo.corp/loki/api/v1/push` (`inventories/office/group_vars/all.yml`, commit `0929e6c1`, 2026-09-11; endpoint answers GET with 405, so the route exists); role default is still `loki.infra.youdo.corp`. Whether the farm hosts run this config is unverified.
 - State: farm verified 2026-08-13; Zabbix/Hub/Grid (8 slots healthy) and Loki-read checks 2026-08-20; SSH checks 2026-09-08; `M-K0058` `Nexus_5X_1` AVD recreated 2026-08-14.
-- Known problems: unmanaged DNS drop-in `local-domain.conf` on farm hosts; `/opt/adb/adb_pkg.sh` missing on `M-K0057`; port `15903` busy race on Samsung A55 (job 3121092); Appium 1.22.3 old for Android 16; overlays; credential-bearing report URLs, anonymous Nexus `raw-private`, plaintext runner variables; mutable image tags; `DevOps-833-fix-hotfix` unverified.
+- Known problems: unmanaged DNS drop-in `local-domain.conf` on farm hosts; CI preparation masks errors with `|| true` (unused `adb_pkg.sh` restoration superseded2026-11-12); Appium 1.22.3 old for Android 16; overlays; credential-bearing report URLs, anonymous Nexus `raw-private`, plaintext runner variables; mutable image tags; DevOps-833closed/merged (verified2026-11-12), separate release-control suggestions remain optional.
 - Where to read: section names below; `Monitoring` includes `Dynamic Android-dig inventory` and `Alloy/Loki delivery incident`.
 - RESOLVED 2026-10-01: farm logs were missing in Loki 2026-09-14..2026-10-01 because the Kazan router `Gate_K` (`192.168.30.1`) DNATed client DNS for `youdo.corp`/`youdo.test`/`youdo.local`/`consul` to decommissioned Moscow srv0 `192.168.60.10`. The DNAT rules and static entries were disabled; the router now answers from upstream `10.16.20.3`, and `M-K0057`/`M-K0058` streams arrive in Loki. See log `2026-10-01-android-farm-kazan-gate-k-dns-forward-to-decommissioned-srv0.md`. SSH addresses: use the inventory (`.31`/`.32`), not `.147`/`.148`.
 
@@ -47,6 +47,8 @@ tags: [android, appium, selenium-grid, adb, emulator, zabbix, loki, alloy, ansib
 - Full route, image build rules, store lanes, runners, variables, and confirmed pipeline gaps are documented in `ci-cd.md`.
 
 ## Test execution route
+
+- Final real-job review2026-11-12: job3285160 finished November9 22:21MSK with469tests/384passed/76failed/9skipped; Gradle test failure, successful report/artifact delivery. Earlier UnicodeIME/session/systemPort/proxy chain not confirmed over complete trace and monitoring window. Request-retry timeouts and oversubscription causality remain unclassified. [Final evidence](../../log/2026-11-12-android-farm-dig-job-3285160.md).
 
 - Recovery verified2026-11-09 18:57MSK: Xiaomi `x4pf5l5haegykni7` on M-K0058:15003 returned to Grid after reboot and3UnicodeIME-enabled serial cycles without Settings reinstall. All7registered slotsidle, queue0 at check. [Recovery evidence](../../log/2026-11-09-android-farm-devops-912-xiaomi-recovered.md).
 
@@ -109,7 +111,7 @@ tags: [android, appium, selenium-grid, adb, emulator, zabbix, loki, alloy, ansib
 ## Known operational issues and risks
 
 - M-K0057 preparation drift reconfirmed by direct SSH on 2026-09-08: `/opt/adb/adb_pkg.sh` is absent even though the autotest CI invokes it. The failure is currently non-fatal in CI and can leave Appium helper-package state unnormalized. Restore the managed helper or update the CI contract, then make unexpected preparation failures fatal.
-- M-K0057 `phone_samsung_galaxy_a55.service` is configured for `RZCY20AXJHN` with fixed `systemPort=15903`; its Selenium 3 node config sets both `maxInstances=1` and `maxSession=1`. During job 3121092 it logged 109 port-busy failures over 11:10:09–11:13:29 MSK. Direct SSH observation at 11:58:52 showed the normal active-session ownership: the ADB server listened on `127.0.0.1:15903`, `adb forward --list` mapped that port from `RZCY20AXJHN` to device port `6790`, and Appium reported the corresponding session. The incident is an overlap between session creation and an existing/tearing-down session on the same device, not a foreign port owner; capture request/cleanup timing to isolate the race.
+- M-K0057 `phone_samsung_galaxy_a55.service` is configured for `RZCY20AXJHN` with fixed `systemPort=15903`; its Selenium 3 node config sets both `maxInstances=1` and `maxSession=1`. During job 3121092 it logged 109 port-busy failures over 11:10:09–11:13:29 MSK. Direct SSH observation at 11:58:52 showed the normal active-session ownership: the ADB server listened on `127.0.0.1:15903`, `adb forward --list` mapped that port from `RZCY20AXJHN` to device port `6790`, and Appium reported the corresponding session. The incident is an overlap between session creation and an existing/tearing-down session on the same device, not a foreign port owner; Historical follow-up superseded2026-11-12: November10A55 recovery passed3/3immediate create/command/quit cycles, every quit released15903, and DevOps-914 was accepted closed. Original September race mechanism remains unproven; no new reproduction remains scheduled. [Recovery and reconciliation](../../log/2026-11-10-android-farm-a55-isolated-check.md#historical-race-backlog-reconciliation--2026-11-12).
 - TECNO/HiOS `com.transsion.usf` froze UiAutomator2. On 2026-08-13 it was removed for Android user 0, the device passed direct and Appium smoke tests, and returned to Grid. Factory APK remains available for rollback via `install-existing`; monitor for power/network/thermal side effects.
 - MIUI/HyperOS control center can remain over the app; the test helper recognizes only legacy notification-panel IDs. Pre-session foreground/overlay reset needs hardening.
 - Some sessions were abandoned without timely `driver.quit()`, leaving stale instrumentation until Appium's 600-second new-command timeout. `/status` alone does not prove UiAutomator2 or session health; watchdog coverage is incomplete.
@@ -186,3 +188,27 @@ Supersedes the15:08MSK unknown-installer snapshot above. Read-only metadata conf
 ## Samsung A55 production return verified — 2026-11-10 15:22 MSK
 
 User started Appium at15:20MSK. Read-only fresh-inventory/Hub check12:21:57UTC confirmed A55 registeredidle at192.168.30.31:15003; Appium active/running/ready, ADBdevice and Android services responding. Grid8registered/8idle/queue0. Supersedes the intentionallystopped state in15:19MSK section above. Earlier3/3isolated sessions passed after user disabled Play Protect; no new Grid-path session or product job was launched. [Evidence](../../log/2026-11-10-android-farm-a55-isolated-check.md#user-started-production-return--2026-11-10-1522-msk).
+
+## Resource monitoring decision — 2026-11-12
+
+The user explicitly cancelled the separate manual memory/iowait/free-disk follow-up for M-K0057/M-K0058 because existing Zabbix monitoring already covers these resources. The corresponding central TODO entry is closed as cancelled, not implemented. Do not recreate this standalone follow-up merely from the historical resource peaks. Historical measurements and causal uncertainty remain evidence; this decision does not prohibit using Zabbix data during a specifically requested incident diagnosis. No monitoring configuration, alert, host or service was changed.
+
+## Backlog audit — 2026-11-12
+
+Latest backlog audit confirms no separate Grid4444checks in Zabbix (84OSitems,0active-checkitems); retain application-level Grid monitoring as a gap. Earlier active-check timeout is historical, not a confirmed current issue. Preparation still masks adb.sh/emulator errors in CI; adb_pkg.sh is no longer invoked. Watchdog/overlay/Appium-version work remains an optional proposal, not a current blocker. [Evidence and scoped results](../../log/2026-11-12-android-farm-backlog-relevance-audit.md).
+
+## Gate_K cleanup ownership — 2026-11-12
+
+The user assigned legacy Gate_K cleanup to another employee. Its central backlog entry is closed as transferred; do not recreate it as agent-owned work without a new request. No claim that cleanup was performed. The earlier DNS incident remains resolved.
+
+## Partial device failure policy — 2026-11-12
+
+The user rejected stopping the entire Android autotest job when preparation fails on one device: other devices can still execute tests. This supersedes the earlier blanket fail-fast/job-stop proposal. Preserve operation on remaining devices; report individual preparation errors and match emulator service lists to actual per-host inventory. Do not blindly remove all tolerance or convert one-device failure into whole-job failure. This discussion authorizes knowledge/backlog correction only, not implementation, device quarantine, service restarts or other external changes. No policy for total farm unavailability was decided. The user subsequently clarified that the same rule applies inside adb.sh: failure on one device must not stop preparation of other devices. Absence of a global stop or set -e is not itself a defect. Do not introduce script-wide abort-on-error or call this tolerance a bug; any reporting changes must preserve processing of remaining devices.
+
+## Emulator preparation preserves stopped services — 2026-11-12
+
+The user explicitly rejected restarting stopped emulator services. For the current Android CI preparation proposal, skip absent and stopped services; restart only running emulator services. Do not use restart on every existing unit, since restart starts an inactive unit. Preserve partial-device failure tolerance and leave adb.sh unchanged. This is a scoped planning constraint; no implementation, service action or repository permission is granted by this clarification.
+
+## Preparation proposal cancelled — 2026-11-12
+
+The user declined emulator-preparation changes because the farm currently works and this change is not worth doing. The central preparation entry is closed as cancelled, not implemented. Earlier partial-device and stopped-state discussion remains historical design context, not pending work. No CI, adb.sh or service changes performed. Do not recreate the preparation proposal from historical missing-emulator messages without a new request or concrete newly reported problem. [Decision evidence](../../log/2026-11-12-android-farm-backlog-relevance-audit.md#emulator-preparation-proposal-cancelled--2026-11-12).

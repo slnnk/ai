@@ -82,3 +82,15 @@ Public docs upload path is in `youdo.business`:
 `PublicDocsS3` uploads the PDF object to S3 with `PutObjectAsync`, then writes/updates the manifest JSON with another `PutObjectAsync`.
 
 For terms category, expected manifest key is `public-docs/terms/index.json`; uploaded file keys are generated under `public-docs/terms/files/`.
+
+## Live client source-port check (2026-11-12)
+
+The tested public DNS path resolves to92.53.80.147, directly assigned to sc-lb-pub01 eth1. A marked HTTPS GET returned200; its outgoing HTTP request to proxy.service.consul contained X-Real-IP but no X-Src-Port. The live vhost does not generate X-Src-Port. DNS and interface assignment do not establish whether Servicepipe network protection participates in this path; that remains unverified. Other DNS views and final application handling were not verified. No configuration changed. [Check evidence](../../log/2026-11-12-automation-services-business-src-port-check.md).
+
+## Source-port addition on sc-lb-pub01 (2026-11-12)
+
+After explicit approval, added `proxy_set_header X-Src-Port $remote_port;` to the live generic location on sc-lb-pub01 and reloaded nginx after successful syntax validation. The shared server also handles business-api.youdo.com. A marked public request returned200 and reached upstream with X-Src-Port28028 and X-Real-IP present. This supersedes header absence above for this host after reload. Prepared the same unconditional one-line template change on local DevOps-913-business-src-port from origin/master457cf622; uncommitted/unpublished. Other balancers were not changed, and a future shared-template rollout would overwrite incoming X-Src-Port there too. [Application evidence](../../log/2026-11-12-automation-services-business-src-port-check.md).
+
+### Ansible publication (2026-11-12)
+
+The prepared template change above was subsequently committed as b16b69d562effb27c236ea41d99e65c243871806 and published after the second supervised approval in ready [MR !1397](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1397), target master. Exact metadata/SHA verified; pipeline142851 skipped. Checkout clean. This supersedes the uncommitted/unpublished status above. No merge or additional rollout performed.

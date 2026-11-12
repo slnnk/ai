@@ -18,4 +18,6 @@ Master pipeline [140457](https://gitlab.youdo.sg/youdo/ai/youdo-chat-agent/-/pip
 Vault references secret/dotnet/chat-agent (six developer-owned keys), secret/resources/databases/postgres C2C fields; policies resources and dotnet. Tooling credentials remain in current/.env or GitLab variables; values are never recorded. Migration CI variables DB_ADDR and POSTGRES_YOUDO_PASSWORD select the deployment database. Runtime uncertainties are recorded in the task log. User confirmed DevOps scope complete on 2026-10-09: infrastructure configured and service launched in production; functional checks belong to developers.
 
 ## Related work
+[November12 VPN/build diagnosis](../log/2026-11-12-corporate-network-job3296907-vpn-nexus-diagnostics.md): job3296907 succeeded in985.96s; approximately12minutes pulling the Docker cache image and3minutes pushing, versus restore3.5s/publish17.8s. Intermittent packet loss observed on runner-to-Nexus path; exact device and connection to employee VPN disconnects remain unverified. No runtime changes.
+
 [Production preparation](../log/2026-10-09-youdo-chat-agent-prod-deploy.md), [initial infrastructure](../log/2026-10-08-gitlab-ci-devops-882-chat-agent-infrastructure.md).

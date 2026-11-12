@@ -63,3 +63,7 @@ User approved the drafted recovery comment after explicitly removing its final p
 ## User-confirmed task closure — 2026-11-10
 
 After comment74-125430 publication, the user explicitly reported that DevOps-914 was already closed. Record task closure as user-confirmed; no independent issue-state query or external mutation was performed. The Samsung recovery entry in the central TODO is already checked and agrees with this closure. No further work is pending under DevOps-914; broader separately tracked farm tasks and historical verification limits are not reopened by this status update.
+
+## Historical race backlog reconciliation — 2026-11-12
+
+The user questioned whether the September8proposal to reproduce the A55 create/quit/create race was still relevant after the successful November10checks. It was an older separate central TODO entry left open despite the accepted recovery. The existing3/3immediate lifecycle cycles each released15903, production return was verified and DevOps-914 was user-confirmed closed. Closed that stale proposal as superseded and corrected the system-map current-problem wording. No additional reproduction or permanent September-race root-cause fix is claimed. The successful November9real job3285160 infrastructure review excluded the then-inactive A55, so it is not evidence of A55 stability; A55 closure relies on its own November10evidence. Historical incident details remain preserved. No external actions or background work.

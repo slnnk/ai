@@ -47,3 +47,11 @@ The table remains the dated 2026-08-12 static audit, not a current count of the 
 - CI mapping: `.gitlab-ci.yml`, rules around lines 69-117.
 - TestNG XML files: `TestSuites/`.
 - Test classes: `src/test/java/app/suites/`.
+
+## Backlog audit — 2026-11-12
+
+Fresh origin/master f126825b still exposes InfoMessages without XML/class and MindBox with20uncommented tests, all disabled. These are QA-owned suite-selection decisions; do not treat enabling disabled tests as infrastructure remediation. [Evidence and scoped results](../../log/2026-11-12-android-farm-backlog-relevance-audit.md).
+
+## QA handoff completed — 2026-11-12
+
+The user confirmed handing the InfoMessages/MindBox findings to QA and explicitly requested closing the backlog item. Central TODO closed as handoff complete; no code change, test enablement or QA resolution is claimed. No further agent action remains on this item.
