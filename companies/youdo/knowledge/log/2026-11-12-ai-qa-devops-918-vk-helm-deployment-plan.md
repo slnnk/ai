@@ -1,7 +1,7 @@
 ---
 system: ai-qa
 status: verified
-checked: 2026-11-12
+checked: 2026-11-13
 tags: [kubernetes, vkcloud, helm, postgresql, planning]
 ---
 # DevOps-918: AI QA permanent VK test deployment with the microservice chart
@@ -9,16 +9,16 @@ tags: [kubernetes, vkcloud, helm, postgresql, planning]
 ## Summary
 
 - Target: service/release ai-qa in permanent namespace dev-ai-qa in VK test Kubernetes, using the shared microservice chart (latest explicit user namespace change).
-- Published app MR3 latest88d3154 contains shared manual Helm CI, inline profiles, chart-default registry/PG and selected S3 bucket/endpoint; pipeline142979 now MANUAL after successful build/unit/javascript jobs. No runtime rollout.
+- App MR3latest07a1175 uses template master and corrected Codex guidance; CI143001MANUAL with build/unit/javascriptSUCCESS. Developer owns app code review, merge and functional QA; on2026-11-13 the user closed these three developer-owned backlog follow-ups without verification. DevOps does not initiate a QA run; review/merge and functional QA completion are not claimed. Existing deployed source88d3154 remains unchanged by documentation/include publication.
 - Published chart MR5/9b8e508 adds optional strategy/passwordSecretRef and compatibility guards; live GET confirms OPEN with pipeline142914SUCCESS. Neither MR is merged.
-- Initial VK namespace/resource/PV inventory found no ai-qa deployment; no runtime deployment has been performed. Empty Vault placeholders were created after approval, then filled by the user; runtime credential preflight succeeded.
+- Initial VK inventory found no ai-qa deployment; first rollout is now verified in dev-ai-qa. Vault/app registry sync and actual PostgreSQL volume allocation succeeded; OIDC/worker/report/retention acceptance remains separate.
 - Namespace intent belongs to service dev.yml: explicit dev-ai-qa is published in service values; shared Helm name generation/creation fallback and its stable naming formula are not implemented.
 - Kubernetes API auth remains kubeconfig/Keystone; separate ServiceAccounts, native token migration and service-specific/generic RBAC implementation were not selected.
 - NodeSelector, securityContext, application volume extensions and token-automount controls were excluded from the chart change. Existing raw/worker settings were not arbitrarily removed.
-- S3 app settings are only bucket, URL, access key and secret key. User selected Yandex endpoint https://storage.yandexcloud.net and bucket youdo-ai-qa; values published in88d3154/MR3, access/privacy/retention acceptance pending. Thirty days was only a retention proposal.
+- S3 app settings are only bucket, URL, access key and secret key. User selected Yandex endpoint https://storage.yandexcloud.net and bucket youdo-ai-qa; values published in88d3154/MR3, access/privacy acceptance pending. User selected indefinite S3 artifact/manifest retention on2026-11-13; the earlier30day proposal and lifecycle-expiry work are superseded.
 - PostgreSQL is the immediate target for state/sessions, alongside the app with retained PVC. The minimal PG port is now published in MR3/41513a2 and verified locally on PG16; no runtime database migration or deployment has been performed. No dual-database target was agreed.
-- Shared GitLab Helm deployment is published in template MR92/82e4ad9; ai-qa consumer ded8ee1 is published in MR3. Deployment is manual only; template include currently uses DevOps-918-helm-deploy pending coordinated master cutover.
-- Permission/network/Vault/VSO/registry/S3/retention/backup and live acceptance work remain open. Current authoritative granular backlog is central TODO, not older proposal sections below.
+- Shared template MR92is user-merged as56ba8a1; master contains visible manual deploy dev and group kubeconfig support. ai-qa include ref is now master in07a1175; no feature-branch dependency remains.
+- On2026-11-13 the user closed the permission, network and worker-image-pull verification follow-ups without DevOps checks: the developer will test and report problems. S3-key permission-scope verification was cancelled by the user on2026-11-13; remaining infrastructure acceptance work remains open; PostgreSQL backup/restore planning and PVC-uninstall policy work were cancelled by the user on2026-11-13; indefinite S3 retention was selected by the user. Current authoritative granular backlog is central TODO, not older proposal sections below.
 - Historical proposal sections preserve discussion evidence; later explicit user decisions and this summary supersede them. Listing tasks grants no implementation or external-change approval.
 
 - Dev PostgreSQL credentials use standard chart defaults by explicit user decision; the separate ai-qa Vault PG mapping is superseded in published values. Shared CI performs namespace/app Helm deployment without VSO bootstrap.
@@ -520,3 +520,81 @@ Do not recommend this apply as-is. Preserve the existing Storybook website confi
 User asked for a repository-change proposal, not implementation. Current yandex-tf checkout is clean DevOps-918-ai-qa-bucket at3da7ba1, matching MR243 plan source. Propose adding one dynamic website block inside existing yandex_storage_bucket.b2b_buckets: for_each is [1] only when each.key equals youdo-b2b-storybook-test, otherwise []; content index_document index.html. This records the already-observed website configuration for that bucket, leaves the bucket-name/service-tag map unchanged and does not enable website for ai-qa or other buckets. No import is required because Storybook bucket is already in Terraform state.
 
 First-gate proposal: reuse existing yandex-tf DevOps-918-ai-qa-bucket at3da7ba1, base/target master, update only this resource declaration; expected subsequent plan1add0change0destroy, which must be observed before apply. User confirmation pending; no repo edits, stage/commit/push or Terraform apply. Existing central bucket-provisioning task retains this proposed correction and plan validation. All read-only commands complete, no background operations remain.
+
+## November13: user provisioned bucket, read access verified
+
+User chose to run Terraform apply themselves and perform a manual Storybook follow-up afterwards, then reported bucket creation. No agent apply or website changes authorized/performed. MR243 is now MERGED. App Vault-key S3 HeadBucket and prefix ai-qa/ ListObjectsV2 both returned HTTP200 with the same SigV4/path-style/us-east-1 client configuration. This confirms existence/authenticated read/list, not privacy or Put/Delete/conditional-write/Range acceptance. Sanitized evidence ai-data/ai-qa/predeploy/s3-after-create.json. The bucket-existence blocker is resolved. Manual Storybook follow-up completion is not reported; keep user-owned, do not assume whether they will change console or Terraform source.
+
+Fresh GitLab check: chartMR5OPEN/source9b8e508 with successful pipeline142914; templateMR92OPEN/source82e4ad9; appMR3OPEN/source88d3154, pipeline142979MANUAL and deploydev3297929MANUAL. Fresh master deployment-template GET confirms service.strategy handling is still absent. ChartMR5therefore remains the Recreate prerequisite before this job clones master. Existing local MR5diff is37added lines across5files (strategy support, optional PG Secret reference/helpers/docs); no runtime deployment on chart merge, only chart validation. No merge approval yet. All local/read-only command sessions completed, no background operations remain. Daily sync completed/pushed; agnix0.61.0current.
+
+## November13: chart merge verified, first deployment approval pending
+
+User reported merging the chart. Fresh GET confirms MR5MERGED as3254a7fa041e4e9c6f31fc52d042e80463eaa843; current master deployment template contains service.strategy/Recreate handling. Earlier source pipeline142914SUCCESS. Read-only namespace inventory confirms dev-ai-qa absent. Job3297929 remains MANUAL in pipeline142979MANUAL after successful build/tests. Previous current-day S3 Head/List200 remains the bucket readiness evidence. Both previously identified blockers are now resolved; no runtime success is claimed.
+
+Concrete proposed external action: play GitLab deploy dev3297929 for app source88d3154/pipeline142979. Existing shared job will create namespace release dev-ai-qa, Vault/registry prerequisites, ai-qa app release with controller and PostgreSQL5GiPVC/ingress, using current chart master and selected bucket. Permanent namespace values have no TTL or stop job. Deployment play is a separate approval under AGENTS.md; user statement about their chart merge is not that approval. No job played or resources changed by this verification. All read-only sessions finished, no background operations remain.
+
+## November13: first deployment succeeded and basic live readiness verified
+
+User supplied deploy job3297929 URL; inspected without play/retry. JobSUCCESS, source88d3154, started00:18:01Moscow/finished00:21:03. Trace confirms first installs of namespace release dev-ai-qa and app release ai-qa. Agent performed read-only postdeployment checks, no runtime writes. Sanitized job/workload evidence ai-data/ai-qa/deploy3297929/{job,workloads}.json.
+
+Observed: ai-qa-control Deployment desired1/ready1 with Recreate; ai-qa-postgres StatefulSet1/1. Both podsRunning/ready/no restarts. postgres-data-ai-qa-postgres-0 PVCBound5Gi on csi-ceph-ssd-ms1. App ai-qa-secrets-0 and registry-auth VSO sourcesReady/Healthy/SecretSynced. Controller/PG image pulls and app startup succeeded; worker image pull and lifecycle remain untested. Canonical https://b2bautomation-ai-qa.dev.youdo.sg/healthz returned HTTP200 with readytrue. Additional https://ai-qa.dev.youdo.sg/healthz returns nginx301Locationhttps://youdo.sg; routing for that alias is not application acceptance and needs separate review. No config/DNS changes made.
+
+Basic rollout/storage/VSO milestones closed in central TODO based on actual resource state, not only job green. Full OIDC login, worker callbacks, S3 Put/Get/Delete/conditional writes/media/ZIP and persistence/restore remain open. User asked next steps: human OIDC login on canonical URL, then choose and explicitly approve one representative QA run before creating workloads/stands or reports. Afterwards coordinate MR92/master include cutover and app MR3merge; preserve template branch until consumer ref changes. All job/read sessions completed, no task background operations remain.
+
+## November13: OIDC availability failure correlated with repeated VSO restarts
+
+User supplied repeated copies of the same callback screenshot showing no available server, then reported successful login. No real callback URL/query/code/state/cookie was requested, replayed or logged. Read-only checks show controller/PGReady, service80->8080 has ready endpoints, ingressPrefix/ covers both hosts. Public root/health/callback-without-params give200/200/400;400is the application rejection of missing login correlation. Each DNS address check found one publicIPv4, same200/400. No ingress or app route mutation.
+
+History revealed the controller had reached revision41, then51, with VSO restartedAt changes approximately every50seconds despite container restartCount0 (pods are replaced, not crashing). Events show SecretSynced/RolloutRestartTriggered. Therefore earlier snapshot readiness was not sufficient evidence of stable availability. Actual VSS generation1/lastGeneration1, hmacSecretDatatrue, refresh60s, excludeRawtrue/excludesall and11templated env fields; Kubernetes Secret has no_rawfield. Only CODEX_ACCESS_TOKEN was empty. Two Secret snapshots55seconds apart had identical data/resourceVersion, while the broader restart history showed repeated replacements. Secret data stayed in memory only; evidence files contain metadata/key names/booleans, never values.
+
+User then filled codex_access_token in Vault. Subsequent observation started with nonempty Codex field and revision51/restartedAt2026-11-12T22:01:11Z. Snapshots at55and110seconds remained revision51,ready1,same restart timestamp. Public health200 and callback-without-params400 after observation. User-confirmed OIDC login is recorded separately from automated read-only checks. The stop after filling the only empty key strongly supports empty-value-triggered VSO false rotation as the cause of intermittent no-backend windows with Recreate. Related upstream issue https://github.com/hashicorp/vault-secrets-operator/issues/903 describes empty-value restart loops and was closed in1.2.0; this reference is supporting context, not proof of an unfixed exact upstream defect in the previously observed1.5.1deployment. No operator upgrade or code-level reproducer was attempted.
+
+Own earlier README recommendation to leave the active Codex mapping empty was inappropriate for this observed configuration. Corrected that one sentence locally to require a nonempty value while mapping is enabled; no commit/push or new CI run. Source branch remains the existing approved ai-qa branch. Central optional-token task closed on user fill and nonempty Secret sync, not Codex API-auth validation. Remaining functional checks are worker/report/S3/video/ZIP; generic alias redirect and source-branch include cutover remain open. Evidence under ai-data/ai-qa/oidc-routing: workload/history summaries, vso-summary.json, secret-stability.json, after-codex-fill.json. The two-observation process completed; no background operations remain. No agent external mutations or credential-value persistence.
+
+## Functional QA ownership and master-include publication
+
+User explicitly corrected scope: one functional QA run is not their DevOps work; the developer will perform application testing. Do not ask this user for UV/test cases or initiate worker/stand/test/report flows as DevOps acceptance. Existing automated CI unit/javascript jobs are unaffected. DevOps remains responsible for CI/deployment/infrastructure and may diagnose infrastructure failures from developer-run tests. Functional acceptance remains open with developer ownership; no messages sent to anyone and no test run triggered.
+
+User then reported merging templates and requested sending README/include master changes. Confirmed templateMR92MERGED, merge/masterSHA56ba8a1a2b20f4b4d71cfe85646edad312bfb5d4, visible deploy dev/group kubeconfig in master. AppMR3stillOPEN/source88d3154. Interpreted include-to-master within the agreed MR workflow, not permission for direct app master push or app MR merge. Changed only .gitlab-ci.yml ref to master and README empty-Codex/temporary-branch guidance. Real master include CI Lint validtrue,0errors/0warnings, deploymanual.
+
+Prepared master-include proposal/patch/immutable snapshot, pre-stage match, entire staged/committed patch match. Published07a11754d4665a86938cbd3c4d1b9cf371be5b73 (use master ci templates and update codex guidance) on existing DevOps-918-secrets-from-env. Existing MR3exactSHA/title/body/settings verified unchanged; no metadata write needed. Pipeline143001RUNNING https://gitlab.youdo.sg/youdo/ai/ai-qa/-/pipelines/143001, status/Cancel available. App worktree clean, all local command sessions finished, no local background operations; external CI remains active. No merge, direct master push or runtime redeploy. Central README publication and include-cutover tasks closed; app MR3merge and developer acceptance remain open.
+
+## Remaining task audit and developer-owned MR3review/merge
+
+User explicitly assigned MR3code review and merge to the developer and requested remaining ai-qa tasks. This adds app review/merge ownership to the previously developer-owned functional QA boundary; no agent merge or outreach authorized. Fresh CI143001isMANUAL, all4nondeploy jobsSUCCESS, deploymanual; no active task background commands.
+
+Reconciled central backlog using existing evidence only: namespace creation/configuration and runtime credential-source identification are complete; actual successful3297929proved deployment-account resource creation/tooling and completed the previously pending first-rollout agreement. Helm/CI checks and actual accepted Kubernetes manifests settle first-rollout configuration validity; standalone pre-rollout server dry-run was not performed and is not retroactively claimed. No additional infrastructure checks used solely for bookkeeping. Explicit namespace support is already deployed; unagreed automatic fallback/formula remain clearly labeled deferred generic enhancements, not ai-qa blockers. Canonical OIDC is user-confirmed, extra-hostname redirect remains open. S3-key task now checks/restricts the existing credential scope instead of assuming another key must be created. Other access/privacy/S3 protocol/retention/PGbackup/PVCretention/rollback/rotation/cleanup checks remain unverified/open.
+
+Developer-owned app MR3review/merge and functional acceptance remain visible with owner labels. Existing worker pull check depends on a developer-initiated scenario. Source review/merge assignment does not disable standard automated CI tests. No repository or infrastructure changes, no task execution implied by listing. Remaining list rendered from todo.py --system ai-qa, not manually curated.
+
+## Developer-owned follow-ups closed by user (2026-11-13)
+
+The user requested closing everything assigned to the developer because they will not verify it. Closed exactly three central TODO entries: app MR3 review/merge, functional acceptance (callbacks/reports/video/ZIP), and the representative QA/stand lifecycle. These are user-closed follow-ups without verification, not evidence of a merged MR or passing functional checks. Other infrastructure, access, persistence and recovery tasks remain open in central TODO. No GitLab, application or infrastructure state was changed.
+
+## Access and worker-image checks closed by user (2026-11-13)
+
+The user declined the proposed read-only runtime access and connectivity checks: the developer will verify and report problems. Closed four central TODO follow-ups without testing: kubeconfig permissions; Kubernetes API/Vault/registry DNS/network/TLS; GitLab/Jenkins/Keycloak/YouTrack/AI/S3 access; and worker image pull. This task-specific decision supersedes earlier proposals to perform these checks and does not establish successful access. The extra-hostname redirect and other infrastructure follow-ups remain in central TODO. No external operations or background work were started.
+
+## Indefinite S3 retention selected by user (2026-11-13)
+
+User explicitly selected keeping ai-qa S3 artifacts indefinitely, without a retention deadline. This task-specific policy covers reports, media and manifests; do not implement time-based expiry or old-version cleanup from the superseded lifecycle proposal. Closed the retention-choice and lifecycle-configuration TODO entries as superseded by this decision. No cloud lifecycle configuration was inspected or changed; this records desired policy, not a verified live configuration. PostgreSQL backup/recovery and PVC uninstall behavior remain separate unresolved topics.
+
+## PostgreSQL backup and uninstall-policy work cancelled (2026-11-13)
+
+User explicitly declined both PostgreSQL backup/recovery planning and deciding PVC behavior on Helm release uninstall. Closed those two TODO entries as cancelled, not implemented. Also removed PostgreSQL restore verification from the combined rollback follow-up, retaining application/chart rollback compatibility as open. This supersedes earlier statements that backup/recovery and PVC-uninstall decisions remain pending. No backup, restore, PVC retention/deletion, chart or cluster settings were changed; the previously agreed persistence across ordinary redeployments is unchanged.
+
+## Stand cleanup verification assigned to developer (2026-11-13)
+
+User confirmed that verifying stand pause/cleanup does not affect permanent ai-qa is developer-owned and requested removing the follow-up. Closed the central TODO entry as a duplicate of the previously closed developer lifecycle acceptance, without DevOps verification. This supersedes earlier open-cleanup verification directions for this task. No application, cluster or repository configuration changed.
+
+## Storybook follow-up removed by user (2026-11-13)
+
+After explaining the unrelated Terraform website-block removal for youdo-b2b-storybook-test, the user explicitly requested removing the manual Storybook follow-up from the backlog. Closed that TODO entry without claiming a website repair or verification. This supersedes the earlier direction to keep the follow-up open; no external state changed. The S3 application-key permission-scope question remains open and is explanation only.
+
+## S3-key scope check cancelled by user (2026-11-13)
+
+After clarification of the application S3 credential scope check, the user explicitly declined it as unnecessary. Closed the corresponding central TODO entry as cancelled, without checking or changing IAM/key permissions. This supersedes earlier open follow-up directions to verify or restrict this credential. Successful bucket read/list remains the only previously established access evidence; no broader permission-boundary claim is made.
+
+## S3 protocol and redeploy-persistence checks assigned to developer (2026-11-13)
+
+User explicitly assigned both S3 Put/Get/Delete/Range/SigV4/conditional-manifest verification and restart/upgrade preservation of PostgreSQL state, sessions, PVC and S3 artifacts to the developer, and requested closing these follow-ups. Closed both central TODO entries without performing tests or claiming passing results. This supersedes earlier open verification directions for these two items. No S3 objects, pods, releases, database state or other external resources changed. Other open entries remain in central TODO.

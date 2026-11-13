@@ -8,8 +8,11 @@ tags: [home, router, openwrt, trusttunnel]
 
 ## Summary
 
-- The target router-level VPN and encrypted-DNS design remains a plan.
-- The existing Archer C64 supplies the home LAN.
+- TrustTunnel1.1.12 and podkop0.7.24/sing-box1.13.21 run on Cudy with verified selective LAN routing and temporary user-approved Archer DNS.
+- Automatic direct fallback and managed TrustTunnel recovery are verified for interface down, client exit, transport loss and network restart; household cutover remains pending.
+- Archer C64 supplies the existing home LAN; Cudy WR3000S v1 now runs OpenWrt 25.12.5 behind it on a test LAN.
+- User ISP cutover verified2026-11-13: Cudy WAN100.64.6.13/16, gateway100.64.0.2; prior Archer-upstream description above is historical. Media bindings and PC VPN/FakeIP compatibility still need completion.
+- Cudy LAN192.168.168.1/24 and DHCP192.168.168.100-.249 verified2026-11-13; wired client192.168.168.165. SSH recovered by user; podkop API refreshed to192.168.168.1:9090 and LAN DNS/direct/VPN probes passed. WAN/DNS still through Archer192.168.192.1.
 - Media Station X and Lampa startup on the TV are user-confirmed as of 2026-11-10.
 - TorrServer MatriX.150 runs in Docker on the existing Linux PC.
 - The current TV endpoint is `http://192.168.192.107:8090`.
@@ -21,8 +24,11 @@ tags: [home, router, openwrt, trusttunnel]
 - The PC must stay on for playback; its DHCP address can change.
 - Components and Operations describe the current deployment and checks.
 - Historical VPN diagnostics remain below; open work is tracked in central TODO.
+- Decision2026-11-13: plan Jackett/FlareSolverr on the home server; the VPS attempt failed readiness under observed resource pressure and was cancelled. The user will switch off the VM; no home-server migration has run.
 
 ## Staleness review (2026-11-04)
+
+Historical review: its AmneziaWG backup direction was cancelled by the user on 2026-11-13.
 
 The home deployment remains a plan: local `home-infra/AGENTS.md` still records no deployment. Its version-3 `PLAN.md` and the explicit decisions in `AGENTS.md` specify podkop with TrustTunnel as a netifd interface, AmneziaWG UDP as backup, and encrypted DNS through the user's own VPS AdGuard Home with Unbound recursion; raw dnsmasq nftset routing is the fallback, not the selected primary design. Amend the planned-components paragraph accordingly and remove VPS AdGuard Home from the deferred list. Fail-open, FakeIP/upstream compatibility and actual tunnel egress still require the existing bench tests in the central backlog. No router, server, hardware purchase or client restart was checked during this review. StrongSwan's trial on the TrustTunnel host was removed on 2026-11-04, as recorded in the [removal log](../log/2026-11-04-vpn-gateway-strongswan-ansible-removal.md); the separate old gateway's current state remains unconfirmed.
 
@@ -36,6 +42,20 @@ domains (YouTube, Instagram, torrent trackers, ...) through the user's TrustTunn
 TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segments.
 
 ## Components
+
+- DNS deployed and externally verified (2026-11-13): AdGuard Home 0.107.80 is live on it-garage-de-02 / d.slnnk.com with public DoT, private admin, selected DoH upstreams and local ad filtering. Initial playbook failed0/unreachable0; trusted certificate expires 2027-02-11. Port53/3000 are not public. The separately approved narrow SSH forwarding exception is applied: a real authenticated panel tunnel returned HTTP200 and forwarding to loopback8081 was administratively prohibited. Home/mobile cutover is pending. See [runtime result](../log/2026-11-13-home-network-ansible-dns-role.md#deployment-approved-and-verified-2026-11-13).
+
+- Earlier local DNS role preparation (2026-11-13, runtime status superseded by the deployment result above): roles/dns and playbooks/dns.yml target it-garage-de-02 / d.slnnk.com with AdGuard Home 0.107.80, public DoT, private admin, Cloudflare and AdGuard Unfiltered DoH, without Unbound. Native local DNS and Ansible checks passed; no runtime deployment/client cutover. The admin bcrypt hash is now Vault-encrypted in DNS group vars; its generated password is stored as ADGUARD_HOME_ADMIN_PASSWORD in personal/.env. See [preparation and approvals](../log/2026-11-13-home-network-ansible-dns-role.md).
+
+- User decision (2026-11-13): deploy only one AdGuard Home, with external encrypted upstreams (superseding the earlier recursive Unbound proposal), on VPS it-garage-de-02 (inventory group dns), using d.slnnk.com. Home clients and phones on mobile networks will use this encrypted DNS endpoint. Cancel the home-server AdGuard Home instance; the earlier two-AdGuard DNS chain below is superseded. Subsequent user decision (2026-11-13): encrypted DNS-over-TLS on TCP 853 is public, without client IP/CIDR/ASN restrictions, for dynamic home and mobile clients. Any Internet client knowing the endpoint can use it. Do not expose plain DNS on port 53 or the loopback-only admin panel. This replaces the earlier unresolved allowlist proposal; deployment requires separate approval. Local dns-role preparation in /home/slnnk/mygit/ansible on existing master from b857c7e was approved, paused for discussion before edits, then explicitly resumed by the user with the final upstream-only design. The VPS was subsequently deployed with explicit approval; client/router DNS changes remain pending.
+
+- User decision (2026-11-13): AmneziaWG backup tunnel is cancelled on both Cudy and the VPS. Keep TrustTunnel with the existing verified direct fail-open behavior. Earlier AmneziaWG mentions in dated planning records are historical and superseded; no deployment, removal or other runtime changes are authorized by this planning decision.
+
+- User clarification (2026-11-13): the target home server must also host the Lampa web frontend; Media Station X on the TV opens that locally hosted frontend. The planned home-server services are Lampa, TorrServer, Jackett, FlareSolverr and Uptime Kuma. AdGuard Home placement was subsequently consolidated on the VPS by the user. This clarifies placement only; deployment is not authorized or completed. The older external lampa.mx startup description below records historical setup.
+
+- Current remote-media decision (2026-11-13): the actual VPS target was `dline-de-01` (`166.1.36.104`) and the selected domain was `ext.slnnk.com`, superseding the historical `dline-pl-01`/`tv.slnnk.com` proposal below. Approved Ansible applied base/security/Docker/nginx and issued TLS, but failed FlareSolverr readiness; HetrixTools was not reached. User chose future home-server placement and will shut down the VM. No remote shutdown, swap, DNS cleanup, PC migration or TV cutover was performed. The final failed Ansible command has exited. Home host/resources and implementation remain to be agreed in central TODO; existing Cudy/podkop can route blocked tracker destinations. See [attempt, cancellation and plan](../log/2026-11-13-home-network-dline-de-jackett-deployment.md#final-outcome-and-home-server-decision).
+
+- Router verified 2026-11-13: Cudy WR3000S v1 runs standard-layout OpenWrt 25.12.5, kernel `6.12.94`, `apk 3.0.5`, with SSH key access and separate WAN/LAN subnets. TrustTunnel client1.1.12 and iamvladdy netifd/LuCI integration are installed; `tun0` up and authenticated curl egress152.234.226.70 verified. Ordinary default route still uses Archer; podkop0.7.24 and sing-box1.13.21 now provide verified selective routing with user-approved temporary Archer DNS. Overlay13.5MiB free. See [bring-up](../log/2026-11-13-home-network-cudy-openwrt-bringup.md#trusttunnel-installed-and-verified).
 
 - Shared nginx/Certbot local implementation (2026-11-11): the user approved the proposed refactor. Shared `nginx` owns main/HTTP/stream configuration with explicit inventory/header merges, validated reload and candidate rollback. Shared `certbot` owns webroot lineages and lineage-specific renewal actions. VPN and relay ownership was migrated locally while retaining TrustTunnel TLS, relay passthrough and issuance-before-service ordering. Media inventory now prepares HTTPS `tv.slnnk.com` for Jackett result/download APIs, with private admin/solver endpoints. Syntax, three isolated nginx configurations, bootstrap selection, hooks and rollback tests passed. No deployment, DNS or live certificate action; see [implementation](../log/2026-11-11-home-network-shared-nginx-certbot.md). This supersedes the earlier pending-refactor proposal below.
 
@@ -66,8 +86,7 @@ TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segme
   and PC keep their own TrustTunnel clients. Tunnel failure must be fail-open with a
   Telegram notification. Decided 2026-09-26.
 - Planned (hypothesis): OpenWrt router Cudy WR3000S v1 (MT7981, 256 MB RAM, 128 MB NAND;
-  not WR3000 v1 with 16 MB flash, not WR3000 v2 which is unsupported) with podkop list-based routing, TrustTunnel as a netifd interface and
-  AmneziaWG UDP as backup; raw dnsmasq nftsets and policy routing are the fallback; 8-port unmanaged switch; Debian mini PC (N100 class) with docker
+  not WR3000 v1 with 16 MB flash, not WR3000 v2 which is unsupported) with podkop list-based routing, TrustTunnel as a netifd interface; raw dnsmasq nftsets and policy routing are the fallback; 8-port unmanaged switch; Debian mini PC (N100 class) with docker
   compose: AdGuard Home (encrypted upstream to the user's VPS AdGuard Home with Unbound
   recursion; no public resolver upstreams), TorrServer, Uptime Kuma. TV Hisense 55U7S PRO (VIDAA U9.5, not bought yet): Lampa via Media Station X with
   start parameter `lampa.mx`; TorrServer must run on the home server. Browser-based
@@ -97,13 +116,114 @@ See [diagnostic evidence](../log/2026-10-11-trusttunnel-client-kickstarter-routi
 
 ## Control points
 
+Cudy management/SSH: `192.168.168.1`; DHCP pool `.100-.249`,12h leases. LAN change
+via user UI and post-change podkop reload verified. Monitor reads its current controller
+from generated JSON; current selector API is192.168.168.1:9090. Household cutover is
+pending; media bindings/TV URLs still reference the old Archer subnet and require review
+then. See [LAN completion evidence](../log/2026-11-13-home-network-cudy-failover.md#current-completion-boundary).
+
 TorrServer on the PC: `http://192.168.192.107:8090`, Docker container `torrserver`.
 Jackett on the PC: `http://192.168.192.107:9117`, Docker container `jackett`.
 FlareSolverr: Docker container `flaresolverr`, reachable from Jackett at `http://flaresolverr:8191` on `home-media`, no host-published port.
-Planned: OpenWrt `/etc/config/*`, procd service for the TrustTunnel client,
-dnsmasq nftsets and policy routing table for VPN traffic.
+Cudy: TrustTunnel is managed by netifd interface `tun0`; runtime TOML under
+`/opt/trusttunnel_client/`, LuCI Status > TrustTunnel. Selective routing is active through podkop.
 
 ## Operations
+
+Telegram domains expanded2026-11-13: all21 literal domains from the user-specified
+v2fly telegram list added to manual main list, retaining existing Telegram community/IP
+coverage and all other domains. All21 FakeIP probes, generated JSON and German VPN
+egress passed. Backup `/root/cudy-before-v2fly-telegram/podkop`; local source/helper
+and verification `/home/slnnk/ai-data/cudy/telegram-domains/`.
+
+OpenAI domain expansion2026-11-13: user chose manual addition of all24 literal v2fly
+openai entries, including CDN/voice/telemetry, plus explicitly authorized replacement
+webpubsub.azure.com for the regex. Added20 new suffix records after deduplication;
+existing main domains retained (39 total). No external JSON subscription installed.
+Verified26 FakeIP names including dynamic Azure host, valid generated config and VPN
+egress152.234.226.70. Backup `/root/cudy-before-v2fly-openai/podkop`; local artifacts
+`/home/slnnk/ai-data/cudy/openai-domains/`.
+
+Post-cutover diagnosis2026-11-13: PC own TrustTunnel routes router FakeIP198.18/15
+into PC tun0/table880, causing Firefox/OpenAI connection refusal. Wi-Fi-bound requests
+through Cudy reach HTTPS403/TLS0. Added the FakeIP range to PC client exclusions;
+user restart/working-site confirmation and route lookup verify activation. Subsequent
+standalone Codex403 targets already-covered chatgpt.com but PC cache retains real apex
+IPs for up to50min; fresh Cudy answers are FakeIP. User cleared the system cache,
+verified198.18.0.57 and supplied a successful restarted Codex CLI response screenshot;
+the403 incident is resolved without additional domains or application changes. Router now
+uses observed public AdGuard UDP/bootstrapGoogle DNS, not Archer; agent did not change it.
+Media container bindings still reference192.168.192.107 and need cutover updates.
+See [cutover diagnostics](../log/2026-11-13-home-network-cudy-cutover-pc-fakeip.md).
+
+OpenAI routing added2026-11-13 at user's request: domain suffixes openai.com,
+chatgpt.com, oaistatic.com, oaiusercontent.com, oaistatsig.com, openaimerge.com in
+podkop main user list, including their subdomains. Router DNS probes return FakeIP;
+selector uses TrustTunnel. API HTTPS401/TLS0 without key verifies transport.
+Backup `/root/cudy-before-openai-domains/podkop`; existing lists preserved.
+
+Wi-Fi on-air confirmation2026-11-13: user supplied an ARIIA associated-station screenshot
+with client192.168.168.234, received signal approximately-51dBm, HE80/two spatial streams
+and PHY rates1080.6/960.7Mbit/s. This supersedes the earlier AP-disabled observation below.
+Screenshot does not show the channel number; do not infer149 was verified from it.
+Actual payload/internet throughput, coverage at distance and radio0 activation remain
+unverified. No additional router changes were requested or performed in this discussion.
+
+Wi-Fi status2026-11-13: user-configured radio1 ARIIA/RU/channel100/HE80/sae-mixed
+failed AP startup;5500MHz disabled in actual regulatory profile. Runtime channel list
+allows149-161 for an80MHz block; proposed149 pending UI application/verification.
+radio0 is still disabled and retains an unencrypted OpenWrt template. No station
+connected at inspection; do not describe Wi-Fi as working until on-air/client checks.
+
+Cudy approved repair verified2026-11-13: netifd owns a foreground TrustTunnel supervisor,
+with WAN DNS bootstrap and authenticated readiness. Procd service cudy-vpn-failover
+checks actual tun0 egress every10s;2 failures select direct-out,3 successes restore
+trusttunnel-out via the main-out selector. FakeIP/DNS remain active. Native podkop WAN
+monitoring restores policy routing after network restart. Four end-to-end scenarios passed:
+manual ifdown/direct fallback13.1s, client exit/reconnect9.2s, transport loss/fallback19.6s,
+and network restart. Selected/direct LAN HTTP(S) egress was verified after each recovery.
+Test rules removed; monitor/client/selector healthy. Status:
+`cat /var/run/cudy-vpn/status.json`, `ifstatus tun0`; monitor stop command:
+`/etc/init.d/cudy-vpn-failover stop` (leaves current path, stops automatic switching).
+Backup `/root/cudy-before-failover/`; local artifacts `/home/slnnk/ai-data/cudy/failover/`.
+Full cold boot and individual UDP voice tests remain unverified. Cutover must adapt
+temporary Archer DNS before disconnecting it. See [repair](../log/2026-11-13-home-network-cudy-failover.md).
+
+Historical pre-repair test2026-11-13 (superseded by repair above): with `ifdown tun0`, unlisted openwrt.org stayed200 but
+listed VPN service/TMDB connections reset while DNS retained FakeIP. Automatic direct
+fallback is not implemented. `ifup tun0` alone initially reported up, then the client
+exited after connection attempts and the TUN vanished. Cause unresolved. Restored by
+stopping podkop, reconnecting TrustTunnel until its process/log/device were ready, then
+starting podkop. LAN ordinary200/VPN200 German egress/TMDB301 and both services verified
+again. No permanent repair applied; household cutover should wait for approved fail-open
+and reconnect corrections. See [failure evidence](../log/2026-11-13-home-network-cudy-openwrt-bringup.md#tunnel-failure-test).
+
+User confirmed2026-11-13 that own DNS/server is not ready and then explicitly chose
+temporary DNS through Archer192.168.192.1. Podkop is now configured/enabled with VPN
+section tun0, youtube/meta/telegram/discord lists and custom Lampa/TMDB/tracker domains.
+dnsmasq forwards to sing-box127.0.0.42, upstream/bootstrap Archer over UDP; updates go
+through TrustTunnel daily. Wired LAN tests verified German VPN egress and different
+direct egress, YouTube200/TLS0, TMDB301/TLS0, Lampa HTTP200, ordinary HTTPS200/TLS0.
+The fail-open/reconnect failures have been repaired as recorded above. Own encrypted DNS and household cutover remain pending. Backup:
+`/root/cudy-before-podkop-config/`. Check `podkop get_status` and
+`podkop get_sing_box_status`; `/etc/init.d/podkop stop` stops routing/sing-box and
+restores the previous DNS path. See [configuration evidence](../log/2026-11-13-home-network-cudy-openwrt-bringup.md#podkop-configured-with-temporary-archer-dns).
+
+Historical installation stages (superseded by the running configuration above):
+Cudy dependency installation verified 2026-11-13 after explicit user approval:
+`kmod-tun 6.12.94-r1`, `ip-full 6.18.0-r2`, `curl 8.23.0-r1` installed through APK
+with four library dependencies. `/dev/net/tun` exists, tool version checks pass,
+default route remains through Archer. At the dependency stage overlay had40.8MiB free;
+subsequent client installation left approximately33.3MiB. TrustTunnel is now running,
+podkop0.7.24 and sing-box1.13.21 were subsequently installed but remain disabled pending
+configuration. Final overlay free13.7MiB. Installation auto-started unconfigured podkop;
+it was stopped, boot disabled and exact DHCP backup restored. DNS queries through loopback
+and LAN and direct HTTPS passed; network/firewall unchanged, tun0 up. Backups for this
+stage: `/root/cudy-before-podkop/`. LuCI: Services > Podkop.
+Check `ifstatus tun0`; stop with `ifdown tun0` only when authorized.
+Network/firewall backups: `/root/cudy-before-trusttunnel/`; no LAN-wide VPN routes or
+DNS changes applied. Full reboot recovery and selective fail-open tests remain unverified.
+See [bring-up log](../log/2026-11-13-home-network-cudy-openwrt-bringup.md).
 
 TorrServer cache inspection (2026-11-10): persisted `BitTorr` settings specify 64 MiB (`CacheSize: 67108864`) and RAM storage (`UseDisk: false`). Downloaded video pieces use a bounded cache rather than a permanent whole-film library. No cache tuning was applied; see [inspection](../log/2026-11-10-home-network-pc-torrserver.md#cache-configuration-inspected).
 
@@ -128,6 +248,8 @@ Router LAN only, from the user's PC. No remote access yet.
 
 ## Related log entries
 
+- [2026-11-13 local VPS AdGuard Home role prepared](../log/2026-11-13-home-network-ansible-dns-role.md)
+- [2026-11-13 VPS Jackett attempt cancelled; future home-server placement planned](../log/2026-11-13-home-network-dline-de-jackett-deployment.md)
 - [2026-11-11 shared nginx/Certbot refactor and local TV HTTPS configuration](../log/2026-11-11-home-network-shared-nginx-certbot.md)
 - [2026-11-11 local Docker/Jackett Ansible roles prepared and checked](../log/2026-11-11-home-network-ansible-jackett-roles.md)
 - [2026-11-10 FlareSolverr installed and RuTracker Test passed](../log/2026-11-10-home-network-pc-flaresolverr.md)

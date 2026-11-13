@@ -10,5 +10,5 @@ Current branch is not a property of the repository; do not record it.
 
 | Path | Origin | Purpose | System | Checked |
 | --- | --- | --- | --- | --- |
-| `/home/slnnk/mygit/ansible` | `git@gitflic.ru:slnnk/ansible.git` | Ansible for the user's VPS: base/security, shared nginx/Certbot, VPN/relay, monitoring, Docker and Jackett/FlareSolverr Compose; functional playbooks `vpn.yml`, `vpn-proxy.yml`, `jackett.yml` | trusttunnel-de, home-network | 2026-11-11 |
+| `/home/slnnk/mygit/ansible` | `git@gitflic.ru:slnnk/ansible.git` | Ansible for the user's VPS: base/security, shared nginx/Certbot, VPN/relay, monitoring, Docker, Jackett/FlareSolverr Compose and VPS AdGuard Home DNS; functional playbooks `vpn.yml`, `vpn-proxy.yml`, `jackett.yml`, `dns.yml` | trusttunnel-de, home-network | 2026-11-13 |
 | `/home/slnnk/mygit/home-infra` | none yet (not a git repo) | Home infrastructure description, questions and deployment plan | home-network | 2026-09-26 |

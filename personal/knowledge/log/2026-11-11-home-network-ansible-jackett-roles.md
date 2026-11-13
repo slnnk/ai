@@ -46,6 +46,8 @@ Required agent instruction lint: 10 files, zero errors, one CDX-AG-005 warning a
 
 ## Status and risks
 
+Subsequent outcome2026-11-13: the actual approved remote attempt used `dline-de-01` and `ext.slnnk.com`, then failed FlareSolverr readiness. The user cancelled VM placement and chose to plan deployment on the home server instead. Historical pending-VPS directions below are superseded; implementation and TV cutover have not run. See [final attempt and decision](2026-11-13-home-network-dline-de-jackett-deployment.md#final-outcome-and-home-server-decision) and central TODO.
+
 Requested local implementation and checks are complete. All task commands finished; no background installer/agent or target deployment remains running. Existing local media containers from the prior TV setup were not changed. Publication and remote application remain unapproved.
 
 The [central TODO](../../../TODO.md) tracks proposed deployment after the machine starts, `ansible_host` and the unique monitoring SID are supplied, TV/API access is chosen, and explicit runtime approval is obtained. Protect API access through an approved HTTPS proxy or explicit listener/firewall configuration before direct TV use. A 1-GB machine's actual browser memory peaks and challenge handling are not validated by syntax/rendering tests.

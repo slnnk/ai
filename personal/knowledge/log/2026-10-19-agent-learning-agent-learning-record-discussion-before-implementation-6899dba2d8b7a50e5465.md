@@ -1,7 +1,7 @@
 ---
 system: agent-learning
 status: verified
-checked: 2026-11-12
+checked: 2026-11-13
 tags: [agents, learning]
 ---
 # Agent learning: discussion-before-implementation
@@ -102,6 +102,39 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-12-trusttunnel-de-proxy-kernel-stall.md",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-12T21:56:06.945515+00:00",
+      "cause": "Applied requested relay and monitoring roles, added host_vars only after first repo gate, old shutdown/SID transfer explicitly requested; no publication or unrelated remote changes.",
+      "event_id": "simplecloud-relay-deployment-20261113",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-trusttunnel-de-simplecloud-relay-migration.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-13T16:28:48.241753+00:00",
+      "cause": "",
+      "event_id": "cudy-trusttunnel-20261113-authorized-install",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-cudy-openwrt-bringup.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-13T20:21:19.854688+00:00",
+      "cause": "",
+      "event_id": "2026-11-13-dns-role-first-applicable-attempt",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-ansible-dns-role.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
@@ -126,7 +159,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agent-learning",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-12T20:29:13.864950+00:00",
+  "updated": "2026-11-13T20:21:19.854688+00:00",
   "version": 1
 }
 ```

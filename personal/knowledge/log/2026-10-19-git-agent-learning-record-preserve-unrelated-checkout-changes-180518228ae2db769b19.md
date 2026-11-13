@@ -1,7 +1,7 @@
 ---
 system: git
 status: verified
-checked: 2026-11-12
+checked: 2026-11-13
 tags: [agents, learning]
 ---
 # Agent learning: preserve-unrelated-checkout-changes
@@ -47,6 +47,28 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "/home/slnnk/ai/current/knowledge/log/2026-11-12-ai-qa-devops-918-vk-helm-deployment-plan.md",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-13T19:40:17.103703+00:00",
+      "cause": "",
+      "event_id": "2026-11-13-dline-de-jackett-deployment-first-attempt",
+      "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-dline-de-jackett-deployment.md#final-outcome-and-home-server-decision",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-13T20:21:19.933470+00:00",
+      "cause": "",
+      "event_id": "2026-11-13-dns-role-first-applicable-attempt",
+      "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-ansible-dns-role.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
@@ -71,7 +93,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "git",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-12T12:05:47.694572+00:00",
+  "updated": "2026-11-13T20:21:19.933470+00:00",
   "version": 1
 }
 ```

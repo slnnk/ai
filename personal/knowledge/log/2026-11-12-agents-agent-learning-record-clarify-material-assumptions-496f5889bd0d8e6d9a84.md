@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-12
+checked: 2026-11-13
 tags: [agents, learning]
 ---
 # Agent learning: clarify-material-assumptions
@@ -14,7 +14,19 @@ Correction evidence and scoped application history. Canonical instructions remai
 {
   "created": "2026-11-12T15:41:35.792309+00:00",
   "decisions": [],
-  "evaluations": [],
+  "evaluations": [
+    {
+      "at": "2026-11-13T19:40:17.226242+00:00",
+      "cause": "",
+      "event_id": "2026-11-13-dline-de-jackett-deployment-first-attempt",
+      "expected": "Check material assumptions against available context; explicitly surface interpretations affecting result, scope or permissions and clarify before acting on that choice; make routine reversible decisions independently.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-dline-de-jackett-deployment.md#final-outcome-and-home-server-decision",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
+    }
+  ],
   "expected": "Check material assumptions against available context; explicitly surface interpretations affecting result, scope or permissions and clarify before acting on that choice; make routine reversible decisions independently.",
   "key": "clarify-material-assumptions",
   "kind": "explicit",
@@ -37,7 +49,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-12T15:41:35.792309+00:00",
+  "updated": "2026-11-13T19:40:17.226242+00:00",
   "version": 1
 }
 ```

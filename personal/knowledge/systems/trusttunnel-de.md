@@ -1,7 +1,7 @@
 ---
 system: trusttunnel-de
 status: verified
-checked: 2026-11-12
+checked: 2026-11-13
 tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 ---
 # TrustTunnel endpoint it-garage-de-01
@@ -23,7 +23,34 @@ tags: [trusttunnel, vpn, ansible, nftables, crowdsec]
 - Local inventory confirms `152.234.226.70` and desired domain `v.slnnk.com`.
 - The user confirmed VPN recovery before domain migration; new-domain HTTPS was subsequently verified by the agent.
 - The old-address incident is closed; historical diagnostics remain below.
-- Russian relay deployed to `dline-spb-01`; authenticated HTTP/2 and HTTP/3 probes passed. User switched DNS to Russia; authoritative servers confirm, recursive caches still retain Germany.
+- Current Russian relay: `simplecloud-msk-01`, `85.143.174.240`; HTTP/2 and HTTP/3 authenticated checks passed on2026-11-13. Old relay poweroff accepted; user confirmed HetrixTools UP after migration.
+
+## Current Russian relay: SimpleCloud, 2026-11-13
+
+User-selected `simplecloud-msk-01` /85.143.174.240 is deployed with existing vpn-proxy
+playbook:77ok/38changed/0failed; monitoring19ok/7changed/0failed. Domainv.slnnk.com
+and old relay's Vault SID are stored in new host_vars after explicit repo gate approval.
+Pinned HTTPS200/TLS0 and authenticatedHTTP2/HTTP3 both passed with German egress.
+German access log confirms new-relay ACME forwarding. No certificate/backend changes.
+At00:51:25MSK old dline-spb-01 agent was stopped and poweroff returned0; subsequentSSH
+unreachable, provider-panel power state not observed. Do not run old SID collection if
+the retired host is powered on again. HetrixTools already reports new hostname/metrics.
+At deployment Cloudflare DNS saw new A/noAAAA while Google/monitor still cached old IP.
+User subsequently confirmed HetrixTools UP; operational migration follow-up is closed.
+Every recursive DNS cache was not rechecked; no extra changes requested.
+Earlier old-relay/current-provider-selection sections are historical and superseded.
+See [deployment and approval evidence](../log/2026-11-13-trusttunnel-de-simplecloud-relay-migration.md).
+
+Post-migration DOWN recurred at01:21:55–01:26:40MSK (285seconds), then recovered UP in all four locations. New-relay pinned HTTPS200/TLS0 and SSH/service health passed; stale old resolve_address and mixed diagnostic IPs support residual DNS caching. No remote changes; see the migration log for evidence.
+
+## Replacement hosting research, 2026-11-13
+
+Historical comparison used budget200–400RUB/month. IHOR/AdminVPS/FirstByte proposals
+were withdrawn after the user's order-flow availability corrections. User then selected
+SimpleCloud and explicitly authorized the migration, old-relay shutdown and SID transfer;
+those requested operations are now verified as described above. Search and destination
+selection are resolved. See [research history](../log/2026-11-13-trusttunnel-de-hosting-shortlist.md)
+and [migration outcome](../log/2026-11-13-trusttunnel-de-simplecloud-relay-migration.md).
 
 ## Current availability after authorized reboot, 2026-11-12
 
