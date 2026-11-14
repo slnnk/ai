@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-04
+checked: 2026-11-14
 tags: [agents, learning]
 ---
 # Agent learning: ai-repo-exempt-first-git-gate
@@ -14,7 +14,19 @@ Correction evidence and scoped application history. Canonical instructions remai
 {
   "created": "2026-11-03T23:18:05.180033+00:00",
   "decisions": [],
-  "evaluations": [],
+  "evaluations": [
+    {
+      "at": "2026-11-13T22:35:00.064569+00:00",
+      "cause": "",
+      "event_id": "ponytail-adoption-2026-11-14",
+      "expected": "Do not request first-gate repository, branch/reuse and base confirmation for edits anywhere in ~/ai; preserve other Git and external-change permissions and ai-sync publication handling.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-12-knowledge-base-ponytail-review.md#selective-adoption-2026-11-14",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    }
+  ],
   "expected": "Do not request first-gate repository, branch/reuse and base confirmation for edits anywhere in ~/ai; preserve other Git and external-change permissions and ai-sync publication handling.",
   "key": "ai-repo-exempt-first-git-gate",
   "kind": "explicit",
@@ -37,7 +49,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-03T23:18:05.180033+00:00",
+  "updated": "2026-11-13T22:35:00.064569+00:00",
   "version": 1
 }
 ```

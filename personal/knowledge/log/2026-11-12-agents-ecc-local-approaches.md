@@ -78,6 +78,17 @@ a separate implementation decision. No background task operations remain.
 
 The user asked to add these approaches to the pilot list for future evaluation. Updated the existing E02-E14 central backlog entry and merged design evidence with the E08, E02/E03/E05 and E12 mapping. Refreshed the affected Russian display title. Recording is complete; pilot execution remains deferred, with no installation, runtime settings change or background operations.
 
+## Scope reconciliation November 14
+
+The E08-first recommendation above is historical: compact checkpoints were
+implemented and the user declined their optional evaluation. Do not reopen that
+comparison. The [personalized-learning reconciliation](2026-11-14-agents-personalized-learning-backlog.md#reconciliation-decisions)
+assigns correction-transfer cases and candidate integration to the existing
+E02/E05/E06/E12 families, with one central TODO owner for each concrete step.
+ECC observation mechanisms remain possible design input; no automatic background
+observer, silence-based confidence promotion or universal rule inference is adopted.
+This follow-up updates backlog scope only; no instruction/skill code was changed.
+
 ## Portable lesson
 
 none

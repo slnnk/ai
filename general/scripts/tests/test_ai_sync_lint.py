@@ -18,7 +18,7 @@ class SyncLintTests(unittest.TestCase):
         self.root = Path(self.tmp.name)
         self.scripts = self.root / 'general/scripts'
         self.scripts.mkdir(parents=True)
-        for name in ('agnix_update.py', 'agent_lint.py'):
+        for name in ('agnix_update.py', 'agent_lint.py', 'agent_metrics.py'):
             (self.scripts / name).write_text('raise SystemExit(0)\n')
         (self.scripts / 'build_index.py').write_text('print(0)\n')
         (self.scripts / 'ai_sync_message.py').write_text(

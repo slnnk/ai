@@ -23,6 +23,7 @@ import datetime as dt
 import fcntl
 import hashlib
 import json
+import shlex
 import os
 from pathlib import Path
 import re
@@ -352,6 +353,7 @@ def main(argv=None):
     q.add_argument('--task-id', default='')
     q.add_argument('--include-history', action='store_true')
     q.add_argument('--limit', type=int, default=8)
+    q.add_argument('--offset', type=int, default=0)
     q.add_argument('keywords', nargs='*')
     sub.add_parser('report', help='count evidence and actual evaluations; no writes')
     sub.add_parser('check', help='validate store and canonical references; no writes')
@@ -368,8 +370,8 @@ def main(argv=None):
             return 0
         items = records(root)
         if a.command == 'query':
-            if a.limit < 1:
-                raise Invalid('limit must be positive')
+            if a.limit < 1 or a.offset < 0:
+                raise Invalid('limit must be positive and offset nonnegative')
             matches = []
             for path, d in items:
                 if disposition(d) in ('rejected', 'superseded') and not a.include_history:
@@ -392,12 +394,32 @@ def main(argv=None):
                 if not (d['scope'] == 'global' and state(d) == 'active') and not all(word.casefold() in hay for word in a.keywords):
                     continue
                 matches.append((path, d))
-            for path, d in sorted(matches, key=lambda item: (state(item[1]) == 'active', item[1]['updated']), reverse=True)[:a.limit]:
+            def relevance(item):
+                _, d = item
+                exact = d['key'].casefold() in [w.casefold() for w in a.keywords]
+                topical = all(w.casefold() in json.dumps(d, ensure_ascii=False).casefold() for w in a.keywords)
+                specific = (bool(d['task_id']), d['scope'] == 'repo', d['scope'] != 'global')
+                return (exact, topical, specific, state(d) == 'active', d['updated'], d['key'])
+
+            matches.sort(key=relevance, reverse=True)
+            page = matches[a.offset:a.offset + a.limit]
+            for path, d in page:
                 print(f'{d["key"]} [{state(d)}; {d["kind"]}; {d["scope"]}; {d["system"]}] {d["summary"]}')
                 print(f'  expected: {d["expected"]}; applicability: {d["repo"] or d["scope"]}' + (f'; task: {d["task_id"]}' if d['task_id'] else ''))
                 print(f'  canonical: {d["target"] or "none"}; evidence: {path}; occurrences: {len(d["occurrences"])}')
-            if len(matches) > a.limit:
-                print(f'showing {a.limit} of {len(matches)}; use --limit {len(matches)} to see all')
+            if matches:
+                topical = sum(all(w.casefold() in json.dumps(d, ensure_ascii=False).casefold() for w in a.keywords) for _, d in matches)
+                print(f'coverage: topical: {topical}; background globals: {len(matches) - topical}')
+                print(f'showing {len(page)} of {len(matches)}; offset {a.offset}')
+                if a.offset + len(page) < len(matches):
+                    command = [sys.executable, str(Path(__file__).resolve()), '--root', str(root), 'query']
+                    for name in ('scope', 'system', 'repo', 'task_id'):
+                        if getattr(a, name):
+                            command += ['--' + name.replace('_', '-'), getattr(a, name)]
+                    if a.include_history:
+                        command += ['--include-history']
+                    command += ['--limit', str(a.limit), '--offset', str(a.offset + len(page)), '--', *a.keywords]
+                    print('truncated; next: ' + shlex.join(command))
             if not matches:
                 print('no matching records' if items else 'store missing or empty (no records)')
         elif a.command == 'check':

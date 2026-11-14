@@ -8,6 +8,20 @@ tags: [home, router, openwrt, trusttunnel]
 
 ## Summary
 
+- Current playback diagnosis2026-11-15: same full34.82GiB source with first E-AC-3 5.1 track plays from zero9m42s without post-start waiting/errors; both~123s static MKV/MP4 DV8+E-AC-3 clips also passed. Nonzero-start/seek path remains a hypothesis, not proven cause. See [latest evidence](../log/2026-11-14-home-network-4k-playback.md#full-original-from-zero-stable-for-9m42s-one-seek-control-prepared).
+- Distinct captured events: long66.655s plain-page wait had urgent piece3603 incomplete by32KiB; earlier short waits had ready source data and TV receiver backpressure. Do not collapse all events into one proven fault or blame audio/Docker. Keep4GiB RAM; SSD trial explicitly rejected. Source scheduler/peer cause and separate DV7 startup error remain open.
+- Current temporary MSX action /playback-from-start/; next one-seek/180s automatic control prepared only locally, approval pending. All captures finished. Temporary pages/media/script and startup redirects need approved restoration/cleanup; original Lampa startup backup /opt/lampa/diag-backups/plain-test-20261114T195322Z/start.json. Existing detailed history retained in [task log](../log/2026-11-14-home-network-4k-playback.md).
+
+- New74.5GB MKV/DolbyVision7 torrent reproduced NETWORK error2026-11-14: 100-164Mb/s preload completed with392MiB ready before TV closed stream. HTTP206/Range/CORS valid; exact cause unproven, MP4/H264/AAC control pending.
+- Home4K buffering persists2026-11-14 despite4GiB cache; during stall3890MiB complete data was ahead, TV stopped consuming TCP. VIDAA MQTT connection/state read succeeded on192.168.168.160:36669, no PIN or keys sent; no screen access. AAC2.0/no-subtitle test pending.
+- Home-01 runtime tuning2026-11-14: user-approved TorrServer4GiB RAM cache /10 percent preload persisted; swap disabled now and in fstab, swap file retained. Gigabit link verified; same4K film retest pending.
+- User confirmed local MSX/Lampa works2026-11-14;40GB4K playback buffered. Home server negotiated100Mb/s; user replaced patch cord and1000Mb/s full duplex is now verified. User confirms buffering remains after gigabit repair; no cache/router changes.
+- Lampa CORS repaired and automatic TV media settings deployed2026-11-14: MSX now receives allow-origin *, bootstrap supplies TorrServer/Jackett/key before app startup; live script/API checks passed, TV retry pending.
+- Home Jackett indexers migrated2026-11-14 from PC: RuTor, NNM-Club and RuTracker.org all passed Test on home-01. Target API key retained; TV instructions supplied, playback not yet confirmed.
+- Home media deployed2026-11-14 on home-01 /192.168.168.2: Lampa8080, TorrServer8090, Jackett9117 and unpublished FlareSolverr on Docker bridges. LAN HTTP checks passed; PC-data/indexer migration and TV cutover remain separate.
+- Home media roles prepared2026-11-14 for inventory home-01 /192.168.168.2: Lampa, TorrServer, Jackett/FlareSolverr use Docker bridges; home.yml includes ansible-user/common/sshd and excludes nftables. Local checks passed; no deployment.
+- Home server `home` uses persistent static `192.168.168.2/24` on `enp1s0` as of 2026-11-14; gateway/DNS `192.168.168.1`, SSH, routing and DNS verified. Netplan backup retained; reboot not tested.
+
 - TrustTunnel1.1.12 and podkop0.7.24/sing-box1.13.21 run on Cudy with verified selective LAN routing and temporary user-approved Archer DNS.
 - Automatic direct fallback and managed TrustTunnel recovery are verified for interface down, client exit, transport loss and network restart; household cutover remains pending.
 - Archer C64 supplies the existing home LAN; Cudy WR3000S v1 now runs OpenWrt 25.12.5 behind it on a test LAN.
@@ -25,7 +39,6 @@ tags: [home, router, openwrt, trusttunnel]
 - Components and Operations describe the current deployment and checks.
 - Historical VPN diagnostics remain below; open work is tracked in central TODO.
 - Decision2026-11-13: plan Jackett/FlareSolverr on the home server; the VPS attempt failed readiness under observed resource pressure and was cancelled. The user will switch off the VM; no home-server migration has run.
-
 ## Staleness review (2026-11-04)
 
 Historical review: its AmneziaWG backup direction was cancelled by the user on 2026-11-13.
@@ -42,6 +55,30 @@ domains (YouTube, Instagram, torrent trackers, ...) through the user's TrustTunn
 TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segments.
 
 ## Components
+
+- Home-media constraint (user2026-11-14): do not add external player portals/services or switch MSX startup to msxplayer.ru. Keep additional playback components local to home-01/TV. Existing external services were not cancelled. Local MSX video-menu trial remains a proposal requiring implementation authorization. See [decision](../log/2026-11-14-home-network-4k-playback.md#additional-external-player-portals-rejected).
+
+- Home media RAM/swap changes (2026-11-14): user requested4GiB TorrServer RAM cache, superseding the1GiB proposal, and separately disabled swap. Official settings API preserved all other fields; CacheSize4294967296/PreloadCache10/UseDiskfalse verified in API and persistent JSON. /swap.img swapoff and fstab autostart disable applied with backups; final swap0, no active swap units, about10GiB RAM available. Swap file retained; no reboot/test of same movie yet confirmed. See [runtime result](../log/2026-11-14-home-network-4k-playback.md#user-approved-ram-cache-and-swap-changes).
+
+- Home4K playback (2026-11-14): local Lampa startup/automatic settings accepted working by user. Ethernet TV buffers on a40GB4K file. Server CPU/RAM had headroom; enp1s0 negotiated100Mb/s despite gigabit-capable ends. User replaced patch cord;1000Mb/s full duplex verified with zero short-sample errors. Default64MiB TorrServer RAM cache unchanged. Retest result pending; no complete buffering cause proven. See [passive diagnostics](../log/2026-11-14-home-network-4k-playback.md).
+
+- Lampa MSX startup and bootstrap (2026-11-14): user status0 report revealed missing CORS despite HTTP200 in TV access logs. Applied Apache headers and header-aware readiness, then user-requested automatic TorrServer/Jackett/key browser bootstrap. Home playbook starts backends before Lampa; source key comes from target ServerConfig with suppressed logs/diffs, stays out of Git, and is served to trusted LAN clients. Browser defaults apply once per settings fingerprint; subsequent manual choices/favorites remain. Server/script/key checks passed, actual TV retry still pending. This supersedes earlier manual API-key entry instructions. See [fix and verification](../log/2026-11-14-home-network-lampa-cors-bootstrap.md).
+
+- Home indexer migration (2026-11-14): user-requested transfer copied only rutor/noname-club/rutracker configs and the source DataProtection key over SSH, preserving target ServerConfig/API key and existing key. Private target backup /opt/jackett/migration-backup-20261114T164258Z retained. All three final Test requests returned204; RuTor transient TLS reset cleared on retry without config changes. Old PC stack remains running; TV cutover and broader media data were not changed. See [migration and TV instructions](../log/2026-11-14-home-network-home-indexer-migration.md).
+
+- Home media deployment (2026-11-14): explicitly requested home.yml applied ansible-user/common/sshd/Docker and media without nftables on home-01. Initial lscr.io image timeout resolved by approved Jackett-only retry (failed0/unreachable0). All four containers run on bridges with unless-stopped and zero initial restarts; LAN HTTP8080/8090/9117 and internal solver checks passed. No PC-data/indexer migration or TV cutover. See [deployment](../log/2026-11-14-home-network-home-media-deployment.md).
+
+- Home media local preparation (2026-11-14): user approved existing ansible master from b857c7e; home-01 is192.168.168.2. New Lampa/TorrServer roles and bridge-capable combined Jackett/FlareSolverr role are configured through group_vars/home.yml. home.yml bootstraps ansible-user, then common, sshd, Docker and media, with no nftables. FlareSolverr is unpublished; HTTP8080/8090/9117 bind only the LAN address. Syntax/native Compose/preservation/MSX checks passed; no deployment, migration, TV cutover or Git publication. See [preparation](../log/2026-11-14-home-network-ansible-home-media.md).
+
+- Google Play downloads (2026-11-14): user enabled Google Play in podkop and confirmed downloading works. Keep this user-applied routing as the known working configuration. DNS log inspection found no blocking rule on the observed Play API and gvt1 download queries; exact direct-path failure remains unverified. No further diagnostics requested. See [result](../log/2026-11-14-home-network-google-play-podkop.md).
+
+- User decision (2026-11-14): planned direct Internet, VPN and Wi-Fi speed measurements are cancelled without testing. Device inventory and separate reachability/media follow-ups were not cancelled by this decision. See [decision](../log/2026-09-26-home-network-initial-plan.md#speed-measurements-cancelled-by-user-2026-11-14).
+
+- User cancellations (2026-11-14): the Archer C64 is powered off and retains its settings; its backup task is cancelled without creating a backup. The user also explicitly cancelled the mobile-phone DNS setup, superseding the previous deferred status. Do not resume phone Private DNS, propose automatic switching as ongoing work, or revive either task without a new request. Home DNS through Cudy and VPS AdGuard remains in use.
+
+- Android DNS decision (2026-11-14): user declined permanent Private DNS to d.slnnk.com after the podkop/FakeIP bypass consequence was explained. Do not enable it or substitute automation without a new request. Home DNS via Cudy remains accepted; mobile DNS setup was initially deferred and subsequently cancelled explicitly by the user on 2026-11-14. See [decision](../log/2026-11-14-home-network-cudy-dot-client-cache.md#android-permanent-private-dns-declined-2026-11-14).
+
+- User applied Cudy own-DoT cutover (2026-11-14): podkop uses d.slnnk.com over TLS with bootstrap77.88.8.8; router FakeIP and VPN selector are healthy. A stale PC DNS cache was corrected by the user; subsequent PC resolution matches router FakeIP198.18.0.57 and routes via Cudy, with no PC tun0. The user confirmed Codex and ChatGPT work without the separate PC VPN. Home cutover and DoT/FakeIP compatibility are accepted complete; mobile-phone DNS setup remains pending. See [cutover diagnosis](../log/2026-11-14-home-network-cudy-dot-client-cache.md).
 
 - DNS deployed and externally verified (2026-11-13): AdGuard Home 0.107.80 is live on it-garage-de-02 / d.slnnk.com with public DoT, private admin, selected DoH upstreams and local ad filtering. Initial playbook failed0/unreachable0; trusted certificate expires 2027-02-11. Port53/3000 are not public. The separately approved narrow SSH forwarding exception is applied: a real authenticated panel tunnel returned HTTP200 and forwarding to loopback8081 was administratively prohibited. Home/mobile cutover is pending. See [runtime result](../log/2026-11-13-home-network-ansible-dns-role.md#deployment-approved-and-verified-2026-11-13).
 
@@ -248,6 +285,9 @@ Router LAN only, from the user's PC. No remote access yet.
 
 ## Related log entries
 
+- [Home server static LAN address](../log/2026-11-14-home-network-server-static-ip.md)
+
+- [2026-11-14 Cudy own-DoT and stale PC DNS diagnosis](../log/2026-11-14-home-network-cudy-dot-client-cache.md)
 - [2026-11-13 local VPS AdGuard Home role prepared](../log/2026-11-13-home-network-ansible-dns-role.md)
 - [2026-11-13 VPS Jackett attempt cancelled; future home-server placement planned](../log/2026-11-13-home-network-dline-de-jackett-deployment.md)
 - [2026-11-11 shared nginx/Certbot refactor and local TV HTTPS configuration](../log/2026-11-11-home-network-shared-nginx-certbot.md)

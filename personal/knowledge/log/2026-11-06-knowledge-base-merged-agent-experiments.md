@@ -25,6 +25,23 @@ design evidence.
 
 The user later authorized the [second E01 stage](../../../current/knowledge/log/2026-11-09-knowledge-base-e01-stage2-comparison.md), completed on 2026-11-09 with 36 historical-task attempts and 114 invocations. Raw cost fell with Luna helpers, but equal quality was not demonstrated; no model-default change was adopted. Method/rubric limits are recorded with that outcome. The user subsequently retained one Sol agent and closed E01 follow-ups without further runs; E02–E14 remain proposals.
 
+## Current scope reconciliation November 14
+
+The [personalized-learning backlog reconciliation](2026-11-14-agents-personalized-learning-backlog.md#reconciliation-decisions)
+is the current scope for applying E02/E05/E06/E12 to correction transfer and solution
+selection. The central TODO owns one case-set, candidate-assessment, conditional
+comparison and adoption decision; F5/F7 owns the proposed canonical workflow changes.
+This does not create duplicate generic experiments or authorize a run.
+
+E01 follow-ups and the Claude extension remain cancelled. Scoped startup/resumption
+changes were implemented and their optional evaluation was explicitly declined on
+November 14; see the [decision](2026-11-14-knowledge-base-scoped-startup-resumption.md).
+Do not revive that E07/E08 evaluation through the historical table or ECC-first order.
+The old blanket statements that E02-E14 all remain pending are historical; other
+optional cases retain their original scope. Retrieval script fixes are complete per
+[the recorded result](2026-11-14-knowledge-base-rules-retrieval-stability.md); future
+E06 behavior trials do not reopen those fixes.
+
 ## ECC follow-up recorded November 12
 
 The user requested retaining the [ECC recommendations](2026-11-12-agents-ecc-local-approaches.md) for future pilots. Map compact resumption state to E08, behavioral regression cases to E02/E03/E05, and one targeted supported lifecycle hook to E12. Preserve the existing experiment IDs and central TODO entry; this records future candidates without authorizing a run, installation or configuration change. The suggested E08-first order remains an engineering recommendation, not a user-selected execution order.

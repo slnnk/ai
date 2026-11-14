@@ -1,6 +1,7 @@
 # YouDo: working context
 
-Read at the start of every task. Update when the stack or priorities change.
+Read at the start of company work, including a switch into company scope.
+Update when the stack or priorities change.
 
 ## Role and priorities
 

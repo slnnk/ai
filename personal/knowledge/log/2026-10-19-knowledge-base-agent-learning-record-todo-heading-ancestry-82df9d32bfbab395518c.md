@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-10-20
+checked: 2026-11-14
 tags: [agents, learning]
 ---
 # Agent learning: todo-heading-ancestry
@@ -14,7 +14,19 @@ Correction evidence and scoped application history. Canonical instructions remai
 {
   "created": "2026-10-19T21:35:30.749798+00:00",
   "decisions": [],
-  "evaluations": [],
+  "evaluations": [
+    {
+      "at": "2026-11-14T00:07:07.452510+00:00",
+      "cause": "",
+      "event_id": "p01-20261114-todo-ancestry",
+      "expected": "Choose TODO section by task subject and source; inspect full Markdown heading ancestry before adding or moving; verify affected rendered heading path using todo.py, or source ancestry for closed entries.",
+      "outcome": "pass",
+      "revision": 2,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-agents-p01-decision-cases-metrics.md#verification-and-status",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
+    }
+  ],
   "expected": "Choose TODO section by task subject and source; inspect full Markdown heading ancestry before adding or moving; verify affected rendered heading path using todo.py, or source ancestry for closed entries.",
   "key": "todo-heading-ancestry",
   "kind": "explicit",
@@ -37,7 +49,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "knowledge-base",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-10-19T21:35:30.831219+00:00",
+  "updated": "2026-11-14T00:07:07.452510+00:00",
   "version": 1
 }
 ```

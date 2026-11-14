@@ -68,6 +68,12 @@ if ! python3 -B general/scripts/agent_lint.py --root "$AI_ROOT"; then
   log "agent lint needs review or could not complete; retry remains pending (Git sync continues)"
 fi
 
+# Prepare evidence once per review interval, including after today's Git skip.
+# The current agent performs the analysis; this never launches a model or timer.
+if ! python3 -B general/scripts/agent_metrics.py --root "$AI_ROOT" prepare; then
+  log "daily metrics analysis pending: collection failed; do not claim it completed"
+fi
+
 if [ "$FORCE" -eq 0 ] && [ "$(cat "$STATE" 2>/dev/null)" = "$TODAY" ]; then
   exit 0
 fi

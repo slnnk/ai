@@ -184,3 +184,68 @@ ADGUARD_HOME_ADMIN_PASSWORD. No password is reproduced in this note.
 DNS deployment and panel tunnel are complete. Home/mobile client cutover remains
 in central TODO; no router/phone configuration, Git publication or renewal dry run
 was performed. No background task/tunnel remains.
+
+## Loaded filter VK domain check (2026-11-14)
+
+Read-only SSH inspection of the live YAML confirmed one enabled list: AdGuard DNS
+filter, ID1, URL https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt.
+The loaded /var/lib/adguardhome/data/filters/1.txt contains nine literal substring
+matches for vk.com, all in other domain names (for example bzrpvk.com and
+elqtrk.stamford-avk.com). None targets vk.com or a subdomain of vk.com.
+whitelist_filters and user_rules are empty. This verifies list contents, not all
+possible DNS blocking mechanisms. No runtime configuration changed; SSH commands
+have exited. No follow-up action or new user preference was introduced.
+
+## Russian filtering catalog clarification (2026-11-14)
+
+Checked the current official HostlistsRegistry assets/filters.json: no separate
+Russian/ru entry was found. The official AdGuardSDNSFilter README lists common
+Cyrillic ad-server sections and Russian first-party ad servers among the inputs
+to the default DNS filter already enabled here. Therefore absence of a separate
+Russian entry does not mean Russian advertising domains are excluded.
+Sources: https://github.com/AdguardTeam/HostlistsRegistry/blob/main/assets/filters.json
+and https://github.com/AdguardTeam/AdGuardSDNSFilter#dns-filter-structure.
+No configuration change, new preference or follow-up task was introduced.
+
+## VK advertising filter applicability (2026-11-14)
+
+Official RussianFilter/sections/specific.txt currently has a VK section targeting
+both vk.com and vk.ru, with element hiding, scriptlets and JSON response pruning.
+These content rules cannot run in AdGuard Home DNS filtering. The absence of a
+vk.com DNS rule is not itself a missing advertising rule: blocking the whole
+service domain would also block legitimate content. No client-specific cause of
+the reported remaining ads was verified.
+The vtosters/adblock README explicitly supports web versions of both domains and
+links https://vtosters.app/adblock; it recommends AdGuard content blocking and
+Tampermonkey compatibility scripts. This is a web-content solution, not a claim
+of DNS-only or native VK application coverage. Sources:
+https://github.com/AdguardTeam/AdguardFilters/blob/master/CyrillicFilters/RussianFilter/sections/specific.txt
+and https://github.com/vtosters/adblock. No installation or runtime changes made.
+
+## Correction: separate VK advertising domains remain possible (2026-11-14)
+
+The user questioned the prior overbroad DNS limitation conclusion. The limitation
+for same-domain ads does not establish that all observed VK ads use that route.
+The inspected vtosters/adblock main/adblock.txt includes ad.mail.ru and an.yandex.ru
+blocking scoped to VK web domains, alongside same-domain URL and content rules.
+Separate advertising hosts are therefore real candidates for DNS filtering;
+list membership is not evidence of use by this user's browser or native apps,
+nor proof that a whole-host block is harmless or will remove all VK advertising.
+Source: https://github.com/vtosters/adblock/blob/main/adblock.txt lines41 and56.
+Read-only SSH attempt to inspect current query logs timed out before execution;
+no live query data, current candidate filtering status or ad-delivery attribution
+was obtained. No configuration changed and the SSH command exited255. The factual
+question is settled; client-specific attribution would need a separate observed
+capture and is not claimed complete or scheduled.
+
+## Social tracker source compatibility (2026-11-14)
+
+The inspected SocialFilter/sections/social_trackers.txt is a browser-content
+filter section: rules use URL paths and the third-party/domain modifiers.
+AdGuard Home matches DNS hostnames and ignores rules with unsupported modifiers;
+this source is unsuitable as a direct DNS subscription. Removing paths or
+modifiers can broaden blocking to legitimate service traffic. The official
+AdGuard DNS filter is designed for DNS filtering and remains the appropriate
+base list. Sources: https://github.com/AdguardTeam/AdguardFilters/blob/master/SocialFilter/sections/social_trackers.txt
+and https://adguard-dns.io/kb/general/dns-filtering-syntax/.
+No configuration changed, new preference or follow-up task was introduced.

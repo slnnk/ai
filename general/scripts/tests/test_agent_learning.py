@@ -4,6 +4,7 @@ import contextlib
 import importlib.util
 import io
 import json
+import shlex
 from pathlib import Path
 import subprocess
 import sys
@@ -174,6 +175,39 @@ class LearningTests(unittest.TestCase):
                      '--expected', 'Changed', '--source', 'session:one', ok=False)
         self.record(key='another')
         self.assertIn('showing 1 of 2', self.run_cli('query', '--limit', '1'))
+
+    def test_exact_key_and_task_rules_survive_global_quota(self):
+        self.record(key='wanted', extra=['--target', str(self.target)])
+        self.record(key='task-match', kind='task', extra=['--task-id', 'one'])
+        for i in range(10):
+            self.record(key=f'noise-{i}', extra=['--target', str(self.target)])
+        out = self.run_cli('query', '--limit', '1', 'WANTED')
+        self.assertTrue(out.startswith('wanted ['), out)
+        self.assertIn('truncated', out)
+        self.assertIn('--offset 1', out)
+        command = shlex.split(out.split('truncated; next: ', 1)[1].strip())
+        continued = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(continued.returncode, 0, continued.stderr)
+        self.assertNotIn('wanted [', continued.stdout)
+        self.assertIn('offset 1', continued.stdout)
+        out = self.run_cli('query', '--task-id', 'one', '--limit', '1', 'Обсуждение')
+        self.assertTrue(out.startswith('task-match ['), out)
+        self.assertNotIn('task-match [', self.run_cli('query', '--task-id', 'two'))
+        out = self.run_cli('query', '--limit', '1', '--offset', '1', 'wanted')
+        self.assertNotIn('wanted [', out)
+        self.assertIn('background globals:', out)
+        self.run_cli('query', '--offset', '-1', ok=False)
+
+    def test_scoped_match_precedes_background_and_retains_repo_boundaries(self):
+        repo = self.base / 'repo'
+        repo.mkdir()
+        self.record(key='repo-match', scope='repo', extra=['--repo', str(repo), '--layer', 'personal'])
+        for i in range(9):
+            self.record(key=f'global-{i}', extra=['--target', str(self.target)])
+        out = self.run_cli('query', '--scope', 'personal', '--repo', str(repo), '--limit', '1', 'Обсуждение')
+        self.assertTrue(out.startswith('repo-match ['), out)
+        self.assertNotIn('repo-match [', self.run_cli('query', '--scope', 'current', '--repo', str(repo)))
+        self.assertNotIn('repo-match [', self.run_cli('query', '--repo', str(self.base / 'other')))
 
     def test_inactive_missing_targets_do_not_poison_store(self):
         for decision in ('rejected', 'superseded'):

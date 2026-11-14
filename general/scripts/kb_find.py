@@ -10,6 +10,7 @@ import datetime
 import json
 import os
 import re
+import shlex
 import sys
 from pathlib import Path
 
@@ -194,13 +195,14 @@ def main():
     ap.add_argument("-s", "--system")
     ap.add_argument("-n", "--lines", type=int, default=5, help="context line budget per note (default 5)")
     ap.add_argument("-m", "--max-notes", type=int, default=15)
+    ap.add_argument("--offset", type=int, default=0, help="skip ranked notes for continuation")
     ap.add_argument("--any", action="store_true")
     ap.add_argument("--regex", action="store_true")
     output = ap.add_mutually_exclusive_group()
     output.add_argument("--files", action="store_true")
     output.add_argument("--json", action="store_true")
     args = ap.parse_args()
-    if args.lines < 0 or args.max_notes < 0:
+    if args.lines < 0 or args.max_notes < 0 or args.offset < 0:
         ap.error("line and note limits must be nonnegative")
     try:
         pats = [re.compile(k if args.regex else re.escape(k), re.I) for k in args.keywords]
@@ -222,26 +224,57 @@ def main():
             head_hits = sum(bool(p.search(head)) for p in pats)
             hits = [(i + 1, l) for i, l in enumerate(lines) if i >= body_start and
                     l.strip() != "# " + title and any(p.search(l) for p in pats)]
-            results.append((head_hits, len(hits), f, meta, title, lines, body_start, len(text.encode())))
-        results.sort(key=lambda r: (-r[0], -r[1], str(r[2])))
+            # Living maps and portable recipes get a one-term tie preference.
+            # Density replaces raw frequency so repeated log lines cannot dominate.
+            relative_parts = f.relative_to(AI_ROOT.resolve()).parts
+            canonical = 'systems' in relative_parts or (relative_parts[0] == 'general' and 'log' not in relative_parts)
+            score = (head_hits + int(canonical), canonical, head_hits,
+                     len(hits) / max(1, len(lines) - body_start))
+            results.append((score, len(hits), f, meta, title, lines, body_start, len(text.encode())))
+        results.sort(key=lambda r: (tuple(-x for x in r[0]), str(r[2])))
         rendered = []
-        for _, _, f, meta, title, lines, body_start, size in results[:args.max_notes]:
+        for _, _, f, meta, title, lines, body_start, size in results[args.offset:args.offset + args.max_notes]:
             if args.files:
                 rendered.append({"path": display(f)})
                 continue
             section, snippets = context(lines, body_start, pats, args.lines)
-            rendered.append({"path": display(f), "system": meta.get("system", "?"),
+            visible = "\n".join(s["text"] for s in snippets)
+            clipped = [s["line"] for s in snippets if s["text"] != lines[s["line"] - 1].strip()]
+            shown_indices = {s['line'] - 1 for s in snippets}
+            omitted_matches = any(i not in shown_indices and any(p.search(l) for p in pats)
+                                  for i, l in enumerate(lines) if i >= body_start)
+            coverage = {"matched_terms": [k for k, p in zip(args.keywords, pats) if any(p.search(l) for l in lines)],
+                        "visible_terms": [k for k, p in zip(args.keywords, pats) if p.search(visible)],
+                        "matching_lines": sum(any(p.search(l) for p in pats) for l in lines[body_start:]),
+                        "shown_lines": len(snippets), "clipped_lines": clipped,
+                        "excerpt_truncated": bool(clipped) or omitted_matches or bool(section and len(snippets) < section["end"] - section["start"])}
+            rendered.append({"path": display(f), "coverage": coverage, "system": meta.get("system", "?"),
                 "status": meta.get("status", "?"), "checked": meta.get("checked", "?"),
                 "title": title, "size_bytes": size, "has_summary": any(l.startswith("## Summary") for l in lines),
                 "decision": decision(meta, f), "section": section, "snippets": snippets})
     except (OSError, ValueError) as e:
         print("kb-find: error: " + str(e), file=sys.stderr)
         return 2
+    end = args.offset + len(rendered)
+    truncated = end < len(results)
+    command = [sys.executable, str(Path(__file__).resolve())]
+    for layer in args.layer or []:
+        command += ['-l', layer]
+    if args.system:
+        command += ['-s', args.system]
+    command += ['-n', str(args.lines), '-m', str(args.max_notes or 15), '--offset', str(end)]
+    command += [flag for flag in ('--any', '--regex', '--files', '--json') if getattr(args, flag[2:])]
+    command += ['--', *args.keywords]
+    next_command = command if truncated else None
     if args.json:
-        print(json.dumps({"schema_version": 1, "total_matches": len(results), "results": rendered}, ensure_ascii=False))
+        print(json.dumps({"schema_version": 1, "total_matches": len(results), "shown_notes": len(rendered),
+                          "offset": args.offset, "truncated": truncated, "next_command": next_command,
+                          "results": rendered}, ensure_ascii=False))
     elif args.files:
         for r in rendered:
             print(r["path"])
+        if truncated:
+            print('kb-find: truncated; next: ' + shlex.join(next_command), file=sys.stderr)
     else:
         for r in rendered:
             print("{}  [{} | {} | {} | {} KB{}]".format(r["path"], r["system"], r["status"],
@@ -255,8 +288,14 @@ def main():
                 print("  Section: " + r["section"]["heading"])
             for snippet in r["snippets"]:
                 print("  {}: {}".format(snippet["line"], snippet["text"]))
-        more = len(results) - args.max_notes
-        print("kb-find: {} notes{}".format(len(results), ", {} not shown (-m)".format(more) if more > 0 else ""))
+            c = r['coverage']
+            print('  Coverage: {}/{} terms visible; {}/{} matching lines shown{}'.format(
+                len(c['visible_terms']), len(c['matched_terms']),
+                sum(any(p.search(s['text']) for p in pats) for s in r['snippets']), c['matching_lines'],
+                '; excerpt incomplete; read {}:{} (full section/source)'.format(r['path'], r['section']['start'] + 1 if r['section'] else 1) if c['excerpt_truncated'] else ''))
+        print("kb-find: {} notes; showing {}; offset {}".format(len(results), len(rendered), args.offset) if results else 'kb-find: 0 notes')
+        if truncated:
+            print('kb-find: truncated; next: ' + shlex.join(next_command))
     return 0 if results else 1
 
 

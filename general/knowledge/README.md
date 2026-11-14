@@ -187,6 +187,27 @@ silently choose such an interpretation. Make routine reversible decisions indepe
 
 Before nontrivial changes, also read "Verifiable results" below.
 
+## Task context selection
+
+Apply the global instructions and local project instructions throughout the task.
+Read Material assumptions and Economical tool use at task entry; run the required
+daily sync helper. Load the agent-learning skill and retrieve applicable rules for
+substantive discussions as required by AGENTS.md.
+
+Select further reading by the task and the next action. Read the company CONTEXT.md
+for company work, including when a personal task expands into company work. Read only
+the affected TODO section. Repository discovery, code edits, reviews, publication,
+external changes and KB writes each trigger their corresponding instructions before
+that action; a read-only repository search does not itself trigger edit/publication
+details. All permission gates in AGENTS.md remain applicable.
+
+Reuse instruction text already fully available in the active context while it is
+current. Do not reread it merely because a new message or task begins. Read the needed
+section again if its text is missing, truncated, changed or of uncertain currency;
+load newly applicable rules when scope changes. A path, summary or previous claim
+that a rule was loaded is not the rule text. This avoids duplicate reads, not required
+sync calls, scoped rule queries or checks of mutable operational state.
+
 ## Verifiable results
 
 Before nontrivial changes, define the expected result and a proportionate way to
@@ -204,6 +225,21 @@ gradually while working; do not crawl the whole filesystem.
 
 ### Repository workflow details
 
+#### Affected flow
+
+Before editing code or configuration, identify the affected callers, consumers, tests,
+fixtures, configuration and exports. Trace the relevant flow far enough to find where
+the change must reach and what existing behavior it could break. Address a shared cause
+when appropriate within the approved scope. If a necessary change exceeds that scope,
+explain the gap and obtain the required approval before proceeding with it.
+
+#### Review evidence
+
+Support each defect finding with a source location, a concrete reachable scenario,
+and the resulting incorrect behavior or impact. Read the relevant connected code to
+check the scenario. Separate confirmed defects from hypotheses and style preferences;
+do not present speculative risks as established bugs.
+
 #### Simplicity
 
 Prefer the simplest solution that meets the request and verified system constraints.
@@ -211,6 +247,14 @@ Add conditions, exceptions, configuration options or abstractions only for a con
 requirement or demonstrated need, not hypothetical scenarios or future flexibility.
 Before presenting a change, check whether each added complication is necessary;
 omit it if removing it preserves the required behavior and existing safeguards.
+
+Choose the first suitable solution: an established project helper, component, service
+or pattern; then standard-library/platform capabilities; then installed dependencies;
+then minimal new code. Respect the project's architecture and requirements: do not
+replace an established component merely because a native alternative is shorter.
+Add a dependency only for a concrete need that the existing options cannot meet.
+
+#### Checkout and Git changes
 
 - For company GitLab work, use `~/ai/current/skills/gitlab-workflow/SKILL.md`.
   Inspect code in an existing local checkout first; consult `current/knowledge/repos.md`
@@ -260,6 +304,7 @@ omit it if removing it preserves the required behavior and existing safeguards.
 | `general/scripts/new_note.py log\|system\|recipe ...` | create a note with correct path, name and frontmatter |
 | `general/scripts/kb_find.py <keywords>` | compact search: path, system, status, checked, title and matching lines per note |
 | `general/scripts/agent_learning.py --help` | record, retrieve and check scoped correction-learning evidence; workflow in `general/skills/agent-learning/SKILL.md` |
+| `general/scripts/agent_metrics.py --help` | record task outcomes in existing notes; prepare daily evidence and acknowledge a saved analysis, without model calls |
 | `general/scripts/agent_lint.py [--force] [paths ...]` | report-only agnix for changed instructions/skills/settings; successful input hashes and sanitized report in `~/ai-data/agnix/`; sync fallback runs before same-day Git skip |
 | `general/scripts/agnix_update.py [--force]` | daily official stable agnix check and verified local update; machine-local state in `~/ai-data/agnix/` |
 | `general/scripts/token_usage.py [--days N] [--kb] [--brief]` | token totals of Claude Code and Codex sessions per project/model, top sessions; `--kb` counts requested knowledge-base reads (kb_find, search, INDEX, full vs partial); Codex nested shell calls use static Node.js/Acorn parsing with explicit coverage; full KiB estimates current note sizes, not tokens; run weekly by `ai-sync.sh` into `personal/usage/` |
@@ -285,7 +330,23 @@ Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
   operations remain. If any remain, identify them and explain how to check or stop them.
   If status cannot be verified, say so; never infer completion from silence or UI exit.
 
-### Economical tool use
+## Task resumption
+
+For a long task, keep a compact current checkpoint in its existing task record at
+meaningful state changes and before an interruption or handoff when possible. Record:
+the goal; authorized scope and action-specific approvals; decisions and cancellations;
+completed work and checks with evidence references; running operations or unknown
+status; and the next permitted step. Update the checkpoint rather than duplicating
+the transcript. Keep historical approval and result evidence elsewhere in the same
+record; central TODO remains the sole backlog. Simple questions need no checkpoint.
+
+On resumption read the checkpoint and relevant evidence, reload missing applicable
+instructions, and recheck mutable source/operation state before acting. Do not repeat
+completed actions without a concrete reason, infer approval from a proposed next step,
+or broaden a saved approval beyond its recorded scope. Resolve missing or uncertain
+permission evidence before the dependent action.
+
+## Economical tool use
 
 - Check `<layer>/scripts/` before improvising. A sequence of three or more commands run
   twice becomes a script (CLI args or env, `--help`, compact summary output).
@@ -297,7 +358,7 @@ Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
   `--quiet`.
 - Reusable prompts go to `<layer>/prompts/<name>.md` with a `model:` tier line.
 
-### External changes
+## External changes
 
 - Ask the user for permission before every command that changes state anywhere other than
   local files. Examples: `terraform apply`/`destroy`, `ansible-playbook` without `--check`,
@@ -360,15 +421,30 @@ service or changing the search implementation.
 
 ### Search results and scoped decisions
 
-`kb_find.py` keeps literal AND/ANY matching and document ranking. Each ordinary
-result now shows the selected Markdown section and a coherent excerpt from it,
+`kb_find.py` keeps literal AND/ANY matching. Ranking uses title/path/system term
+coverage, a one-term tie preference for living system maps and portable recipes,
+then matching-line density instead of absolute hit count. A log with a more specific
+identifier can still outrank a map; canonical location is a heuristic, not proof of
+current correctness. Each ordinary result shows the selected Markdown section and a coherent excerpt from it,
 with source line numbers. The default budget is 5 context lines per note; `-n`
 sets that total budget, including blank lines. Lines are clipped to 240 characters
 around the densest query matches. Headings inside fenced examples are not section
 boundaries. Term coverage chooses candidate sections; cause, summary, decision,
 fix and resolution headings receive a one-term tie preference because explanations
 can omit a repeated symptom term. This is a retrieval heuristic, not answer validation.
-`--files` remains path-only; `--json` exposes structured results for checks.
+`--files` stdout remains path-only; pagination notices go to stderr in that mode.
+`--json` exposes structured results for checks, including `shown_notes`, `offset`,
+`truncated` and `next_command` (an argv array, or null). `--offset` continues the ranked
+list with the same query and filters. The normal output supplies a shell-quoted next
+command when notes remain. Pagination assumes unchanged sources between calls.
+
+Each excerpt reports matched/visible query terms, source matching-line count,
+shown-line count, clipped line numbers and `excerpt_truncated`. An incomplete excerpt
+means selected-section lines, other matching lines or parts of a long line were omitted;
+read the indicated source section and other matching sections when needed. A complete
+excerpt does not establish a complete or correct answer. Do not equate a page or excerpt
+with full inspection; follow continuation or read the source before drawing a conclusion
+that depends on omitted content.
 
 When a user cancels or supersedes an instruction, keep historical evidence and add
 these optional scalar frontmatter fields to the affected note. All five are required
@@ -539,6 +615,15 @@ of this reconciliation. This is an agent review of meaning; link/format lint alo
 prove that statuses agree.
 
 ## Daily sync
+
+Normal sync also calls `agent_metrics.py prepare` before the same-day Git skip.
+A `daily analysis pending` message requires the current agent to follow the
+agent-learning skill's "Daily metrics" section: inspect the snapshot and source
+examples, save findings/actions/limits, then acknowledge the saved review. Preparation
+alone is not analysis. Failed reviews stay pending. There is no background model or
+timer: the first active task triggers the review, covering missed days in a bounded
+interval. Read-only sync modes do not collect metrics. Task metrics live in existing
+notes; generated snapshots/receipts live in `~/ai-data/agent-metrics/`.
 
 `~/ai/general/scripts/ai-sync.sh` is called by agents at the start of every task. On the
 first call of a day it rebuilds indexes, commits everything, pulls with rebase and pushes to

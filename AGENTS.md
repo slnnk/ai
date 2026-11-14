@@ -1,15 +1,14 @@
 # Global instructions for AI agents
 
 `~/ai` holds durable DevOps knowledge; memory is a cache. Project instructions win locally.
-Read triggered sections of `~/ai/general/knowledge/README.md` (README); follow their rules.
+Read and follow triggered sections of `~/ai/general/knowledge/README.md` (README).
 
 ## Before a task
 
-- Read README "Material assumptions" first.
-- Run `~/ai/general/scripts/ai-sync.sh`; relay output/reminders. Read README "Daily sync"
-  for monthly review proposals; offer once per month and wait for agreement.
-  Normal runs also check the latest stable agnix daily and update the local install.
-- Read `~/ai/current/CONTEXT.md` and the affected system in `~/ai/TODO.md`.
+- Read README "Material assumptions" first, then "Task context selection".
+- Run `~/ai/general/scripts/ai-sync.sh`; relay output/reminders per README "Daily sync".
+  Offer monthly review once; wait for agreement. Normal sync checks/updates stable agnix daily.
+- For company work read `~/ai/current/CONTEXT.md`; read only the affected TODO section.
 - Before KB search read README "Knowledge retrieval": prepare English technical terms,
   choose layers and simplify empty queries. Use `kb_find.py`; INDEX only for browsing,
   long notes by Summary and needed section.
@@ -32,12 +31,12 @@ Read triggered sections of `~/ai/general/knowledge/README.md` (README); follow t
 
 ## Local code and Git
 
-- Prefer the simplest sufficient solution; read README "Simplicity" before proposing changes.
-- Keep changes within the request, including removals; propose unrelated improvements
-  in TODO without implementing/deleting them.
+- Read README "Simplicity" before proposals, "Affected flow" before code/config edits,
+  and "Review evidence" before reviews.
+- Keep edits/removals within the request; propose unrelated improvements in TODO only.
 - Before repo searches read `~/ai/current/knowledge/repos.md` (company) or
-  `~/ai/personal/knowledge/repos.md` (personal), plus README "repos.md" and
-  "Repository workflow details".
+  `~/ai/personal/knowledge/repos.md` (personal), plus README "repos.md".
+  Before Git operations read README "Checkout and Git changes".
   Company GitLab: read `~/ai/current/skills/gitlab-workflow/SKILL.md`, inspect local code first.
   Use existing checkouts; worktrees only on explicit request.
   Preserve unrelated changes; explain conflicts before moving/discarding them.
@@ -64,9 +63,9 @@ changes"; TODO grants no permission.
 
 ## Progress and execution status
 
-- During long work update progress at least every 30 seconds. Before final, verify task
-  background commands/agents; state completion and any remaining operations, with check/stop
-  instructions. Disclose unknown status. Read README "Progress and execution status".
+- Update progress every 30 seconds during long work; before final verify and report task
+  background status per README "Progress and execution status". Disclose unknown status;
+  give check/stop instructions for remaining operations. Read "Task resumption" for checkpoints.
 
 ## Backlog and completion
 

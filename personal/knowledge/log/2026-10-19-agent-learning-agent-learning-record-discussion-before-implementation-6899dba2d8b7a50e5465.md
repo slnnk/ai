@@ -1,7 +1,7 @@
 ---
 system: agent-learning
 status: verified
-checked: 2026-11-13
+checked: 2026-11-14
 tags: [agents, learning]
 ---
 # Agent learning: discussion-before-implementation
@@ -135,6 +135,83 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-ansible-dns-role.md",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-13T22:53:49.638250+00:00",
+      "cause": "",
+      "event_id": "scoped-startup-resumption-2026-11-14-authorization",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-knowledge-base-scoped-startup-resumption.md#task; explanation and proposal preceded edits, which began after user reply Начинай",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-13T23:07:39.765617+00:00",
+      "cause": "",
+      "event_id": "retrieval-stability-20261114-authorization",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-14-knowledge-base-rules-retrieval-stability.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-13T23:24:28.650334+00:00",
+      "cause": "Discussion remained read-only until the user requested backlog edits and lifted session restrictions; subsequent changes cover bookkeeping only, with no tool installation, pilot or runtime implementation.",
+      "event_id": "personalized-learning-backlog-20261114-scope",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-agents-personalized-learning-backlog.md#task-and-authorization",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-14T00:14:31.043465+00:00",
+      "cause": "Completed the requested comparison and bookkeeping without installing candidates, changing runtime/configuration/instructions or executing the conditional pilots.",
+      "event_id": "kb-p02-20261114-scope",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-agents-p02-learning-search-comparison.md#actions-checks-and-final-status",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-14T00:19:33.198376+00:00",
+      "cause": "",
+      "event_id": "kb-p11-20261114-design-scope",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-agents-p11-experience-delivery-design.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-14T00:23:27.288614+00:00",
+      "cause": "",
+      "event_id": "p12-necessity-design-20261114-planning",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-agents-p12-necessity-design.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-14T00:28:12.920542+00:00",
+      "cause": "",
+      "event_id": "p13-canonical-reconciliation-20261114-discussion",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-agents-p13-canonical-reconciliation.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
@@ -159,7 +236,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agent-learning",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-13T20:21:19.854688+00:00",
+  "updated": "2026-11-14T00:28:12.920542+00:00",
   "version": 1
 }
 ```

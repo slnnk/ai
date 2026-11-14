@@ -99,6 +99,49 @@ class RetrievalTests(unittest.TestCase):
         self.assertEqual(check().returncode, 1)
         self.assertIn("E decision", check().stdout)
 
+    def test_focused_answer_survives_keyword_rich_distractor_logs(self):
+        self.write('\n## Cause\nalpha beta parser is broken.\n')
+        for i in range(12):
+            (self.path.parent / f'noise-{i}.md').write_text(
+                '# Service\n' + ('alpha beta routine status\n' + 'unrelated text\n' * 20) * 10)
+        result = json.loads(self.run_cli('--json', '-m', '1', 'alpha', 'beta').stdout)
+        self.assertEqual(result['results'][0]['path'], '~/ai/general/knowledge/service/note.md')
+
+    def test_result_and_excerpt_coverage_and_continuation(self):
+        self.write('\n## Cause\nalpha ' + 'x' * 500 + ' beta\nsecond line\nthird line\n')
+        (self.path.parent / 'other.md').write_text('# Other\nalpha beta\n' + 'unrelated\n' * 20)
+        p = self.run_cli('--json', '-m', '1', '-n', '1', 'alpha', 'beta')
+        data = json.loads(p.stdout)
+        self.assertTrue(data['truncated'])
+        self.assertEqual(data['shown_notes'], 1)
+        self.assertIn('--offset', data['next_command'])
+        coverage = data['results'][0]['coverage']
+        self.assertTrue(coverage['excerpt_truncated'])
+        self.assertEqual(coverage['matched_terms'], ['alpha', 'beta'])
+        self.assertTrue(coverage['clipped_lines'])
+        self.assertIn('excerpt incomplete', self.run_cli('-m', '1', '-n', '1', 'alpha', 'beta').stdout)
+        next_page = json.loads(self.run_cli('--json', '-m', '1', '--offset', '1', 'alpha', 'beta').stdout)
+        self.assertFalse(next_page['truncated'])
+        continued = subprocess.run(data['next_command'], env=dict(os.environ, AI_ROOT=str(self.root)), capture_output=True, text=True)
+        self.assertEqual(continued.returncode, 0, continued.stderr)
+        self.assertEqual(json.loads(continued.stdout)['offset'], 1)
+        self.assertNotEqual(data['results'][0]['path'], next_page['results'][0]['path'])
+        self.assertEqual(self.run_cli('--offset', '-1', 'alpha').returncode, 2)
+        files = self.run_cli('--files', '-m', '1', 'alpha')
+        self.assertEqual(len(files.stdout.splitlines()), 1)
+        self.assertIn('next:', files.stderr)
+
+    def test_coverage_reports_matches_omitted_in_other_sections_and_zero_budget(self):
+        self.write('\n## Cause\nalpha beta\n\n## History\nalpha happened before\n')
+        data = json.loads(self.run_cli('--json', 'alpha', 'beta').stdout)
+        self.assertTrue(data['results'][0]['coverage']['excerpt_truncated'])
+        self.assertIn('full section/source', self.run_cli('alpha', 'beta').stdout)
+        zero = json.loads(self.run_cli('--json', '-m', '0', 'alpha').stdout)
+        self.assertEqual(zero['shown_notes'], 0)
+        self.assertTrue(zero['truncated'])
+        self.assertIsNotNone(zero['next_command'])
+        self.assertNotEqual(zero['next_command'][zero['next_command'].index('-m') + 1], '0')
+
     def test_files_empty_modes_filters_and_literal_matching_remain_compatible(self):
         self.write("\n## Cause\nalpha [beta]\n")
         p = self.run_cli("--files", "-l", "general", "-s", "SERVICE", "[beta]")

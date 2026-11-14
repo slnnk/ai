@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-11-12
+checked: 2026-11-14
 tags: [agents, simplicity, review]
 ---
 # Ponytail: assessment for local agent rules
@@ -58,8 +58,10 @@ These results do not establish savings for our Codex DevOps tasks. No benchmark 
 Research note and central proposal only. Active rules, skills, settings and external state unchanged.
 
 ## Status and risks
-Research complete. Adoption remains a proposal in [central TODO](../../../TODO.md).
-No background task remains. Implementation behavior and local savings are unmeasured.
+Research completed on 2026-11-12. The proposal was subsequently approved selectively
+and implemented on 2026-11-14; see the adoption section below and
+[central TODO](../../../TODO.md). No background task remains.
+Implementation behavior and local savings are unmeasured.
 
 ## Portable lesson
 Reuse and concrete review evidence make simplicity operational; smaller diffs are only
@@ -67,3 +69,32 @@ useful when the required behavior and safeguards remain complete.
 
 Checks: kb-lint reported zero errors and warnings; the proposal rendered under Knowledge base.
 Discussion-before-implementation outcome recorded as pass from actual research-only behavior.
+
+## Selective adoption, 2026-11-14
+
+After clarification that this meant adapting selected rules rather than installing the
+full skill, the user requested implementation. Adopted findings 1-3 in the shared
+README: solution selection order under Simplicity, Affected flow, and Review evidence.
+AGENTS.md now triggers the relevant sections before code/configuration edits and reviews.
+Existing project architecture, task scope and approval requirements are preserved.
+Findings 4-5 were not selected for implementation. No package, hook or setting changed.
+
+Expected result: all three rules have a canonical home and a mandatory read trigger,
+and the central proposal reflects their completed adoption. Verification checks the
+actual diff and trigger/section correspondence, instruction lint and KB lint.
+These static checks do not establish future agent compliance or token savings.
+
+Verification: actual instruction diff and read triggers reviewed; agent lint passed
+with zero errors, warnings or information findings; KB lint passed with zero errors
+and warnings after shortening shared instructions to remain within the size limit.
+The closed proposal remains under Knowledge base; filtered TODO output has no open
+Ponytail entry. No task background operations remain.
+
+## Final scope decision, 2026-11-14
+
+The user explicitly declined findings 4-5 after discussing their marginal benefit:
+existing note/TODO requirements already cover significant temporary limitations,
+and shared instruction bodies use symlinks. No additional shortcut rule or copy
+checker will be implemented for this proposal. The selected three-rule adoption
+is complete; there is no remaining Ponytail action. This decision is scoped to
+this proposal and does not prohibit addressing a demonstrated future need.

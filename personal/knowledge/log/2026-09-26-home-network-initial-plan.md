@@ -121,3 +121,19 @@ Key findings (web sources, not verified on hardware):
 ## Portable lesson
 
 none
+
+## C64 backup cancelled by user (2026-11-14)
+
+The user reported that the Archer C64 is powered off with all settings retained
+on the device and said no backup is needed. The historical phase1 backup action
+is cancelled without creating an export. No C64 login, reset, deletion or other
+device change was performed or authorized. Other phase1 items remain unchanged
+in central TODO; the historical plan is not an instruction to revive the backup.
+
+## Speed measurements cancelled by user (2026-11-14)
+
+After clarification of the planned direct Internet, TrustTunnel and Wi-Fi speed
+measurements, the user said they are not needed. These measurements are cancelled
+without running them. This does not cancel the separate device-list item, media
+checks or VPS-IP reachability check. Earlier speed-test directions are historical
+and superseded; remaining work stays in central TODO. No runtime changes.

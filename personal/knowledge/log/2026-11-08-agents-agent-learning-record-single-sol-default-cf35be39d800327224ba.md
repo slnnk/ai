@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-13
+checked: 2026-11-14
 tags: [agents, learning]
 ---
 # Agent learning: single-sol-default
@@ -58,6 +58,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-dline-de-jackett-deployment.md#final-outcome-and-home-server-decision",
       "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-13T22:53:49.533326+00:00",
+      "cause": "",
+      "event_id": "scoped-startup-resumption-2026-11-14-single-sol",
+      "expected": "Use one Sol agent by default; add same-model or cheaper helpers only with explicit authorization for the current task. File count and log length alone do not authorize delegation.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-14-knowledge-base-scoped-startup-resumption.md#actions; task executed by root only, no helpers spawned",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
   "expected": "Use one Sol agent by default; add same-model or cheaper helpers only with explicit authorization for the current task. File count and log length alone do not authorize delegation.",
@@ -82,7 +93,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-13T19:40:17.444881+00:00",
+  "updated": "2026-11-13T22:53:49.533326+00:00",
   "version": 1
 }
 ```

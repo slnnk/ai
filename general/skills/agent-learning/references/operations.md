@@ -58,7 +58,13 @@ python3 ~/ai/general/scripts/agent_learning.py report
 python3 ~/ai/general/scripts/agent_learning.py check
 ```
 
-Read the returned canonical target. Query is deterministic filtering, not semantic search: try a stable key/system or alternate keywords. Global rules remain discoverable alongside specific results. Omitted scope retrieves global rules, plus an exact repository match when supplied; choose current/personal explicitly for layer-wide rules. Increase `--limit` when the result says it was truncated.
+Read the returned canonical target. Query is deterministic filtering, not semantic search: try a stable key/system or alternate keywords. Global rules remain discoverable alongside specific results. Omitted scope retrieves global rules, plus an exact repository match when supplied; choose current/personal explicitly for layer-wide rules. Exact key matches rank first, then topical matches, with matching task/repository/layer
+specificity before recency. Scope and task-ID exclusion still happen before ranking;
+active global rules remain included as background obligations. Coverage reports topical
+and background-global counts. When truncated, follow the shell-quoted next command
+(`--offset` with the original filters), or increase `--limit`. Pages assume an unchanged
+store; query again from offset zero if records change. A targeted first page is not proof
+that all global obligations or canonical rule text were read.
 
 After observing an applicable outcome:
 
@@ -71,6 +77,61 @@ python3 ~/ai/general/scripts/agent_learning.py verify \
 ```
 
 Use `fail` with an evidence-based `--cause` for a violation and `not-applicable` outside scope. A successful record/query/lint command does not demonstrate behavior. Missing or moved canonical targets require repair.
+
+## Task metrics and daily review
+
+Use an existing task log and a stable task ID. `record` maintains one
+`agent-task-metrics-json` block in that note; task metrics survive normal KB sync.
+The command validates the store and refuses duplicate IDs across notes. Do not use
+session ID alone when a session contains several tasks. Example with synthetic IDs:
+
+```bash
+python3 ~/ai/general/scripts/agent_metrics.py record \
+  --source personal/knowledge/log/YYYY-MM-DD-agents-example.md \
+  --task-id session-example-task1 --kind code --state open \
+  --model MODEL --session-id SESSION --evidence 'Task request and scope in this note'
+```
+
+At completion use the same command/ID with `--state closed`, evidence-supported
+`--first-result pass|fail|unknown` and `--final-result pass|partial|fail|unknown`.
+Optional integer counters: `--corrections`, `--unnecessary-actions`, `--critical-events`,
+`--tokens`, `--active-seconds`. Omitted counters remain unknown or retain their earlier
+value; zero requires evidence. Count distinct substantive corrective interventions,
+not required approvals/new requirements. Count unnecessary actions only when their
+lack of purpose is supported by evidence. Tokens/time require task-attributable
+measurements; never assign a whole multi-task session's usage to each task. Keep
+source examples in the note and put only short references in `--evidence`.
+`--first-result` describes the first substantive delivered result, not internal test
+iterations. A recorded first failure cannot be overwritten by later success.
+
+Normal sync runs `agent_metrics.py prepare` before its same-day Git skip. On first
+use it snapshots the previous seven completed calendar days in the host timezone;
+later runs cover the interval since the last reviewed boundary, excluding today.
+An unfinished snapshot is reused until reviewed; absent days do not create fake
+daily reviews. After a delayed review, remaining days enter the next review interval.
+Generated snapshots and receipts live in `~/ai-data/agent-metrics/`; `status` is read-only.
+Changed task snapshots are not additional tasks; do not sum daily counts as distinct
+tasks. The existing token helper supplies a rolling seven-day session-cohort reference,
+explicitly not an exact calendar-day or task cost. Missing data remains visible.
+
+For a pending review, read its JSON and usage reference, then relevant source notes.
+Use `new_note.py` for one dated analysis log, in the appropriate layer (company
+examples belong in current). Include `## Findings`, `## Actions`, `## Limits` and the
+snapshot SHA-256. State counts/denominators, unknown coverage, comparable trends if
+available, concrete examples and narrowly supported conclusions. Existing learning
+records own corrections; existing TODO items own proposed actions. Do not add new
+rules merely to report a metric or infer improvement from silence.
+
+```bash
+python3 ~/ai/general/scripts/agent_metrics.py complete --source PATH_TO_REVIEW_NOTE
+```
+
+This records the saved review and suppresses further reminders that day. It verifies
+the snapshot reference and note structure, not the truth of the analysis. Never call
+it before doing the review; leave failed collection/review pending. No model or timer
+is launched. Do not copy private raw logs or credentials into metrics. A missing
+generated state after machine migration needs explicit reconciliation; never invent
+a completed historical review.
 
 ## Maintenance
 

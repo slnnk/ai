@@ -197,6 +197,14 @@ Priorities for simplification, rather than additional broad instructions:
 
 ## Context engineering discussion follow-up
 
+Later status, 2026-11-14: the user authorized and the agent implemented a narrowed
+startup/resumption instruction change; see the [implementation and limits](2026-11-14-knowledge-base-scoped-startup-resumption.md).
+A separate housekeeping coordinator was dropped for the single-Sol workflow; concise
+output remains an existing requirement. The historical recommendations below are
+retained. Later on 2026-11-14 the user retained these changes without evaluation;
+the optional comparison for this implementation is closed without execution or a
+claim of measured benefit. See the [decision](2026-11-14-knowledge-base-scoped-startup-resumption.md#evaluation-decision).
+
 On 2026-11-05 the user asked whether Anthropic's
 [Effective context engineering for AI agents](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents)
 applies to this method. The discussion refined the existing proposals rather than
@@ -277,3 +285,12 @@ All reviewer tasks and test commands finished; no background work remains.
 ## Portable lesson
 
 none
+
+## F3 and F6 implementation — 2026-11-14
+
+The user explicitly authorized the existing three-part retrieval proposal. F3 and F6
+were implemented locally: targeted correction relevance and scope isolation, knowledge
+ranking resilient to the measured log-growth regression, and observable output coverage
+with continuation. The earlier proposal-only statements remain historical for these
+items. Other findings and declined evaluation scopes are unchanged.
+See [implementation and verification](2026-11-14-knowledge-base-rules-retrieval-stability.md).

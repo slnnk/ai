@@ -57,6 +57,25 @@ Find the existing key and add the new occurrence once. Diagnose from evidence: r
 
 Update the existing rule instead of appending a duplicate. Repeated failure of a loaded rule calls for the smallest effective enforcement: an existing script check, validation, supported hook, or checkpoint before the action. Implement it only within authorized scope; external changes retain their approval requirements. Put further work in `~/ai/TODO.md` with an evidence link. Records are evidence, not another backlog.
 
+## Daily metrics
+
+Collect task metrics in the existing task note using `agent_metrics.py record`
+(commands in [operations](references/operations.md#task-metrics-and-daily-review)).
+Use one stable ID for the parent task, register it when its note exists and update
+it at meaningful changes and completion. Never count each turn or commit as a task.
+Keep first-attempt failure separate from final recovery; unsupported outcomes/counts
+stay unknown. Useful clarification, approval and changed requirements are not errors.
+
+On the first daily `ai-sync.sh` metrics reminder, read the pending snapshot, inspect
+the relevant source examples and save a short dated analysis with findings, actions
+and limits. Compare available comparable evidence; distinguish task metrics, rule
+events and resource totals. Reuse existing learning keys and TODO owners; inferred
+changes stay proposals. Mark the review complete only after saving the analysis.
+Missing or insufficient evidence is a finding, not a passing score. This runs in the
+current agent, without a timer/background model; do not promise analysis on idle days.
+If blocked or writes are forbidden, leave it pending and report why. The existing
+November review and publication/deployment permissions are unchanged.
+
 ## Verification and review
 
 Separate **recorded**, **linked**, **retrieved/read**, and **demonstrated by behavior**. Record pass/fail only after observing an applicable scenario or real action; an out-of-scope case does not increase the applicable-task count. Days without complaints are not proof. Same-session role-play checks interpretation, not activation in a fresh client.
