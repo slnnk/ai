@@ -9,6 +9,8 @@ tags: [jenkins, recovery, vkcloud, DevOps-892]
 
 ## Summary
 
+Current acceptance: on 2026-11-16 the user confirmed Jenkins recovery workflows, backups and settings already work and closed the overall recovery follow-up. The plan and verification limits below preserve historical evidence; see [user acceptance](#user-acceptance-november-16).
+
 Prepare recovery independent of unavailable Yandex infrastructure. Task: [DevOps-892](https://youtrack.youdo.com/youtrack/issue/DevOps-892), newly created by the user. Historical Jenkins notes incorrectly used DevOps-890, which is the Nexus recovery issue. No previous completion status applies to DevOps-892.
 
 Root SSH is verified on both VK hosts after the explicitly requested public-key installation. Remote changes in this task were limited to adding the user's public key and setting root SSH directory/file ownership and permissions. No disk formatting, software installation, Jenkins startup, DNS change or build execution occurred.
@@ -107,3 +109,7 @@ This note; knowledge/systems/jenkins.md; ~/ai/TODO.md; generated knowledge index
 ## Risks
 
 Backup restore point is October 7, so later controller changes may be lost. Restored queues/resumable builds may cause unintended deployment unless controlled before startup. Incorrect home nesting or losing secrets prevents recovery. Agent disks may fill during the first cold build. Public URL still targets Yandex. Exact images, secret mapping, workflow dependencies and new backup schedule remain subject to verification.
+
+## User acceptance November 16
+
+On 2026-11-16 the user confirmed the overall Jenkins recovery item (working workflows, backups and settings) is already working. The corresponding central TODO entry is closed on that user-reported acceptance. Earlier pending workflow, backup and settings statements are historical and no longer block this accepted recovery. No new jobs, backup capture/restore tests, runtime changes or independent checks were performed in this closure. Monitoring remains separately deferred; optional hardening and historical Yandex-only work are outside this closure. No external issue update was performed.

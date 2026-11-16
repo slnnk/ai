@@ -45,3 +45,7 @@ None.
 ## Approved CI token replacement completed
 
 User explicitly requested replacing NPM_TOKEN. Ran update_npm_ci_token.py --apply: project496 variable PUT returned200 and subsequent GET verified exact equality to current/.env:NEXUS_NPM_TOKEN and unchanged metadata. Scope*, env_var, protectedfalse, maskedfalse, rawfalse and descriptionnull preserved. No secret values printed/logged, no pipeline/job retry, no public LB change or package publication. GitLab CI credential replacement is complete; public npm routing and private package contents remain separate unfinished recovery work.
+
+## Public npm route decision November 16
+
+On 2026-11-16 the user cancelled the proposed public Nexus npm nginx route because it is unnecessary. The corresponding central TODO item is closed without implementation. The proposed public location and its approval requirements above are historical and do not represent an active follow-up. No nginx edits, reloads or fresh route checks were performed; private package recovery and lock compatibility retain their separate scope.

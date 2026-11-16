@@ -215,3 +215,14 @@ Project AGENTS and role README document version compatibility/recovery. Instruct
 lint:10files,0errors,1CDX-AG-005warning (report-only). No commit/push. All task
 commands finished; the user-started torrent intentionally continues in qBittorrent.
 Central TODO now tracks completion/import/TV acceptance; no extra mutation allowed.
+
+## MobLand playback accepted (2026-11-16)
+
+User confirmed in the TODO discussion that they watched one MobLand episode on
+2026-11-15 and everything worked normally. This accepts the basic downloaded-show
+viewing workflow through MiniDLNA and closes the remaining acceptance task.
+This supersedes the pending playback status above. No independent import-path or
+hardlink inode/link-count check was performed in this follow-up; do not infer full
+season completion, seeking or format coverage from one episode. No remote changes
+or new downloads were requested or performed. Only TODO and KB records updated;
+no task background operations started.

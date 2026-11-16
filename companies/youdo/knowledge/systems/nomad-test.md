@@ -44,6 +44,8 @@ DevOps-898 B2B catalog COMPLETE2026-10-16: finalBusinessmaster-21509 ordinary jo
 
 2026-10-21 static autotest dependency audit: no confirmed price-predictor test path; customer-task-recommendations is an optional task-card browser call behind A/B with backend fallback, without dedicated test assertions found. Executor recommendation tests use recommendations-mock instead. Fresh static master26c7ea0d9fab/testFixTests both configure VK mock. No runtime experiment or source changes. [Evidence](../log/2026-10-21-web-autotests-price-customer-recommendations-dependencies.md).
 
+Moderation BERT2026-11-16: VK deployment blocked before application startup by missing Vault `secret/ds/moderation-bert` (independent GET404). Template expects `CLICKHOUSE_USERNAME` and `CLICKHOUSE_PASSWORD`; prestart fetch succeeds. Read-only diagnosis, no repair. [Evidence](../log/2026-11-16-nomad-test-moderation-bert-missing-vault-secret.md).
+
 ## Summary
 
 DevOps-916 (2026-11-10, user-confirmed closed): CallMasking Endpoint and Secret stand templates added to the Nomad environment overlay in automation-test-yandex, commit8e33aed/[MR130](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/130), subsequently mergedf49c108. Render/JSON/exact-value checks passed for22stands. Subsequent user-requested Services.InternalApi.Secret addition published as b0693d4/[MR131](https://gitlab.youdo.sg/sysadmins/automation-test-yandex/-/merge_requests/131), target master; publication verified, user subsequently confirmed MR131 merged and DevOps-916 closed on2026-11-10; no pipelines or agent deployment. [Evidence](../log/2026-11-10-nomad-test-devops-916-call-masking-config.md).

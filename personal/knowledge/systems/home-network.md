@@ -8,11 +8,11 @@ tags: [home, router, openwrt, trusttunnel]
 
 ## Summary
 
-- MediaManager compatibility2026-11-15 applied via approved Ansible: structured qBittorrent add responses, S2E1-9 season parser and title-only Jackett season search.16tests passed; app apply failed0. Separate approved transaction recovered the already-downloading MobLand S02 without a new add: API linked seasons[2]. Basic search now32season1 results across all3indexers and10season2 results from NoNaMe/RuTracker. User-started download continues; import/TV acceptance pending. [Recovery](../log/2026-11-15-home-network-mediamanager.md#qbittorrent-response-and-season-parser-recovery).
+- MediaManager compatibility2026-11-15 applied via approved Ansible: structured qBittorrent add responses, S2E1-9 season parser and title-only Jackett season search.16tests passed; app apply failed0. Separate approved transaction recovered the already-downloading MobLand S02 without a new add: API linked seasons[2]. Basic search now32season1 results across all3indexers and10season2 results from NoNaMe/RuTracker. User acceptance2026-11-16: one MobLand episode watched2026-11-15 with normal playback; basic MiniDLNA workflow accepted and TODO closed. Hardlink details not independently verified in this follow-up. [Recovery](../log/2026-11-15-home-network-mediamanager.md#qbittorrent-response-and-season-parser-recovery).
 
 - MediaManager metadata routing2026-11-15: approved user-selected dorninger.co suffix now in Cudy Podkop; complete MobLand season responses222587/49076bytes in0.49/0.29s replace prior direct-path18KiB stalls. Helper reload exit9 independently reconciled to preserved list, valid sing-box/FakeIP and healthy VPN. Direct Jackett search finds season2 on all3indexers; MediaManager Basic defaults to season1, select2 or use Advanced MobLand query. No torrents started. [Evidence](../log/2026-11-15-home-network-mediamanager.md#mobland-metadata-route-and-season-search).
 
-- MediaManager replacement2026-11-15 deployed through approved Ansible on existing master: stable1.12.3 UI8000, private PostgreSQL17, shared movies/tv directories and read-only native MiniDLNA. Radarr stopped with /opt/radarr retained; qBittorrent/Jackett unchanged. Login and MobLand/movie search verified, all3indexer caps200. Admin email admin@example.com; initial password in target /opt/mediamanager/.env0600, field MEDIAMANAGER_BOOTSTRAP_PASSWORD. No downloads/requests started; new-manager download/TV acceptance not tested. [Result](../log/2026-11-15-home-network-mediamanager.md#deployment-and-independent-verification).
+- MediaManager replacement2026-11-15 deployed through approved Ansible on existing master: stable1.12.3 UI8000, private PostgreSQL17, shared movies/tv directories and read-only native MiniDLNA. Radarr stopped with /opt/radarr retained; qBittorrent/Jackett unchanged. Login and MobLand/movie search verified, all3indexer caps200. Admin email admin@example.com; initial password in target /opt/mediamanager/.env0600, field MEDIAMANAGER_BOOTSTRAP_PASSWORD. No downloads/requests started during deployment; subsequent one-episode MiniDLNA playback accepted by user2026-11-16. See [acceptance](../log/2026-11-15-home-network-mediamanager.md#mobland-playback-accepted-2026-11-16). [Result](../log/2026-11-15-home-network-mediamanager.md#deployment-and-independent-verification).
 
 - Radarr transition2026-11-15 deployed: qBittorrent8081 and Radarr7878 Docker plus native MiniDLNA/Home Movies active, /data/minidlna contains separate downloads and movies. Authenticated links to qBittorrent and three existing Jackett indexers all passed Test; manual search only, RuTor needs Other8000. Admin passwords in target /opt/radarr/.env root0600; no secrets in Git. Independent auth/API/catalog/service checks passed; no downloads started. Cleanup39.04GB and Lampa restoration remain complete. Real1.55GB film download/import/hardlink accepted: two paths share device/inode and nlink2, Radarr hasFiletrue, MiniDLNA catalogs1video; user confirms TV playback. Duplicate-add409 caused the misleading connection error; no repair needed.4K/HDR/seeking not newly verified. [Result](../log/2026-11-15-home-network-radarr-roles.md#deployment-and-authenticated-linkage-completed).
 
@@ -185,6 +185,15 @@ route through TrustTunnel table `880`. System resolution of `api.openai.com` ret
 answer; Wi-Fi and `1.1.1.1` return public addresses. Intent of the mapping is unknown. Both Wi-Fi and OpenVPN advertise DNS
 routing domain `~.`; TrustTunnel has `change_system_dns = false`.
 See [diagnostic evidence](../log/2026-10-11-trusttunnel-client-kickstarter-routing.md).
+
+## Home-01 hardware
+
+Verified over read-only SSH on 2026-11-16 with `lscpu` and `dmidecode`:
+
+- CPU: Intel Core i3-10105, 4 cores / 8 threads, 3.70 GHz base, 4.40 GHz maximum, 6 MiB L3 cache.
+- Motherboard: Micro-Star International (MSI) PRO H410M-B (MS-7D82), revision 1.0.
+- RAM: 16 GiB total, two A-DATA Technology 8 GiB DDR4 DIMMs, one in each channel A/B; single rank, 1.2 V. SMBIOS part number is the generic `DDR4 3200`; configured speed is 2667 MT/s. Exact retail module model was not exposed.
+- SMBIOS reports 64 GB maximum and four logical device entries, including two empty entries; physical slot count and upgrade limits were not independently verified.
 
 ## Control points
 

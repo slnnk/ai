@@ -1,0 +1,157 @@
+sandbox_mode = "workspace-write"
+
+model = "gpt-6.1-sol"
+model_auto_compact_token_limit = 800000
+model_context_window = 872000
+model_reasoning_effort = "medium"
+service_tier = "default"
+
+[projects."/home/slnnk"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/mygit/ansible"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/helm-charts"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/jenkins-pipelines"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/fastlane-docker"]
+trust_level = "trusted"
+
+[projects."/tmp"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/mygit/youdo-ai"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/jenkins"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/automation-test-yandex"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/YouDoApp"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/trusttunnel"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo.business"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/jenkins-agent"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo-business-loopplugin"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/dns"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/automation-services"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/yandex-tf"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/Youdo.Services.Docker"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/infra-tf"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/team-copilot"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/base-images"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/Fns"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo.dengage"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/escrow.tinkoff"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo-android-testing"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo-evaluation-service"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/gitlab-ci-templates"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/docvalidation"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/ai-skills"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo.business.landings"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/test_signals"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/geocoder"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/yc-base-image"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo-mcp"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/selectel-tf"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo-business-tickets"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/sorm"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/youdo.content"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/buildapi"]
+trust_level = "trusted"
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"
+
+[tui]
+screen_reader_detection_done = true
+status_line = ["model-with-reasoning", "current-dir", "thread-name", "run-state", "context-used", "weekly-limit", "used-tokens", "task-progress"]
+status_line_use_colors = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+"gpt-5.6-sol" = 4
+gpt-6-astra = 4
+"gpt-6.1-sol" = 4
+
+[mcp_servers.hetrixtools]
+url = "https://mcp.hetrixtools.net"
+http_headers_helper = "python3 /home/slnnk/ai/personal/scripts/hetrixtools_mcp_headers.py"
+startup_timeout_sec = 30.0
+tool_timeout_sec = 60.0
+default_tools_approval_mode = "writes"
+
+[mcp_servers.hetrixtools.http_headers]
+User-Agent = "codex-mcp-client/0.167.0"
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+
+[sandbox_workspace_write]
+network_access = true

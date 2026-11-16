@@ -36,3 +36,7 @@ None.
 
 ## Applied verification
 `python3 /home/slnnk/ai-data/nexus-recovery/verify_raw.py` exited0. Admin GET confirms raw-private online/ALLOW/raw-hosted/ATTACHMENT, raw group member raw-private, nx-raw exact read/browse/add/edit privileges and active raw user with sole nx-raw role. Authenticated raw asset listing HTTP200 and zero items; wrong password HTTP401. Missing-object probes return404 through internal msk3-nexus, public HTTPS nexus.youdo.com and iOS Appium HTTP nexus.youdo.corp for both repositories, authenticated and anonymous. This verifies missing-object routing, not successful real APK/ZIP downloading. No artifacts uploaded or pipelines run.
+
+## User acceptance November 16
+
+On 2026-11-16 the user confirmed mobile APK/ZIP publication through the agreed CI and Appium downloads work. The corresponding central TODO item is closed on that user-reported evidence. Earlier empty-repository and missing-object checks above describe the October 12 state; they are not current blockers. No new CI jobs, uploads, runtime changes or independent download checks were performed for this closure.
