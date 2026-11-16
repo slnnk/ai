@@ -1091,3 +1091,692 @@ read-only preflight passed. New pageSHA256
 proposed MSX action /playback-seek-control/?v=679c4d4a5e1e. Page and redirect are
 not installed; explicit approval required. Existing /playback-from-start remains
 current MSX action. Main diagnostic TODO and separate DV7 startup error remain open.
+
+## Backward and forward sequence installed; TV test deferred by user
+
+User explicitly requested installing the short one-backward-seek test but said TV
+testing would be later. That version was installed with backup
+/opt/lampa/diag-backups/seek-control-20261114T211147Z/start.json, delivered hash679c4d4a5e1ebfa27bd82605c296be83ae9ebee4ed94d10a99029f9df25925c4.
+No TV launch or background capture started. User then discussed forward versus
+backward behavior; discussion alone did not authorize an intermediate forward-only
+change. Finally user explicitly requested combined sequence:1min watch,back30s,
+3min watch,forward30min,5min watch. This supersedes short one-backward version.
+
+Implemented locally seek-sequence.js,seek-sequence.html.in,seek-sequence-diag.js and
+install_seek_sequence.py. Playback stage durations use actual advancing media time,
+excluding paused/seeking/waiting/insufficient-ready periods; seek jumps do not count
+as viewing. From near60s seek to30s, then after180s more seek from about210s to2010s,
+then300s viewing, automatic pause/completion around38:30 media time. About540s of
+actual watching plus initial loading/rebuffers. Hard20min wall-time timeout. Separate
+copied observer at /playback-seek-control/diag.js has20min bound; shared original
+playback-diag.js unchanged. Stage markers include stage,played time,from/target
+numbers in same local access log; no URLs,keys or media content in telemetry.
+
+Meaningful local JS checks passed: zero initial seek, exactly-30 then+1800s, stage
+thresholds60/180/300, paused/waiting time excluded, correct automatic completion;
+observer remains active after10min and stops after20min. Python compile and remote
+read-only preflight passed. Executed one user-requested update with baseline hash
+checks and backups: /opt/lampa/diag-backups/seek-sequence-20261114T212052Z contains
+old index.html and startup JSON. Updated existing test index, new private diag.js,
+and MSX version/action. PageSHA256
+920aef537c26449d7911ef270c9eefa9c607c361a86a07056f77cc7de6dd450d;
+private observerSHA25647d2c186a58b66fc7831d86b4395fea56320301f084f1e3232d7184dca757b50.
+Current action link:http://192.168.168.2:8080/playback-seek-control/?v=920aef537c26.
+
+Post-install HTTP startup/page/private observer200,CORS*,exact hashes and schedule
+verified. RAM readback4294967296 bytes,UseDiskfalse,PreloadCache10,ReaderReadAHead95.
+No service/container/image/network changes, no clip encoding or cache-mode changes.
+Actual TV sequence not run or claimed working: user will test later. No scheduled
+job, automation or background sampler left. Before user later starts, launch bounded
+cache/stat/TCP observation; browser observer begins only when page opens. Current MSX
+redirect and all temporary pages/media/scripts still await approved restoration/
+cleanup after diagnostic work. Original Lampa startup backup remains
+/opt/lampa/diag-backups/plain-test-20261114T195322Z/start.json. Parent diagnosis and
+separate DV7 startup error remain unresolved; only requested test setup completed.
+
+## Seek sequence observation started 2026-11-15
+
+User is ready to launch the TV and asked whether attendance is needed. Live HTTP200 and exact installed page/observer hashes verified; MSX still selects the approved combined sequence. Read-only SSH collection started10:01:47UTC for1500s (expected end10:26:47UTC), local exec session5560. Local runner ai-data/home-media-diagnostics/run_seek_observation.py reads cache/stat, TorrServer TCP and Lampa diagnostic events; files seek-cache/tcp/events-20261115T100147Z.jsonl. Initial cache/TCP samples present without stderr; HEAD observer_probe round trip confirmed in parsed local events. No remote files/settings changed. Actual TV test events not yet observed at this checkpoint. User may leave after playback starts; telemetry detects waits/errors/progress, but cannot certify subjective picture/audio quality. Keep TV/MSX/server/collecting PC running. Browser/test hard limit20min; capture25min. Parent diagnosis remains open. Check local capture files and exec session5560; stop runner with Ctrl-C via that session if requested.
+
+## Combined seek sequence completed with three post-seek stalls
+
+2026-11-15: user reported picture/audio running at launch, then TV displayed completion.
+Parsed local browser trace confirms test_done reason completed at10:12:30UTC,
+media2310.533169s; all three actual-watch stages60/180/300s completed.
+First playing10:03:19UTC; first minute had no post-start waiting.
+Backward seek60.178271 ->30.178271 took about0.438s until playing;
+forward seek210.422244 ->2010.422244 took about0.309s. These expected seek waits
+are separate from three later non-seek waits (browser elapsed times):
+
+- At media91.224558s,10:05:22UTC:3.634s waiting. Current server piece complete,
+  approximately3184MiB contiguous ready; about3.97MB unsent TCP queue,
+  acknowledged bytes stopped over two consecutive samples and rwnd_limited increased.
+- At media137.429s,10:06:12UTC:2.733s waiting. Current piece complete,
+  3888MiB contiguous ready; about4.15MB unsent queue, flat acknowledged bytes
+  and increasing receiver-window limited time, resuming before playing returned.
+  Retransmissions occurred elsewhere in capture; do not claim no packet loss globally.
+- At media2096.761s (34m56.761s),10:08:55UTC:0.918s waiting. Current piece complete,
+  about2552MiB contiguous ready. Adjacent TCP samples show queued bytes and resumed
+  transfer; do not claim a whole-stall zero-window proof from one-second sampling.
+
+No media error/stalled event recorded. Buffered reports22/24s ahead during first
+two waits do not prove every audio/video track was ready. After far seek, currentTime
+was about2010s while buffered ranges remained near~250s and subsequently progressed
+on the prior timeline; ahead_s0 cannot be interpreted as an empty actual buffer.
+The timeline mismatch is reproducible evidence, not a demonstrated root cause.
+
+Result: scripted completion is not a clean playback pass. These three waits were
+not caused by unavailable current torrent pieces in sampled server cache. Two align
+with TV receiver backpressure. Prior from-zero/no-seek9m42s control was smooth;
+seek-related player/demux behavior is strengthened as a hypothesis, still not causal
+proof without a repeatable matched control. Distinct earlier incomplete-piece and
+DV7 startup events remain separate unresolved cases. No settings/files changed on
+server. Temporary redirect/pages remain pending approved restoration/cleanup.
+
+Raw numerical evidence: ai-data/home-media-diagnostics/seek-events/cache/tcp-20261115T100147Z.jsonl.
+Local collection session5560 remains bounded to10:26:47UTC (13:26:47 Moscow),
+with browser observer ending20min after page load (~10:23:02UTC). Check/stop via
+local session5560; no unattended scheduler installed. Parent diagnostic remains open.
+
+## Full unchanged MKV HTTP control prepared; installation awaiting approval
+
+User requested preparation of the proposed full-file HTTP test. Prepared local
+ai-data/home-media-diagnostics/prepare_full_http_test.py, generated
+install_full_http_test.py, and run_full_http_observation.py. No remote writes made.
+Read-only sudo SSH preflight verified current startup/source test hashes, destination
+absence and209.5GiB free on the Lampa release filesystem. Expected source37390284387
+bytes (~34.82GiB); require6GiB additional free reserve.
+
+Proposed single reviewed installer operation: create
+/opt/lampa/releases/lampa-5d135cd2ed2d0ed4650e0b185fc2107d47c9c6bc/playback-http-control,
+copy full original TorrServer response byte-for-byte to source.mkv.part, with45s
+socket timeout and90min overall download bound; verify status200/Content-Length
+and exact byte count, stream SHA256, fsync and rename to source.mkv. No ffmpeg,
+remux, track removal, codec/settings/cache/network/container change. Partial failures
+retain temporary evidence; old MSX redirect remains until all preparatory checks pass.
+Validate Apache206/Content-Range/CORS and exact local bytes at start/middle/end.
+Install same seek-sequence page and same20min diagnostic script, first audio,
+60s watch ->back30s ->180s watch ->forward1800s ->300s watch. Only media URL and
+diagnostic script path differ from last test. Save startup backup/source manifest
+under /opt/lampa/diag-backups/full-http-<UTC>, then atomic temporary MSX redirect.
+
+Expected delivered pageSHA256d8c3d949bd476a4b131578f79e21cb2161e4159e266052b4a13031ffa6e2c284;
+observerSHA25647d2c186a58b66fc7831d86b4395fea56320301f084f1e3232d7184dca757b50.
+Action /playback-http-control/?v=d8c3d949bd47. Local compile/guard/order checks
+passed; template equality preserves already tested seek logic. Read-only remote
+preflight passed. Actual download, static media Range delivery and TV behavior
+remain unverified until approved execution. Observer prepared for25min Apache TCP
+and browser events, not launched. Current old seek capture session5560 still active
+at this checkpoint, bounded to10:26:47UTC; no new background operation.
+
+Before running installer --apply obtain explicit approval for these remote writes
+under user AGENTS External changes. This diagnostic static copy is not the declined
+TorrServer disk-cache experiment. Interpretation: successful HTTP control would
+implicate differences in the TorrServer/live source path, not prove one exact bug;
+repeated waiting would narrow toward the shared media/player/network path, not
+prove a decoder defect alone. Parent diagnosis and cleanup remain open.
+
+## Full HTTP installation approved and copying
+
+User explicitly approved the reviewed single installer operation. Started
+install_full_http_test.py --apply on home-01 over sudo SSH, local exec session99654,
+2026-11-15 around10:22UTC. Preflight passed209.5GiB free, exact source/startup hashes;
+first copy progress0.45GiB/1.3 percent confirmed. Source37390284387bytes, same raw MKV,
+20min seek scenario and paths as reviewed. Do not run --apply again while session
+active; target now exists and partial file is expected. Check output through
+session99654; stopping the SSH process may not prove remote termination, inspect
+before cleanup/retry. No MSX redirect until full copy and checks finish. Existing
+old observer5560 remains bounded until10:26:47UTC; HTTP observer not yet launched.
+
+## Full copy timed out; verified resumable retry awaits approval
+
+Approved installer session99654 exited1 with TimeoutError during response.read:
+source sent691011584bytes (~659MiB), then no next block within45s. Partial remains
+at playback-http-control/source.mkv.part. Read-only inspection verified startup
+SHA25633ad279999e826318f080b5845f53c0be58739506dab41b12de9e65c10ce1e6c
+unchanged; no HTTP page/observer or new redirect installed. Directory contains only
+source.mkv.part. SHA25665d70cd16c8633902943c67f20c5345445bc4b4f52798eb12274b9bc5f784a56.
+Later read-only torrents list empty; do not infer the cause of this transfer timeout
+from that later state. Initial partial-copy response had expected200 and exact
+Content-Length; download is incomplete, no full-source test is ready.
+
+Prepared local prepare_full_http_resume.py ->resume_full_http_test.py. Guard exact
+inspected partial size/checksum; same page/hash/target and same final HTTP checks.
+One proposed retry command resumes with HTTP Range from saved offset,180s socket
+timeout, at most10 connections/retries and90min overall download bound. Preserve
+partial and old startup on failure. No source re-encoding/settings/cache change.
+Default read-only remote preflight passed208.9GiB free, exact prefix and startup.
+Local compile/guard/bound checks passed. Re-execution is a new external-write
+command and requires explicit approval under user AGENTS; not run automatically.
+
+Old observation session5560 has now finished: cache/TCP exited0, bounded logs
+exited124 as expected from timeout1500. Preflight22012/32908 exited0. Installer
+99654 exited1; all task commands ended, no task background collector or download
+remains. Browser observer's20min window has also elapsed. Parent diagnosis and
+full-file HTTP preparation remain open; source copy and pending retry are evidence.
+
+## Resumable full copy approved and running
+
+User explicitly approved the reviewed resumable command. Started
+resume_full_http_test.py --apply, exec session53254,2026-11-15~10:47UTC. Exact prefix
+checksum/startup checks passed; resumed connection1 progressed beyond prior offset,
+2.71GiB/7.8percent by10:48UTC. Same agreed paths/source/page and final redirect;
+180s socket timeout,10 connections,90min bound, no settings changes. Do not rerun
+while active. Read-only source-hash-matched cache sampler32316 started for600s,
+local full-copy-cache-20261115T1047.jsonl; no remote files written by sampler.
+Snapshot10:48:15UTC showed485.9Mb/s download and urgent piece447 missing64KiB;
+this is a live transfer sample, not proof of a playback stall. Current startup
+remains old seek control until all full-file verification completes.
+
+## Full unchanged MKV HTTP control installed and verified
+
+Approved resumable installer session53254 exited0. Resumed from the inspected
+691011584byte prefix, completed on connection1 without a new timeout/reconnect.
+Installed2026-11-15T10:56:04UTC. Source copied byte-for-byte,37390284387bytes,
+SHA256be7ed164f446f498685c29325ee1f53469a4815d7faaf3aa683af97cac60032f.
+No remux, encoding, track removal, TorrServer settings, service/network/container
+change. Media now served by Apache from playback-http-control/source.mkv,
+independent of live torrent delivery during the TV control.
+
+Installer validated exact source count/full-stream SHA, static206 Content-Range,
+CORS* and byte identity at first/middle/last4KiB, then page/observer delivery hashes,
+then backed up prior MSX startup and atomically redirected. Backup and source
+manifest: /opt/lampa/diag-backups/full-http-20261115T105604Z.
+Current action http://192.168.168.2:8080/playback-http-control/?v=d8c3d949bd47.
+StartupSHA25656e648530807bde89f1dfdfda48918c535f45422f1116b2638f7b5dabb6b3323.
+Same seek script60/180/300s actual viewing,back30s,forward1800s,first audio,
+20min test/observer bounds. Source URL and observer path are the controlled changes.
+
+Independent verify_full_http_test.py read-only SSH exited0: current action correct,
+HTTP200 page and observer exact hashes, media HEAD200 exact37390284387 length,
+video/x-matroska, Accept-Ranges bytes; GET bytes0-15 returned206 and EBML header.
+Probe full_http_observer_probe observed in local parsed event log. These checks
+verify delivery/preparation, not TV playback or elimination of stalls.
+
+Started run_full_http_observation.py session52696 at11:03:09UTC for1500s;
+local full-http-tcp/events-20261115T110309Z.jsonl. Initial TCP samples and probe
+present, stderr0. Reads Apache namespace TCP and browser events, local writes only.
+Expected capture end11:28:09UTC (14:28:09 Moscow); browser observer/test starts on
+TV page load and bounds itself20min. To check/stop current local observer use
+exec session52696; if session control unavailable inspect the local process
+run_full_http_observation.py before acting. Do not claim background termination
+without checking it. Old full-copy cache sampler32316 exited0; installer53254,
+independent verification and all older observers finished. No download running.
+
+Prepared test is ready: user should close/reopen MSX, start with OK/Play if needed,
+leave TV/MSX/PC on and allow the sequence to finish. Actual TV launch/results not
+observed yet. Current full HTTP action and source supersede prior seek-test redirect,
+not historical evidence. Parent playback diagnosis, separate DV7 startup error and
+later approved cleanup/restoration remain open; source static copy uses~34.82GiB.
+
+## Full HTTP sequence also reproduces fixed-position waits
+
+User confirmed picture/audio at launch and later reported completion. Full static
+HTTP browser trace has300 records, first playing11:05:23UTC, test_done completed
+11:14:32UTC at media2310.697023s. All actual-watch stages60/180/300s completed.
+First minute had no post-start waits; expected seek waits about0.422s backward
+and0.274s forward, excluded from non-seek stalls. No media error/stalled event.
+
+Four later non-seek waits measured from browser elapsed_ms (network log receipt
+delay differs, so do not use receipt-time differences for exact duration):
+
+| Media position | TorrServer control | Static full HTTP control |
+| --- | --- | --- |
+| ~91s |91.224558s /3.634s wait |91.466s /2.899s wait |
+| ~137s |137.429s /2.733s wait |137.429s /0.642s wait |
+| ~2093s |none recorded |2093.049s /1.201s wait |
+| ~2097s |2096.761s /0.918s wait |2096.844s /1.553s wait |
+
+These waits occur with a complete local unchanged source through Apache, no live
+TorrServer source dependency. Thus insufficient torrent/cache data or TorrServer
+HTTP implementation is not necessary for these fixed-position waits. This does
+not resolve the distinct earlier urgent-piece66.655s stall or DV7 startup error.
+Shared TV/player/MKV/HTTP/LAN path remains; no exact decoder, subtitle or firmware
+root cause proven. CurrentTime/buffered mismatch also recurs after far seek with
+static source (currentTime~2090s,buffered~330s); ahead_s0 is not empty-buffer proof.
+Apache TCP samples show queued media bytes and increasing rwnd_limited during
+first two waits, with flat acknowledged counters then recovery. This supports TV
+receiver backpressure, not a claim of source starvation or universal network health.
+
+Read-only docker exec ffprobe over static HTTP read intervals88%+10,134%+10,
+2090%+12, exited0; saved technical-only stream/packet fields to local
+ai-data/home-media-diagnostics/full-http-packets-stall-windows.json (12309 packets).
+Removed unnecessary title/language/tag metadata from the local artifact.
+Full source has mainHEVC DV8 video,11 audio tracks,19 SubRip tracks and one attached
+MJPEG cover (32 streams total). Selected stream1 is E-AC-3 5.1. Within sampled
+windows, primary-video DTS increments41/42ms, selected-audio DTS exactly32ms;
+no detected decode-timestamp gap in those windows. This does not establish all
+codec payloads or whole-file timestamps are defect-free. Subtitle packet times
+near stalls are observations, not proven causation.
+
+Next proposed matched control: use the already saved full original to remux a
+full-length MKV containing only main video and first audio, both stream-copy,
+then same HTTP/seek sequence. Preserve codecs/DV8/audio and full length; remove
+extra audio/subtitle/cover streams and rebuild container. This is a proposal,
+not authorized remote creation/redirect; prepare reviewable command before any
+external-write approval. Success would implicate packaging/stream-set differences,
+not identify one exact faulty track by itself. No remux or remote changes performed
+in this result turn. Avoid repetitive manual track switching or cache changes.
+
+Collector52696 still active at checkpoint, bounded until11:28:09UTC/14:28Moscow;
+TCP/event numeric files remain full-http-*-20261115T110309Z.jsonl. All metadata
+commands completed; no download/transcode running. Check/stop collector via local
+session52696; browser observer expires~11:25:19UTC. Temporary current HTTP redirect,
+34.82GiB source and diagnostic files await later approved cleanup. Parent diagnosis
+and separate DV7 startup issue remain open.
+
+## Codec and browser replacement options researched
+
+User asked whether codecs can be installed or the browser replaced on this TV.
+Discussion only; no TV changes, firmware update, app installation or DLNA service
+authorized. Official Hisense55U7S PRO product page lists HEVC/Dolby Vision support:
+https://ru.hisense.com/catalog/tvs/55U7SPRO/ . Current successful HEVC/E-AC-3 playback
+also makes a simple missing-codec explanation weak; no exact decoder defect proven.
+
+Official VIDAA support documents firmware updates through System Settings > Support
+> System Upgrade > Check Firmware Upgrade: https://www.vidaa.com/support/ .
+No confirmed user-installable codec pack or independent Chrome/Firefox engine
+replacement found for this exact model. Absence of a documented route is not proof
+that every unofficial native modification is impossible. Official VIDAA partner FAQ
+says platform supports native Linux and HTML5 apps; avoid claiming all VIDAA apps
+are web-only: https://www.vidaa.com/is-ortaklari/ . Older WebApp development guide
+explains platform browser engines but is not model-specific U9.5 evidence:
+https://www.vidaa.com/wp-content/uploads/2020/12/WebApp_Development_Guide_for_VIDAA.pdf .
+
+Official Hisense regional VIDAA U9 manual (generic, not the exact55U7S PRO manual)
+describes App Store installation, warns downloaded APK files may not install, and
+supports media/content sharing. Therefore Android APK installation is not a confirmed
+supported route for this model. Do not assert a particular unsupported browser engine
+version from third-party SEO pages or the old developer guide.
+Manual: https://www.hisense.com.my/wp-content/uploads/2025/08/93041_9603VIDAA_U9_EUEMCO_E-Manual_eng_202502%E5%AE%8C%E6%95%B4%E6%9F%A5%E7%9C%8B%E7%89%88.pdf .
+
+Candidate diagnostic alternative discussed: play same saved full source using TV's
+built-in media player via USB or a local DLNA server, to compare a path outside
+MSX browser playback. This is a proposal, not a confirmed fix or DLNA installation
+approval. Previously proposed full two-track stream-copy MKV test remains unexecuted;
+no user cancellation/supersession inferred. Check existing diagnostic TODO before
+selecting or implementing next control.
+
+## Single-file DLNA control prepared; server launch awaiting approval
+
+User has no USB drive and asked how to use DLNA. Read-only home-01 checks:
+no minidlnad/installed minidlna found, no listeners1900/udp or8200/tcp;
+enp1s0 UP192.168.168.2, source.mkv exact37390284387bytes; only existing media images.
+No DLNA server has been started. Docker image documentation verified at
+https://hub.docker.com/r/vladgh/minidlna/ : host networking for SSDP discovery,
+MINIDLNA_ configuration, V,/media scan filtering and notify interval30.
+Source: https://github.com/vladgh/docker_base_images/tree/main/minidlna .
+
+Prepared local start_dlna_test.py, default read-only preflight passed remotely.
+Proposed single docker run: image vladgh/minidlna:latest (pull if absent), ephemeral
+container tv-dlna-test, --rm, --restart=no, --network=host; bind only existing
+source.mkv ->/media/test.mkv read-only, media_dirV,/media, friendly name
+Home TV Test, network_interfaceenp1s0, port8200, SSDP1900/udp, notify30s,inotifyno.
+No film copy/transcode, MSX redirect, router/firewall or existing service change.
+Default preflight checks complete source and absence of container name; --apply
+is gated by explicit per-command external-change approval. After launch, planned
+read-only checks: descriptionXML friendlyName, running state, readonly single
+media mount, host network, restartno. Does not prove TV discovery/playback.
+Shutdown command after separate approval: sudo docker stop tv-dlna-test; --rm
+removes ephemeral container/anonymous volumes, downloaded image remains.
+
+TV instructions from official generic VIDAA U9 manual, not exact model UI labels:
+Settings > Connection > Multimedia Device Connection > Content Sharing ON,
+then Media > Content Sharing(device name), select Home TV Test and movie.
+Some VIDAA versions put sharing under System > Application Settings per official
+https://www.vidaa.com/customer_support/what-should-i-do-if-the-vidaa-app-media-function-isnt-working/ .
+No TV setting has been changed by agent. Native media player has no installed
+browser observer or automatic seek scenario: server can observe transfers, but
+cannot claim browser waiting telemetry/automatic native controls. User should
+observe a short playback/seek comparison; no repeated track switching proposed.
+
+Full HTTP observer52696 now finished (TCP0,bounded logs124), browser expired.
+All task commands complete, no download/capture/server-launch running. Current
+MSX HTTP control remains installed. Parent diagnosis, optional two-track remux
+and approved cleanup remain open. USB unavailable is a task constraint, not a
+universal preference or a cancellation of other previously proposed controls.
+
+## Native DLNA playback accepted smooth including seeking
+
+User approved the reviewed single DLNA launch operation. start_dlna_test.py --apply
+session25717 exited0; container tv-dlna-test running, ID3843744b18e37ca3cecaed1a9e796c107745e20fc934de4023e4bd992fbabe79.
+Pulled image vladgh/minidlna:latest digest
+sha256:cdfa0ed2bc9482b350c387d793ec6e2d41749cdafd9b69a4fe3579c0995469ef.
+Verified HTTP200 rootDesc.xml friendlyName Home TV Test, readonly bind of sole
+source.mkv into /media/test.mkv, host network and restartno. Source unchanged.
+SSDP1900/udp and media8200/tcp configured on enp1s0. No existing service/MSX
+redirect/configuration/router change. --rm container; image remains after stopping.
+
+User already found DLNA server and started native TV picture/audio. Catalog
+verification initially counted two resources; read-only follow-up proved one
+37390284387byte video resource /MediaItems/24.mkv and its embedded JPEG artwork
+/AlbumArt/1-24.jpg, exposed through several virtual folder references to same item.
+This is one film, not two movies or another host directory exposure. Range0-15
+returned206, correct Content-Range total and MKV EBML header. All catalog/probe
+commands finished; no fix/config change was needed for the verification assertion.
+
+User later explicitly reported extended viewing without problems, then clarified
+that this includes seeking. Treat as user-observed native-player success, not
+instrumented proof of exact matching seek positions/duration/audio-track index.
+No native browser waiting/error telemetry exists. TCP independently confirms
+active media delivery; it cannot certify smooth picture/audio. The earlier raw
+HTTP/MSX full-file test reproduced waits near same media positions as TorrServer.
+This strongly shifts diagnosis to browser-based MSX/HTML5 playback versus native
+DLNA playback. Native path also changes HTTP server/headers/control behavior;
+do not claim the exact Chromium/demux/decoder bug is proven, all LAN issues are
+universally excluded, or a new codec installation is required.
+
+Practical currently accepted playback path: existing saved full source ->MiniDLNA
+->native TV player, including manual seeking. Current MiniDLNA shares this one
+saved file; it is not an implemented Lampa/TorrServer-to-native-player integration
+and does not automatically publish arbitrary torrents. Do not replace that scope
+with a promised working live-torrent workflow. Native smoothness does not close
+the separate DV7 startup error or prior urgent-piece download issue. No next remux,
+firmware/browser change or permanent DLNA deployment authorized by this report.
+Keep currently working container active for viewing until user requests otherwise;
+later stop/removal remains subject to external-change approval.
+
+Read-only native host TCP sampler95644 active for600s from12:06:37UTC, expected
+end12:16:37UTC/15:16:37Moscow; local dlna-tcp-20261115.jsonl. It filters source8200
+and TV192.168.168.160 and saves numerical transport data only. Check/stop using
+exec session95644. Container tv-dlna-test intentionally remains serving film;
+check sudo docker ps --filter name=tv-dlna-test, stop sudo docker stop tv-dlna-test
+only after approval. Installer, all catalog/range checks and previous observers
+finished; no download/transcode running. Existing temporary HTTP/MSX pages,
+34.82GiB source and diagnostic redirects still require later approved cleanup.
+
+## Stremio VIDAA issue and linked Reddit discussion match the failure class
+
+User supplied https://github.com/Stremio/stremio-bugs/issues/2055 and
+https://www.reddit.com/r/Stremio/comments/1pn840i/does_anybody_know_if_the_vidaa_problem_is_getting/ .
+Read issue body, visible Reddit comments and all119 GitHub comments via public API
+(100+19, no next page). Local source snapshots stremio-2055-comments-page1/2.json.
+Issue remains open. Reddit includes the issue author's link to2055, so these are
+connected discussions, not fully independent confirmations.
+
+Matching pattern: VIDAA browser/app MKV playback stalls across source paths while
+same source plays via native DLNA. Our pauses are usually transient, versus many
+reports of indefinite buffering; exact same defect not proven. Original reporter
+uses U7Q Pro/9.02, our known model55U7S PRO differs; actual full firmware string
+not yet supplied. Async request for full V0000... version sent, answer pending.
+
+Key evidence (technical claims paraphrased; no support contact made):
+- Maintainer jaruba reproduced platform issue on43E7Q and32A5NQ, found short/high
+  bitrate trailers could work, and questioned a universal16MB buffer explanation:
+  https://github.com/Stremio/stremio-bugs/issues/2055#issuecomment-4343092617
+  https://github.com/Stremio/stremio-bugs/issues/2055#issuecomment-4327804474 .
+- User-posted support correspondence2026-06-04 says MKV support is stronger via
+  USB/DLNA, acknowledges app/network playback bug and promises improvement in
+  U9.6.1 after U9.6. It recommends supported streaming packaging (DASH/HLS).
+  This is a forwarded support letter, not an independently verified release note:
+  https://github.com/Stremio/stremio-bugs/issues/2055#issuecomment-4619857345 .
+- Later users report firmware improvements, but2026-11-09 U7 report describes
+  regression after updating. No universal fixed version for our model established:
+  https://github.com/Stremio/stremio-bugs/issues/2055#issuecomment-6749111516 .
+
+Implication: prioritize exact TV firmware/model/region comparison and retain working
+native DLNA. Do not infer that latest firmware universally fixes it or install a
+firmware from another model based on a shared9.6 label. No update/contact authorized.
+The16MB/disabled-overlay explanation remains unverified, not a demonstrated cause.
+If a further browser control is needed, full-length MP4 or HLS stream-copy packaging
+is now a stronger proposed direction than arbitrary cache changes; DV/audio behavior
+still requires verification. No new remux/HLS service authorized or implemented;
+previous optional two-track MKV proposal remains history, not a pending command.
+Current DLNA serves saved file only; live TorrServer handoff remains separate.
+
+Background checkpoint: container tv-dlna-test intentionally active for viewing;
+TCP sampler95644 still active around12:14:51UTC, bounded until12:16:37UTC.
+All issue retrieval/check commands finished; no firmware/server state change in
+this turn. Parent diagnosis remains open pending exact firmware and next decision.
+
+## Exact TV firmware provided by screenshot
+
+User supplied About-device screenshot. Observed software V01.09.50W.Q0312;
+extended build W.Q0312.X0001.W01.Y01.J01.9.05.00. Record software identifiers only;
+serial/device identifiers are not necessary for diagnosis and are not transcribed.
+This answers the pending full-version question. Existing known model55U7S PRO.
+
+Bounded public search found no exact-build changelog or verified firmware fix for
+this specimen. First-hand review of another55U7S PRO explicitly states test firmware
+V01.09.60W.Q0611:
+https://club.dns-shop.ru/review/t-132-televizoryi/186425-obzor-hisense-55u7s-pro-prokachannyii-4k-televizor-s-mini-led-m/ .
+This is primary observation of a review sample, not an official release note,
+proof of OTA availability/compatibility for this unit or proof the MKV bug is fixed.
+Official download page https://ru.hisense.com/support/downloads/ did not provide
+a verified exact-unit newer build in retrieved public content. No unofficial
+firmware package downloaded, no TV update or other external change performed.
+
+Next user-side read-only check: Settings > Support > System Upgrade > Check Firmware
+Upgrade (localized labels can differ), report whether newer software is offered
+and its version before deciding any installation. Official path documented at
+https://www.vidaa.com/support/ . Keep working native DLNA available. A09.60/09.61
+number alone cannot establish the exact Stremio issue fix across model/region.
+Original support-letter promiseU9.6.1 and mixed later reports retain their limits.
+
+Native TCP sampler95644 has now exited0; all samplers/installers/probes finished.
+Only intentionally running temporary service tv-dlna-test remains for viewing;
+stop still requires approval. No download/transcode/firmware operation running.
+Parent diagnosis and temporary diagnostic cleanup remain open.
+
+## Built-in update check offers no newer firmware
+
+User reports TV says it is already updated to the latest version after built-in
+update check. Current observed firmware remains V01.09.50W.Q0312; no installation
+or changed version reported. This is evidence that this TV's current OTA check
+returns no update, not proof of globally latest firmware or absence of a fix for
+other model/hardware/region cohorts. Review-sample09.60W.Q0611 availability and
+support-letterU9.6.1 fix applicability to this unit remain unverified.
+
+Next proposed vendor question: whether Hisense55U7S PRO on V01.09.50W.Q0312 in
+user's market has a firmware fix for browser/app MKV stalls with same-file native
+DLNA success (Stremio issue2055), and whether it can be delivered through OTA
+without USB. User has no USB. No support message sent or contact authorized.
+Keep currently accepted saved-file DLNA playback; no firmware sideload/recovery,
+permanent architecture change or new MP4/HLS operation authorized. Optional full
+MP4/HLS stream-copy control remains a separate decision if browser playback is
+needed. Exact internal defect and live TorrServer-to-native integration unresolved.
+
+Task background: all samplers/probes finished; only intentionally active temporary
+tv-dlna-test remains serving the saved movie. Stop requires explicit approval;
+status check sudo docker ps --filter name=tv-dlna-test. No download/transcode/update
+running. This is an intermediate diagnostic decision, not parent-task completion.
+
+## Official model-specific downloads checked for USB firmware
+
+User asked whether official Hisense downloads offer firmware and USB installation.
+Read raw official downloads HTML and resolved exact55U7S PRO selector ID9243.
+Opened model-specific card:
+https://ru.hisense.com/support/downloads/?ACTION=start&ID=9243&PARENT_SECTION=10 .
+It publishes only20186350_55-65-75-85U7S_PRO_Rus PDF7.62MB, no downloadable
+firmware package or software version. Generic page title/description says firmware
+and instructions, but that alone is not evidence of a firmware download.
+Exact linked manual (13-page PDF, read-only open):
+https://cdn.hisense.ru/upload/file_tovar/Service/User%20Manuals/TV/U7S_PRO/20186350_55-65-75-85U7S_PRO_Rus.pdf .
+
+Official generic regional VIDAA U9 e-manual page73 documents Settings > Support
+> System Update > Update from USB, files at USB root,FAT32/MBR. This establishes
+platform-level USB update route, not exact-unit package compatibility or confirmed
+presence of this menu on55U7S PRO:
+https://www.hisense.com.my/wp-content/uploads/2025/08/93041_9603VIDAA_U9_EUEMCO_E-Manual_eng_202502%E5%AE%8C%E6%95%B4%E6%9F%A5%E7%9C%8B%E7%89%88.pdf .
+
+Conclusion: a USB update is a potential route if Hisense supplies an exact-unit
+compatible package/instructions; no official public download found on the exact
+model card. Proposed support request should include model55U7S PRO, current
+V01.09.50W.Q0312, no OTA offered, MKV browser stalls/native DLNA success and request
+USB firmware containing the issue2055-related fix. No serial/device identifier sent,
+no vendor message sent, binary downloaded or firmware applied. Do not substitute a
+third-party package or a related-model build for compatibility confirmation.
+User previously lacked USB; asking about this route does not prove possession or
+cancel DLNA. Full MP4/HLS control remains an optional distinct proposal.
+
+Task commands complete, no background download/sampler/update. Temporary
+MiniDLNA tv-dlna-test intentionally remains active for current viewing; stop and
+cleanup require approval. Parent diagnosis remains open.
+
+## Proposed convenient torrent predownload and native DLNA workflow
+
+User asked to think through DLNA alternative with convenient torrent selection
+and predownload. Clarification: both TV and phone/PC interfaces are acceptable,
+phone/PC only is sufficient. Task-scoped requirement, not deployment authorization.
+Keep native DLNA playback that already works. No repository/server/service changes.
+
+Primary-source comparison:
+- qBittorrent +VueTorrent: torrent-oriented search/download management; VueTorrent
+  documents mobile/PWA support, integrated search, selective download and queue
+  controls: https://github.com/VueTorrent/VueTorrent . Reviewable mocked demo
+  https://vuetorrent.github.io/demo (not a live downloader).
+- Reuse existing Jackett/indexers rather than migrate them: official qBittorrent
+  integration https://github.com/qbittorrent/search-plugins/wiki/How-to-configure-Jackett-plugin .
+- Radarr +qBittorrent +existing Jackett: optional film-catalog/poster interface,
+  manual release choice and quality/custom-format policies. Source https://radarr.video/ .
+  It adds a library/import workflow; not required for basic chosen-torrent download.
+  TV remote navigation support for these web UIs not verified and not required.
+
+Initial recommendation (proposal only): qBittorrent with VueTorrent on home-01,
+existing Jackett for search and MiniDLNA exposing only completed downloads. User
+on phone/PC searches title, compares release name/size/seeders, selects file(s),
+starts download and sees completion; TV uses native Media/DLNA to choose ready film.
+No browser media playback or transcoding in this design. Current temporary
+single-file DLNA is not yet this library and needs a separately approved permanent
+configuration; do not silently widen its readonly mount or replace active service.
+
+Separate incomplete/complete folders: qBittorrent documents temp_path_enabled and
+ temp_path in https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-5.0) .
+Proposed same-filesystem move on completion, no unnecessary second media copy;
+MiniDLNA receives read-only completed directory only. Automatic discovery via
+inotify=yes is documented at
+https://manpages.debian.org/trixie/minidlna/minidlna.conf.5.en.html .
+Actual end-to-end behavior must be tested before accepting deployment: incomplete
+file hidden, complete file cataloged once, TV discovery/seeking/audio functional,
+UI removal reflected in library, existing working media/VPN unaffected.
+
+Storage budget, retention/deletion and seeding policy remain design choices,
+not inferred auto-delete or auto-download permissions. Radarr is an alternative
+if movie posters/discovery/quality automation matter more than direct torrent UI;
+no need to add extra request/catalog services without that requirement. Film/series
+scope not yet specified; do not add Sonarr automatically. No external portal or
+third-party hosted playback proposed. All actual services would remain on home-01.
+Parent diagnosis/firmware investigation stays open independently of this proposal.
+All task research commands finished, no new background operation. Current
+single-file tv-dlna-test remains intentionally active; stop requires approval.
+
+## Radarr website podkop addition prepared
+
+User supplied radarr.video Cloudflare block screenshot and requested adding it to
+podkop. Target domain only, suffix matching covers subdomains; no unrelated CDN,
+Servarr or tracker additions implied. Read-only router preflight: dynamic manual
+list, no radarr match, DNS returned public addresses rather than FakeIP; current
+selector trusttunnel-out, failures0, generated sing-box check exit0.
+
+Prepared /home/slnnk/ai-data/cudy/radarr-domains/domains.txt with single radarr.video,
+validated using existing /home/slnnk/ai-data/cudy/add_domains.py without --apply.
+Reviewed proposed one apply operation: backup /root/cudy-before-v2fly-radarr/podkop,
+append missing suffix to podkop.main.user_domains, commit UCI, reload podkop and
+verify sing-box, old-domain preservation, FakeIP and VPN state. Existing helper
+previously encountered reload exit9 on LinkedIn addition; do not blindly retry
+mutations if return nonzero, inspect actual resulting state read-only first.
+HTTP/Cloudflare success cannot be promised from routing alone. No router changes
+yet; explicit per-command approval pending under user AGENTS External changes.
+All current read/preflight commands completed, no new background operation.
+Current temporary native DLNA container remains intentionally active for viewing.
+
+## Radarr website VPN routing applied and independently verified
+
+User explicitly approved the reviewed router change. Ran existing add_domains.py
+with radarr single-domain source and --apply once, session1268 exited0. Added1
+radarr.video suffix to podkop.main.user_domains, UCI committed and podkop reloaded.
+Backup /root/cudy-before-v2fly-radarr/podkop. Helper verified FakeIP, previous
+manual domains preserved, generated sing-box config valid and healthy VPN selector.
+Independent read-only UCI exports before/after excluding user_domains have equal
+SHA256, confirming other UCI settings preserved. Router DNS returns FakeIP for
+radarr.video and www.radarr.video; sing-box check passed, failures0.
+
+Independent home-01 LAN-client HTTPS check resolved radarr.video through router
+FakeIP and returned200, Radarr content present, Cloudflare blocked-page marker
+absent. This verifies LAN request, not the user's exact browser/cache state.
+User should reopen/refresh the site. No other suffix/CDN/Servarr domain added,
+no repository, firewall, DNS upstream or failover setting changed. Apply/check/sync
+commands finished, no new background operation. Existing temporary native DLNA
+service remains intentionally active. Radarr web access is a resolved dependency
+within the ongoing DLNA UI-design discussion; no deployment authorization implied.
+
+## Synology considered as complete home-01 replacement
+
+User asked whether Synology can run Radarr, Immich and Uptime Kuma, linked
+https://synocommunity.com/packages and noted Jackett. Clarified target: replace
+home-01, not an extra storage box alongside it. Budget is not allocated; compare
+available options and decide later. These are task-scoped planning requirements,
+not purchase, migration, deployment or permission to stop current services.
+
+Verified primary catalog lists Radarr, Jackett, qBittorrent, Immich and Uptime Kuma.
+Separate pages verified Jackett/qBittorrent/Kuma supported DSM/architectures:
+https://synocommunity.com/package/jackett
+https://synocommunity.com/package/qbittorrent
+https://synocommunity.com/package/uptime-kuma
+Immich package page retrieval failed, but catalog listing and upstream community
+build recipe establish a native SPK path with Node/PostgreSQL/Redis/Python/FFmpeg
+dependencies rather than a mandatory Docker wrapper:
+https://raw.githubusercontent.com/SynoCommunity/spksrc/master/spk/immich/Makefile .
+Exact package availability/features must still be checked for a selected model/DSM.
+SynoCommunity packages are third-party, not Synology-maintained built-in apps.
+Container Manager remains an alternative; compatibility model list:
+https://www.synology.com/en-global/dsm/packages/ContainerManager .
+Immich docs also include a Synology container guide marked community-supported:
+https://docs.immich.app/install/synology/ .
+
+Official Immich requirements current2026-11-11: minimum6GB/recommended8GB RAM,
+minimum2/recommended4 CPU cores; local SSD recommended for PostgreSQL database,
+not a network share. Source https://docs.immich.app/install/requirements/ .
+Inference/recommendation for combined DSM/photo/download/library services: target
+16GB upgradeable RAM, x86-64 platform and enough drive bays; not an official16GB
+minimum or measured performance guarantee. Immich initial indexing/ML/video jobs
+matter more than Radarr/Kuma idle resource use. Native DLNA direct play retains
+successful TV path; photo-video processing is a separate CPU workload.
+DSM7.3 specs list Media Server for DLNA:
+https://www.synology.com/en-us/dsm/7.3/software_spec .
+
+Two current reference classes, not final buying recommendations:
+DS725+:2 bays,RyzenR1600/2 cores,4GB supplied,32GB max.
+DS925+:4 bays,RyzenV1500B/4 cores,4GB supplied,32GB max.
+Official sheets:
+https://global.download.synology.com/download/Document/Hardware/DataSheet/DiskStation/25-year/DS725%2B/enu/Synology_DS725%2B_Data_Sheet_enu.pdf
+https://global.download.synology.com/download/Document/Hardware/DataSheet/DiskStation/25-year/DS925%2B/enu/Synology_DS925%2B_Data_Sheet_enu.pdf .
+No price/stock query or claims of cheapest/best model. Exact disk/RAM/SSD
+compatibility, data/backup capacity and total ownership cost need assessment after
+requirements narrow. Four bays provide growth flexibility; two bays suit smaller
+capacity targets. DSM offers common package/storage administration; apps still
+have separate interfaces and third-party maintenance. No all-app compatibility
+claim for every model and no assumption all native packages equal upstream Docker.
+
+Current home-01 and working temporary DLNA remain intact. All research commands
+finished; no new background work or migration. Firmware issue separate; support
+question was drafted but not sent by agent. Existing server not decommissioned.
+
+## Synology evaluation replaces Immich with Synology Photos
+
+User asked to exclude Immich because Synology has its own photo application.
+For the Synology replacement comparison, use Synology Photos instead of Immich.
+Task-scoped planning revision; no app installation/migration or global preference
+against Immich. Historical Immich requirement/availability research remains valid
+but no longer sets the active NAS memory/CPU baseline.
+
+Official Synology Photos docs verify automatic iOS/Android photo/video backups,
+folder/timeline views, albums/sharing, personal/shared spaces and face/object
+organization on selected models:
+https://www.synology.com/en-global/dsm/feature/photos
+https://www.synology.com/en-global/dsm/7.3/software_spec/synology_photos .
+Photos is Synology's own application, unlike third-party SynoCommunity apps.
+Recognition is model-dependent; verify support list before model choice. Current
+DSM docs note HEIC/HEVC additional previews may need Synology Image Assistant on
+client devices; do not promise every format preview is processed on NAS alone.
+No assertion that Photos is feature-identical to Immich or needs no indexing CPU.
+
+Revised workload: Synology Photos, Radarr/Jackett/qBittorrent, DLNA Media Server,
+Uptime Kuma. Previous16GB target was a recommendation driven by Immich; it is
+superseded for this plan. Initial engineering target8GB, with4GB potentially
+sufficient for light use and memory expansion preferred; not vendor-guaranteed
+minimum/performance. Exact library size/users/recognition and torrent load still
+unknown. Re-evaluate cheaper models as well as DS725+/DS925+ rather than keep a
+four-core/16GB requirement without need. Disk bay count still depends on storage
+growth, not removal of Immich. No final model or budget selected, no purchase or
+migration authorized. Existing home-01/DLNA unchanged, no new background task.

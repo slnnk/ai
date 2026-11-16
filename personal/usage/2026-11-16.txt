@@ -1,0 +1,30 @@
+Token usage, last 7 days (since 2026-11-09)
+agent   project                            model                sess   fresh  c.read c.write     out
+codex   ~                                  gpt-6.1-sol            70    7.7M  743.7M       0    2.0M
+codex   ~/mygit/ansible                    gpt-6.1-sol             9    1.8M  214.3M       0    646k
+codex   ~                                  gpt-6-astra             1    350k   19.0M       0     64k
+codex   ~/git/buildapi                     gpt-6.1-sol             1    102k    5.9M       0     20k
+codex   ~/git/automation-test-yandex       gpt-6.1-sol             1     70k    2.9M       0     12k
+total                                                             82   10.0M  985.8M       0    2.8M
+
+Top 5 sessions by input (fresh + cache read + cache write):
+  2026-11-12 17:21  codex   124.8M in   321k out  ~  01a1d0c7
+  2026-11-12 11:24  codex   123.7M in   320k out  ~  01a1cf80
+  2026-11-13 15:47  codex    69.9M in   165k out  ~  01a1d597
+  2026-11-14 17:58  codex    69.5M in   215k out  ~/mygit/ansible  01a1db35
+  2026-11-12 20:20  codex    64.5M in    86k out  ~  01a1d16b
+
+Knowledge-base access (heuristic, see --help):
+agent   sess  kb_find   search    index     full  partial full KiB
+claude     0        0        0        0        0        0        0
+codex     81      171      348        0      164      435     4797
+Codex parser coverage: 4222 wrappers, 5728 shell sites, 5666 static calls, 0 direct calls; 62 dynamic sites, 4 JS parse failures, 0 wrappers unavailable, 0 invalid calls, 2 shell parse failures.
+Codex coverage is incomplete; excluded calls are not treated as zero KB access.
+KB counts describe static requested reads; full KiB is a current-file-size estimate, not token usage.
+Shell parsing is heuristic: dynamic paths, custom readers and runtime control flow may be missed.
+Most read in full:
+   67x README.md
+   36x repos.md
+    6x log/2026-11-14-agents-personalized-learning-backlog.md
+    2x log/2026-11-12-agents-agent-learning-record-simplest-sufficient-solution-4cedeecedfca84d648d0.md
+    2x log/2026-11-12-agents-ecc-local-approaches.md

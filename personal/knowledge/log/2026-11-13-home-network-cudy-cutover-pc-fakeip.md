@@ -81,6 +81,8 @@ without PC VPN remains pending user activation/retest; no background diagnostic 
 
 ## Current follow-up
 
+Media binding follow-up superseded2026-11-15: home-server media deployment and indexer migration completed2026-11-14, reconfirmed by user. Old PC copies removed; user subsequently deleted root-owned TorrServer data and local absence was verified2026-11-15. No update to the retired PC IP bindings is needed. See [cleanup](2026-11-15-home-network-pc-media-cleanup.md) and [central TODO](../../../TODO.md). Historical observations below remain dated evidence.
+
 Telegram expansion completed after user supplied the v2fly telegram file and requested
 addition: all21 literal domain suffixes added manually, no duplicates or previous
 domain removals. Existing Telegram community/IP list retained; preflight also found

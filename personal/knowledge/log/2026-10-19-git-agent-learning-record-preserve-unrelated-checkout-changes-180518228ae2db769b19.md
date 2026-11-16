@@ -1,7 +1,7 @@
 ---
 system: git
 status: verified
-checked: 2026-11-13
+checked: 2026-11-15
 tags: [agents, learning]
 ---
 # Agent learning: preserve-unrelated-checkout-changes
@@ -69,6 +69,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "/home/slnnk/ai/personal/knowledge/log/2026-11-13-home-network-ansible-dns-role.md",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-15T17:06:36.327900+00:00",
+      "cause": "",
+      "event_id": "home-mediamanager-20261115",
+      "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-15-home-network-mediamanager.md#task-and-approvals",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
@@ -93,7 +104,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "git",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-13T20:21:19.933470+00:00",
+  "updated": "2026-11-15T17:06:36.327900+00:00",
   "version": 1
 }
 ```

@@ -137,3 +137,7 @@ measurements, the user said they are not needed. These measurements are cancelle
 without running them. This does not cancel the separate device-list item, media
 checks or VPS-IP reachability check. Earlier speed-test directions are historical
 and superseded; remaining work stays in central TODO. No runtime changes.
+
+## VPS public IP check cancelled (2026-11-15)
+
+The original check concerned reaching the VPS AdGuard Home public address from a phone inside its TrustTunnel connection (PLAN.md lines57-60). Mobile DNS setup was subsequently cancelled. After this explanation the user explicitly requested closing the remaining VPS-IP check. Closed as cancelled without testing, not as verified reachability; historical planning and earlier deferrals above are superseded for this check only. No network command or configuration change was made. The earlier completed DoT/FakeIP result remains unchanged. Central TODO now records the cancellation.

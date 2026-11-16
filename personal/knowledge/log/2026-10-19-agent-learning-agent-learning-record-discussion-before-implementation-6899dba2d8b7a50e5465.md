@@ -1,7 +1,7 @@
 ---
 system: agent-learning
 status: verified
-checked: 2026-11-14
+checked: 2026-11-15
 tags: [agents, learning]
 ---
 # Agent learning: discussion-before-implementation
@@ -212,6 +212,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "personal/knowledge/log/2026-11-14-agents-p13-canonical-reconciliation.md",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-15T17:06:36.226461+00:00",
+      "cause": "",
+      "event_id": "home-mediamanager-20261115",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-15-home-network-mediamanager.md#task-and-approvals",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
@@ -236,7 +247,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agent-learning",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-14T00:28:12.920542+00:00",
+  "updated": "2026-11-15T17:06:36.226461+00:00",
   "version": 1
 }
 ```

@@ -8,9 +8,18 @@ tags: [home, router, openwrt, trusttunnel]
 
 ## Summary
 
-- Current playback diagnosis2026-11-15: same full34.82GiB source with first E-AC-3 5.1 track plays from zero9m42s without post-start waiting/errors; both~123s static MKV/MP4 DV8+E-AC-3 clips also passed. Nonzero-start/seek path remains a hypothesis, not proven cause. See [latest evidence](../log/2026-11-14-home-network-4k-playback.md#full-original-from-zero-stable-for-9m42s-one-seek-control-prepared).
+- MediaManager compatibility2026-11-15 applied via approved Ansible: structured qBittorrent add responses, S2E1-9 season parser and title-only Jackett season search.16tests passed; app apply failed0. Separate approved transaction recovered the already-downloading MobLand S02 without a new add: API linked seasons[2]. Basic search now32season1 results across all3indexers and10season2 results from NoNaMe/RuTracker. User-started download continues; import/TV acceptance pending. [Recovery](../log/2026-11-15-home-network-mediamanager.md#qbittorrent-response-and-season-parser-recovery).
+
+- MediaManager metadata routing2026-11-15: approved user-selected dorninger.co suffix now in Cudy Podkop; complete MobLand season responses222587/49076bytes in0.49/0.29s replace prior direct-path18KiB stalls. Helper reload exit9 independently reconciled to preserved list, valid sing-box/FakeIP and healthy VPN. Direct Jackett search finds season2 on all3indexers; MediaManager Basic defaults to season1, select2 or use Advanced MobLand query. No torrents started. [Evidence](../log/2026-11-15-home-network-mediamanager.md#mobland-metadata-route-and-season-search).
+
+- MediaManager replacement2026-11-15 deployed through approved Ansible on existing master: stable1.12.3 UI8000, private PostgreSQL17, shared movies/tv directories and read-only native MiniDLNA. Radarr stopped with /opt/radarr retained; qBittorrent/Jackett unchanged. Login and MobLand/movie search verified, all3indexer caps200. Admin email admin@example.com; initial password in target /opt/mediamanager/.env0600, field MEDIAMANAGER_BOOTSTRAP_PASSWORD. No downloads/requests started; new-manager download/TV acceptance not tested. [Result](../log/2026-11-15-home-network-mediamanager.md#deployment-and-independent-verification).
+
+- Radarr transition2026-11-15 deployed: qBittorrent8081 and Radarr7878 Docker plus native MiniDLNA/Home Movies active, /data/minidlna contains separate downloads and movies. Authenticated links to qBittorrent and three existing Jackett indexers all passed Test; manual search only, RuTor needs Other8000. Admin passwords in target /opt/radarr/.env root0600; no secrets in Git. Independent auth/API/catalog/service checks passed; no downloads started. Cleanup39.04GB and Lampa restoration remain complete. Real1.55GB film download/import/hardlink accepted: two paths share device/inode and nlink2, Radarr hasFiletrue, MiniDLNA catalogs1video; user confirms TV playback. Duplicate-add409 caused the misleading connection error; no repair needed.4K/HDR/seeking not newly verified. [Result](../log/2026-11-15-home-network-radarr-roles.md#deployment-and-authenticated-linkage-completed).
+
+- Current playback diagnosis2026-11-15: user confirms extended smooth playback including seeking through native TV DLNA player, same saved full MKV. MSX/HTML5 static HTTP and TorrServer controls both stalled near matching media positions. This strongly implicates the browser playback path, not a proven exact decoder/firmware bug; native selected track/exact positions not instrumented. Accepted current workaround is saved file ->MiniDLNA ->native TV player; no live-torrent/Lampa integration implemented. See [native result](../log/2026-11-14-home-network-4k-playback.md#native-dlna-playback-accepted-smooth-including-seeking).
+- External corroboration2026-11-15: Stremio issue2055/linked Reddit describe browser/app buffering with same-source DLNA success. Posted VIDAA support letter promises MKV web-path improvement inU9.6.1; later firmware reports mixed, including U7 regression2026-11-09. Same failure class likely, exact identity unproven. User screenshot shows V01.09.50W.Q0312; another55U7S PRO review sample reports V01.09.60W.Q0611, exact-unit OTA/fix unverified. User ran built-in update check: reports latest/no newer OTA offered on V01.09.50W.Q0312. Exact official downloads card ID9243 has only PDF, no firmware binary. USB update route documented generically for VIDAA U9; exact-unit USB package/fix needs Hisense confirmation. Vendor inquiry proposed, no contact/update authorized.16MB/overlay theory not established. See [sources and limits](../log/2026-11-14-home-network-4k-playback.md#stremio-vidaa-issue-and-linked-reddit-discussion-match-the-failure-class).
 - Distinct captured events: long66.655s plain-page wait had urgent piece3603 incomplete by32KiB; earlier short waits had ready source data and TV receiver backpressure. Do not collapse all events into one proven fault or blame audio/Docker. Keep4GiB RAM; SSD trial explicitly rejected. Source scheduler/peer cause and separate DV7 startup error remain open.
-- Current temporary MSX action /playback-from-start/; next one-seek/180s automatic control prepared only locally, approval pending. All captures finished. Temporary pages/media/script and startup redirects need approved restoration/cleanup; original Lampa startup backup /opt/lampa/diag-backups/plain-test-20261114T195322Z/start.json. Existing detailed history retained in [task log](../log/2026-11-14-home-network-4k-playback.md).
+- Current temporary MSX action2026-11-15 /playback-http-control/?v=d8c3d949bd47 runs the same1min watch ->back30s ->3min watch ->forward30min ->5min watch using a complete unchanged37390284387byte MKV through Apache, bypassing live TorrServer. Approved resume completed and byte/Range/CORS/MIME/page/observer checks passed; actual TV sequence completed with four non-seek waits, no errors. Local read-only TCP/event collector52696 finished (TCP0,bounded logs124), browser expired; no task background operation. Approved single-file tv-dlna-test/Home TV Test container running; native TV smooth including seeking confirmed by user. Host TCP sampler95644 finished0; container intentionally remains active for viewing; USB unavailable. Startup backup /opt/lampa/diag-backups/full-http-20261115T105604Z, original Lampa startup backup /opt/lampa/diag-backups/plain-test-20261114T195322Z/start.json. Temporary source/pages/redirects need approved cleanup. See [current setup](../log/2026-11-14-home-network-4k-playback.md#full-unchanged-mkv-http-control-installed-and-verified).
 
 - New74.5GB MKV/DolbyVision7 torrent reproduced NETWORK error2026-11-14: 100-164Mb/s preload completed with392MiB ready before TV closed stream. HTTP206/Range/CORS valid; exact cause unproven, MP4/H264/AAC control pending.
 - Home4K buffering persists2026-11-14 despite4GiB cache; during stall3890MiB complete data was ahead, TV stopped consuming TCP. VIDAA MQTT connection/state read succeeded on192.168.168.160:36669, no PIN or keys sent; no screen access. AAC2.0/no-subtitle test pending.
@@ -25,20 +34,15 @@ tags: [home, router, openwrt, trusttunnel]
 - TrustTunnel1.1.12 and podkop0.7.24/sing-box1.13.21 run on Cudy with verified selective LAN routing and temporary user-approved Archer DNS.
 - Automatic direct fallback and managed TrustTunnel recovery are verified for interface down, client exit, transport loss and network restart; household cutover remains pending.
 - Archer C64 supplies the existing home LAN; Cudy WR3000S v1 now runs OpenWrt 25.12.5 behind it on a test LAN.
-- User ISP cutover verified2026-11-13: Cudy WAN100.64.6.13/16, gateway100.64.0.2; prior Archer-upstream description above is historical. Media bindings and PC VPN/FakeIP compatibility still need completion.
+- User ISP cutover verified2026-11-13: Cudy WAN100.64.6.13/16, gateway100.64.0.2; prior Archer-upstream description above is historical. PC VPN/FakeIP recovery subsequently confirmed; old PC media bindings retired2026-11-15 after home-server migration.
 - Cudy LAN192.168.168.1/24 and DHCP192.168.168.100-.249 verified2026-11-13; wired client192.168.168.165. SSH recovered by user; podkop API refreshed to192.168.168.1:9090 and LAN DNS/direct/VPN probes passed. WAN/DNS still through Archer192.168.192.1.
 - Media Station X and Lampa startup on the TV are user-confirmed as of 2026-11-10.
-- TorrServer MatriX.150 runs in Docker on the existing Linux PC.
-- The current TV endpoint is `http://192.168.192.107:8090`.
-- Host-side HTTP health passed; TV connectivity and playback remain pending.
-- TorrServer data persists in `/home/slnnk/ai-data/torrserver`.
-- Jackett runs on TCP 9117; working Lampa integration is user-confirmed after the CORS fix.
-- Current Russian-language sources are RuTor, NNM-Club and RuTracker.org; the latter passed Test after FlareSolverr integration.
-- FlareSolverr 3.5.2 runs privately on `home-media`; Jackett uses `http://flaresolverr:8191`.
-- The PC must stay on for playback; its DHCP address can change.
+- Current media host is home-01 /192.168.168.2: Lampa8080, TorrServer8090, Jackett9117 and internal FlareSolverr; user reconfirmed2026-11-15.
+- PC Jackett/TorrServer/FlareSolverr containers, images, anonymous solver volume and empty home-media network removed2026-11-15. Jackett data deleted; user subsequently deleted root-owned PC TorrServer data, locally verified absent2026-11-15.
+- Old PC endpoints192.168.192.107:8090/9117 are retired; no PC binding/TV URL update is needed. See [cleanup](../log/2026-11-15-home-network-pc-media-cleanup.md).
 - Components and Operations describe the current deployment and checks.
 - Historical VPN diagnostics remain below; open work is tracked in central TODO.
-- Decision2026-11-13: plan Jackett/FlareSolverr on the home server; the VPS attempt failed readiness under observed resource pressure and was cancelled. The user will switch off the VM; no home-server migration has run.
+- Decision2026-11-13: plan Jackett/FlareSolverr on the home server; the VPS attempt failed readiness under observed resource pressure and was cancelled. The user will switch off the VM; home-server media deployment and indexer migration subsequently completed2026-11-14.
 ## Staleness review (2026-11-04)
 
 Historical review: its AmneziaWG backup direction was cancelled by the user on 2026-11-13.
@@ -54,7 +58,38 @@ domains (YouTube, Instagram, torrent trackers, ...) through the user's TrustTunn
 (see [trusttunnel-de](trusttunnel-de.md)). Encrypted DNS with ad blocking (AdGuard Home),
 TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segments.
 
+- Radarr website VPN routing2026-11-15: approved radarr.video suffix added to Cudy podkop.main.user_domains, subdomains covered. Backup /root/cudy-before-v2fly-radarr/podkop; old list/other UCI preserved, sing-box/FakeIP and home-01 HTTPS200 verified. Browser refresh pending user. See [result](../log/2026-11-14-home-network-4k-playback.md#radarr-website-vpn-routing-applied-and-independently-verified).
+
+## Proposed selection and predownload workflow
+
+Latest comparison scope2026-11-15: compare home-01, NAS and Android HDMI box for4K torrent viewing; exclude Uptime Kuma and both photo applications from this analysis. Earlier full-home-server evaluation below is historical broader context, not the active comparison workload. Existing server +completed-only DLNA is the lowest equipment-cost proposal; HDMI Android player +existing server backend is the on-demand proposal; NAS does not improve native TV decoding. No option chosen or deployment authorized. See [comparison](../log/2026-11-15-home-network-media-station-comparison.md).
+
+
+Planning update2026-11-15: user considers Synology as a full home-01 replacement,
+budget not allocated, compare options before deciding. Revised photo workload uses
+Synology Photos; Immich excluded from this comparison. Other services remain
+Radarr/Jackett/qBittorrent/DLNA/Uptime Kuma. Earlier16GB target driven by Immich is
+superseded;8GB is an initial recommendation,4GB may suit light use, exact model/
+recognition/library load and expansion need checking. HEIC/HEVC preview support
+may involve client-side Image Assistant. DS725+/DS925+ remain reference classes,
+not selected purchases; consider lower configurations as well. No purchase,
+migration or shutdown authorized; existing home-01/DLNA stay active. See
+[revised scope](../log/2026-11-14-home-network-4k-playback.md#synology-evaluation-replaces-immich-with-synology-photos).
+
+
+2026-11-15 discussion only: user accepts phone/PC control; TV remote UI optional.
+Initial proposal is qBittorrent +VueTorrent, reuse existing Jackett search and
+publish only completed downloads to native TV through MiniDLNA. Incomplete files
+stay outside DLNA; no transcoding or duplicate media copy needed by design.
+Radarr +qBittorrent is an alternative for poster/catalog-oriented film selection.
+No choice/deployment approved yet; current one-file DLNA stays active. Storage,
+retention/seeding policy and end-to-end publication checks need definition before
+implementation. See [requirements and sources](../log/2026-11-14-home-network-4k-playback.md#proposed-convenient-torrent-predownload-and-native-dlna-workflow).
+
 ## Components
+
+- TV firmware observed from user screenshot2026-11-15: V01.09.50W.Q0312, extended W.Q0312.X0001.W01.Y01.J01.9.05.00; no device/serial identifiers retained. Exact newer OTA/version and MKV fix for this unit unverified. See [firmware evidence](../log/2026-11-14-home-network-4k-playback.md#exact-tv-firmware-provided-by-screenshot).
+- Temporary native DLNA control2026-11-15: tv-dlna-test, vladgh/minidlna digest sha256:cdfa0ed2bc9482b350c387d793ec6e2d41749cdafd9b69a4fe3579c0995469ef, host networking/enp1s0,1900UDP/8200TCP, Home TV Test. Bind only existing playback-http-control/source.mkv ->/media/test.mkv read-only, --rm/restartno. One film plus artwork, catalog/Range checks passed; user reports extended smooth playback including seeking. No automatic torrent publishing/Lampa integration. Container intentionally active; check sudo docker ps --filter name=tv-dlna-test; stop sudo docker stop tv-dlna-test requires approval. See [launch and result](../log/2026-11-14-home-network-4k-playback.md#native-dlna-playback-accepted-smooth-including-seeking).
 
 - Home-media constraint (user2026-11-14): do not add external player portals/services or switch MSX startup to msxplayer.ru. Keep additional playback components local to home-01/TV. Existing external services were not cancelled. Local MSX video-menu trial remains a proposal requiring implementation authorization. See [decision](../log/2026-11-14-home-network-4k-playback.md#additional-external-player-portals-rejected).
 
@@ -64,7 +99,7 @@ TorrServer for the TV, basic monitoring. No remote access, no guest or IoT segme
 
 - Lampa MSX startup and bootstrap (2026-11-14): user status0 report revealed missing CORS despite HTTP200 in TV access logs. Applied Apache headers and header-aware readiness, then user-requested automatic TorrServer/Jackett/key browser bootstrap. Home playbook starts backends before Lampa; source key comes from target ServerConfig with suppressed logs/diffs, stays out of Git, and is served to trusted LAN clients. Browser defaults apply once per settings fingerprint; subsequent manual choices/favorites remain. Server/script/key checks passed, actual TV retry still pending. This supersedes earlier manual API-key entry instructions. See [fix and verification](../log/2026-11-14-home-network-lampa-cors-bootstrap.md).
 
-- Home indexer migration (2026-11-14): user-requested transfer copied only rutor/noname-club/rutracker configs and the source DataProtection key over SSH, preserving target ServerConfig/API key and existing key. Private target backup /opt/jackett/migration-backup-20261114T164258Z retained. All three final Test requests returned204; RuTor transient TLS reset cleared on retry without config changes. Old PC stack remains running; TV cutover and broader media data were not changed. See [migration and TV instructions](../log/2026-11-14-home-network-home-indexer-migration.md).
+- Home indexer migration (2026-11-14): user-requested transfer copied only rutor/noname-club/rutracker configs and the source DataProtection key over SSH, preserving target ServerConfig/API key and existing key. Private target backup /opt/jackett/migration-backup-20261114T164258Z retained. All three final Test requests returned204; RuTor transient TLS reset cleared on retry without config changes. Old PC stack remained running at that time; user authorized its removal2026-11-15, completed including user-deleted root-owned TorrServer data (absence verified). TV cutover and broader media data were not changed during the migration itself. See [migration and TV instructions](../log/2026-11-14-home-network-home-indexer-migration.md).
 
 - Home media deployment (2026-11-14): explicitly requested home.yml applied ansible-user/common/sshd/Docker and media without nftables on home-01. Initial lscr.io image timeout resolved by approved Jackett-only retry (failed0/unreachable0). All four containers run on bridges with unless-stopped and zero initial restarts; LAN HTTP8080/8090/9117 and internal solver checks passed. No PC-data/indexer migration or TV cutover. See [deployment](../log/2026-11-14-home-network-home-media-deployment.md).
 
@@ -155,17 +190,23 @@ See [diagnostic evidence](../log/2026-10-11-trusttunnel-client-kickstarter-routi
 
 Cudy management/SSH: `192.168.168.1`; DHCP pool `.100-.249`,12h leases. LAN change
 via user UI and post-change podkop reload verified. Monitor reads its current controller
-from generated JSON; current selector API is192.168.168.1:9090. Household cutover is
-pending; media bindings/TV URLs still reference the old Archer subnet and require review
-then. See [LAN completion evidence](../log/2026-11-13-home-network-cudy-failover.md#current-completion-boundary).
+from generated JSON; current selector API is192.168.168.1:9090. ISP cutover subsequently verified2026-11-13; media now runs on home-01 and old PC endpoints are retired2026-11-15. See [LAN completion evidence](../log/2026-11-13-home-network-cudy-failover.md#current-completion-boundary).
 
-TorrServer on the PC: `http://192.168.192.107:8090`, Docker container `torrserver`.
-Jackett on the PC: `http://192.168.192.107:9117`, Docker container `jackett`.
-FlareSolverr: Docker container `flaresolverr`, reachable from Jackett at `http://flaresolverr:8191` on `home-media`, no host-published port.
+TorrServer on home-01: `http://192.168.168.2:8090`.
+Jackett on home-01: `http://192.168.168.2:9117`.
+Lampa on home-01: `http://192.168.168.2:8080`.
+FlareSolverr is internal to the home-server Docker stack; the old PC stack was removed2026-11-15.
 Cudy: TrustTunnel is managed by netifd interface `tun0`; runtime TOML under
 `/opt/trusttunnel_client/`, LuCI Status > TrustTunnel. Selective routing is active through podkop.
 
 ## Operations
+
+LinkedIn routing added2026-11-15: all12 literal names from the user-specified v2fly
+list appended to main manual suffix rules, including the three full-prefixed names
+as suffixes with explicit user approval. All12 FakeIP checks, preserved prior domains,
+unchanged remaining UCI settings, generated config and active VPN egress verified.
+Backup `/root/cudy-before-v2fly-linkedin/podkop`; reload exit9 was followed by successful
+independent state checks. See [result](../log/2026-11-15-home-network-cudy-linkedin-podkop.md).
 
 Telegram domains expanded2026-11-13: all21 literal domains from the user-specified
 v2fly telegram list added to manual main list, retaining existing Telegram community/IP
@@ -190,7 +231,7 @@ IPs for up to50min; fresh Cudy answers are FakeIP. User cleared the system cache
 verified198.18.0.57 and supplied a successful restarted Codex CLI response screenshot;
 the403 incident is resolved without additional domains or application changes. Router now
 uses observed public AdGuard UDP/bootstrapGoogle DNS, not Archer; agent did not change it.
-Media container bindings still reference192.168.192.107 and need cutover updates.
+Historical PC media bindings192.168.192.107 were superseded by home-01 deployment; old local containers removed2026-11-15.
 See [cutover diagnostics](../log/2026-11-13-home-network-cudy-cutover-pc-fakeip.md).
 
 OpenAI routing added2026-11-13 at user's request: domain suffixes openai.com,
@@ -272,7 +313,7 @@ Lampa parser correction on 2026-11-10: the user confirmed the LAN URL, working J
 
 Subsequent user confirmation: Lampa now works. Current sources were then changed to Russian-language RuTor and NNM-Club; RuTracker.org awaits the user's manual credential entry. The earlier pending TV parser retry and three-source list are superseded. Specific movie audio/seek behavior has not been independently tested.
 
-TorrServer: inspect with `docker ps --filter name=torrserver` and `docker logs --tail 30 torrserver`; host-side health check `curl --max-time 10 http://192.168.192.107:8090/echo`. Stop only when requested with `docker stop torrserver`. The PC must remain powered on during TV playback. Other open questions and the target deployment plan live in the repository above.
+TorrServer now runs on home-01; LAN health endpoint `http://192.168.168.2:8090/echo`. Old PC containers and their automatic restart policies were removed2026-11-15; the PC is no longer required for playback. Other open questions and the target deployment plan live in the repository above.
 
 ## Boundaries
 

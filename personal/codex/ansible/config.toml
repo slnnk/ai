@@ -1,0 +1,12 @@
+[mcp_servers.ansible]
+command = "/bin/bash"
+args = ["/home/slnnk/ai/general/scripts/ansible-mcp.sh", "/home/slnnk/mygit/ansible"]
+enabled_tools = ["zen_of_ansible", "ansible_content_best_practices", "list_available_tools", "ade_environment_info"]
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.ansible.tools.ansible_content_best_practices]
+approval_mode = "approve"
+
+[mcp_servers.ansible.tools.zen_of_ansible]
+approval_mode = "approve"
