@@ -143,6 +143,8 @@ Published work and superseded proposals are recorded in the source note. The fol
 - [x] Verify stand pause/stop and temporary environment cleanup never scale down/delete the permanent ai-qa controller/namespace. (2026-11-12) — [src](current/knowledge/log/2026-11-12-ai-qa-devops-918-vk-helm-deployment-plan.md) Closed by user on2026-11-13: developer-owned lifecycle verification, duplicating the previously closed developer QA follow-up; not verified by DevOps.
 ### dev-deployment (B2B ephemeral dev, DevOps-832, DevOps-A-50)
 
+- [ ] Deferred DevOps-923: prepare production KYC Nomad HCL, then verify production nginx/Traefik route and nginx -t after separately approved rollout; user confirmed KYC MR4 and nginx MR1399 merged, dev deployment/health accepted; extend/delete checks and old Vault key cleanup cancelled by user, no execution authorized by this backlog entry (2026-11-17) — [src](current/knowledge/log/2026-11-17-dev-deployment-devops-923-kyc-plan.md#session-closeout-decision-2026-11-17)
+
 - [x] DevOps-917: verify user-started release 0.5.14 pipeline142721 and runtime cache clear after separately authorized deployment; approved publication bb23b95/MR41 completed, user merged332bcd1, 5 local tests passed (2026-11-11) — [src](current/knowledge/log/2026-11-11-dev-deployment-buildapi-cache-dns-search.md) — User confirmed deployment and working cache clear; closed based on user acceptance, no independent runtime verification. Requested problem/solution comment74-125488 published and GET-verified (2026-11-11).
 
 Post-deploy autotests (DevOps-832), state checked in GitLab 2026-09-28:

@@ -1780,3 +1780,7 @@ unknown. Re-evaluate cheaper models as well as DS725+/DS925+ rather than keep a
 four-core/16GB requirement without need. Disk bay count still depends on storage
 growth, not removal of Immich. No final model or budget selected, no purchase or
 migration authorized. Existing home-01/DLNA unchanged, no new background task.
+
+## Playback discussion context recovered 2026-11-17
+
+User corrected a repeated request for playback symptoms: this diagnosis was already discussed. Read the existing system summary, native DLNA acceptance and Stremio2055 evidence before answering. Same complete MKV stalled over MSX/HTML5 static HTTP and TorrServer, while user confirmed smooth native DLNA playback including seeking. Current launcher/installer discussions do not demonstrate a fix to that browser playback path. DLNA is the verified route for this unit; MP4/HLS repackaging and an exact-unit firmware fix remain unverified alternatives, not approved implementation. No new external operation or background task started. This is recovery of existing task context, not a new global rule or fresh playback verification.

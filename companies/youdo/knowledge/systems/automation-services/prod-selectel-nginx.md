@@ -66,6 +66,8 @@ inventory secrets: [local Ansible access to Vault](local-vault-ansible-access.md
 
 ## History
 
+- 2026-11-17: dedicated KYC external API vhost prepared for `youdo-kyc-api-ext.youdo.com` -> `youdo-kyc-api-ext.proxy.youdo.local`, published as `3f3c5912`/[MR1399](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1399) with VK test/dev routes. User confirmed MR1399merged on2026-11-17 (no independent merge audit). Production inventory/template render passed, 70prior vhost items unchanged; no production apply or live router verification. Production KYC HCL preparation and later route verification are explicitly deferred in central TODO. Shared Traefik template untouched. [Task evidence](../../log/2026-11-17-dev-deployment-devops-923-kyc-plan.md).
+
 - 2026-10-08: `chat-agent.youdo.com` vhost published in [automation-services MR !1364](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1364) under DevOps-882; merge and rollout remain pending. [Work log](../../log/2026-10-08-gitlab-ci-devops-882-chat-agent-infrastructure.md).
 - 2026-09-23: `giveaway-admin.youdo.com` added (DevOps-864),
   [log](../../log/2026-09-23-automation-services-prod-selectel-nginx-giveaway-admin.md).

@@ -1,7 +1,7 @@
 ---
 system: youtrack
 status: verified
-checked: 2026-11-12
+checked: 2026-11-17
 tags: [agents, learning]
 ---
 # Agent learning: youtrack-comment-review
@@ -36,6 +36,28 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "/home/slnnk/ai/current/knowledge/log/2026-11-12-android-farm-devops-922-wait-source-job.md",
       "target": "/home/slnnk/ai/companies/youdo/CONTEXT.md"
+    },
+    {
+      "at": "2026-11-17T18:42:53.511296+00:00",
+      "cause": "",
+      "event_id": "devops-923-comment-draft-20261117",
+      "expected": "Read issue context and applicable preferences, prepare the exact concise Markdown draft, check facts and relevant MR URLs, obtain explicit posting/update confirmation, verify readback and record original/final wording plus applicable outcomes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "current/knowledge/log/2026-11-17-dev-deployment-devops-923-kyc-plan.md#youtrack-performed-work-comment-draft-2026-11-17",
+      "target": "/home/slnnk/ai/companies/youdo/CONTEXT.md"
+    },
+    {
+      "at": "2026-11-17T18:44:44.318473+00:00",
+      "cause": "",
+      "event_id": "devops-923-comment-publication-20261117",
+      "expected": "Read issue context and applicable preferences, prepare the exact concise Markdown draft, check facts and relevant MR URLs, obtain explicit posting/update confirmation, verify readback and record original/final wording plus applicable outcomes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "current/knowledge/log/2026-11-17-dev-deployment-devops-923-kyc-plan.md#approved-youtrack-comment-publication-2026-11-17",
+      "target": "/home/slnnk/ai/companies/youdo/CONTEXT.md"
     }
   ],
   "expected": "Read issue context and applicable preferences, prepare the exact concise Markdown draft, check facts and relevant MR URLs, obtain explicit posting/update confirmation, verify readback and record original/final wording plus applicable outcomes.",
@@ -60,7 +82,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "youtrack",
   "target": "/home/slnnk/ai/companies/youdo/CONTEXT.md",
   "task_id": "",
-  "updated": "2026-11-12T17:17:20.906238+00:00",
+  "updated": "2026-11-17T18:44:44.318473+00:00",
   "version": 1
 }
 ```
