@@ -63,6 +63,9 @@ artifact retention; adding another broad simplicity slogan would not fix either.
 
 ## Proposed disposition
 
+P1.6 follow-up completed on 2026-11-18: the repeated GitLab runner collector and
+Cudy domain helper have tracked entry points. See the [candidate decisions and verification](2026-11-18-agents-p16-helper-reuse.md).
+
 Reusable operational helpers belong in the correct scripts directory (or an existing
 skill's scripts); parameterize only concrete reuse needs, retain approved behaviors
 and verify callers. One-off investigation scripts and frozen review artifacts may
@@ -124,3 +127,9 @@ source/object tree. Proposed end-of-task retain/temporary/delete dispositions an
 bounded caches belong to existing P2.2, not a new cleanup task. The user asked to
 ensure all proposals are recorded and list the Knowledge base backlog. No deletion,
 movement, runtime policy or automatic expiration was authorized by this clarification.
+
+## P2.2 follow-up
+
+The November 14 status above records the original read-only assessment. The
+user subsequently authorized discretionary local archiving and removal on
+November 18. See the [full inventory, applied actions and restore procedure](2026-11-18-agents-ai-data-retention.md).

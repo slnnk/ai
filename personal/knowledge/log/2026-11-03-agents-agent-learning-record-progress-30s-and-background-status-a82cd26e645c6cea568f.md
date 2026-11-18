@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-12
+checked: 2026-11-18
 tags: [agents, learning]
 ---
 # Agent learning: progress-30s-and-background-status
@@ -13,7 +13,16 @@ Correction evidence and scoped application history. Canonical instructions remai
 ```agent-learning-json
 {
   "created": "2026-11-03T22:47:24.189335+00:00",
-  "decisions": [],
+  "decisions": [
+    {
+      "at": "2026-11-18T19:29:01.931600+00:00",
+      "decision": "adopted",
+      "expected": "During long work update progress every 30 seconds. Before finalizing verify and report completion and background status, disclose unknowns, and give check or stop instructions for remaining operations. When blocked on the user, say explicitly that the task is waiting for them, what input, decision or action is needed, and what resumes afterwards.",
+      "revision": 2,
+      "source": "2026-11-18 user explicitly made the P1.4 handoff correction global after having to ask what to do next. Evidence: personal/knowledge/log/2026-11-14-agents-p14-transfer-protocol.md#approved-scope-and-preflight-on-november-18",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
+    }
+  ],
   "evaluations": [
     {
       "at": "2026-11-12T16:33:39.491500+00:00",
@@ -27,7 +36,7 @@ Correction evidence and scoped application history. Canonical instructions remai
       "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
-  "expected": "During long work update progress at least every 30 seconds; before final response verify task background commands and agents, state completion and remaining operations, and give check or stop instructions when needed. Disclose unverifiable status.",
+  "expected": "During long work update progress every 30 seconds. Before finalizing verify and report completion and background status, disclose unknowns, and give check or stop instructions for remaining operations. When blocked on the user, say explicitly that the task is waiting for them, what input, decision or action is needed, and what resumes afterwards.",
   "key": "progress-30s-and-background-status",
   "kind": "explicit",
   "layer": "personal",
@@ -43,13 +52,13 @@ Correction evidence and scoped application history. Canonical instructions remai
     }
   ],
   "repo": "",
-  "revision": 1,
+  "revision": 2,
   "scope": "global",
-  "summary": "User requested implementing explicit progress and completion status, with updates every 30 seconds.",
+  "summary": "User requires explicit progress, execution status and handoffs that depend on the user.",
   "system": "agents",
-  "target": "/home/slnnk/ai/AGENTS.md",
+  "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-12T16:33:39.491500+00:00",
+  "updated": "2026-11-18T19:29:01.931600+00:00",
   "version": 1
 }
 ```

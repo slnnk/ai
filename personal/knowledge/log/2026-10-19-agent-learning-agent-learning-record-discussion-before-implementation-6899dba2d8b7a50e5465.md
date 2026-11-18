@@ -1,7 +1,7 @@
 ---
 system: agent-learning
 status: verified
-checked: 2026-11-15
+checked: 2026-11-18
 tags: [agents, learning]
 ---
 # Agent learning: discussion-before-implementation
@@ -223,6 +223,39 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "personal/knowledge/log/2026-11-15-home-network-mediamanager.md#task-and-approvals",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T19:25:35.552875+00:00",
+      "cause": "",
+      "event_id": "kb-setup-guide-audit-2026-11-18-discussion-scope",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-18-knowledge-base-setup-guide-audit.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T20:14:53.778690+00:00",
+      "cause": "",
+      "event_id": "kb-p15-20261118-scope",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-18-agents-p15-adoption-decision.md#changes-and-status: completed adoption assessment as documentation only, without editing the live skill or starting another pilot.",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T20:20:44.634800+00:00",
+      "cause": "",
+      "event_id": "codex-config-performance-review-2026-11-18",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-18-codex-config-performance-review.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
@@ -247,7 +280,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agent-learning",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-15T17:06:36.226461+00:00",
+  "updated": "2026-11-18T20:20:44.634800+00:00",
   "version": 1
 }
 ```

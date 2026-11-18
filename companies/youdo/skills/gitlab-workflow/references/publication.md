@@ -31,9 +31,9 @@ do not interpolate backticks or `$` through a shell. A proposal JSON has these f
 ```
 
 `body_file` is absolute or relative to the proposal file. `task_paths` names explicit
-relative files, not ownership of every hunk within them. Include the exact `Draft: `
-prefix in `title` for an approved draft. Use actual checked results and CI effects,
-not the example values. The proposal and body must contain no credentials or raw logs.
+relative files, not ownership of every hunk within them. Use a Ready title and record
+actual check results, pending dependencies and CI effects. The proposal and body must
+contain no credentials or raw logs.
 
 Capture the prepared state before asking for publication approval:
 

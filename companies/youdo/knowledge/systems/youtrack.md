@@ -29,6 +29,10 @@ Last checked: 2026-10-11 (Europe/Moscow).
 
 For reading, request only the necessary fields, for example `id,idReadable,summary,updated`. Before updating, fetch the current `content` so as not to overwrite parallel changes. Do not print the token value to the console and do not copy it into Markdown or scripts.
 
+## Inspect comments before approval
+
+Use [youtrack_comment_inspect.py](../../scripts/youtrack_comment_inspect.py) with the issue ID, `--draft FILE` for exact text comparison, and optional repeated `--match TEXT` for related comments. The read-only helper reports matching IDs and related text from the issue. Keep drafts and any inspection receipts in the task directory under `~/ai-data/`. Posting or editing still requires approval of the exact comment.
+
 ## Recovery access verification (2026-10-11)
 
 - The user reported YouTrack was restored. Existing `YOUTRACK_TOKEN` returns HTTP200 from `GET /api/users/me`, login `a.solonenko`, ID `25-546`; no tooling-token rotation/loss is established.

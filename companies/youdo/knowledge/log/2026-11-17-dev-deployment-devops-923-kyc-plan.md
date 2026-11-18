@@ -265,3 +265,134 @@ KYC добавлен в деплой на dev Kubernetes.
 
 ## Approved YouTrack comment publication 2026-11-17
 User explicitly approved the revised three-bullet text with `Да`. Fresh comment GET found no matching existing comment. One POST created comment `74-125619` in DevOps-923; individual GET verified exact approved text and MR URLs. Receipt: `/home/slnnk/ai-data/youtrack/DevOps-923-comment-receipt.json`. Original draft, requested omissions and final wording remain above. Requested comment work is complete; production follow-up remains deferred in central TODO and cancelled checks remain cancelled. No issue status change, deployment or other external mutation performed. Publication command exited0; no task background operations remain.
+
+## Production deployment preparation plan 2026-11-18
+
+The user requested the plan for the deferred production follow-up. YouTrack DevOps-923 still describes dev Kubernetes onboarding. GitLab GET verified KYC MR !4 merged and remote master at 454d393b, automation-services MR !1399 merged at 32fb12c7, no KYC release tags, and no production HCL in the remote master devops tree. The checkout remains clean on the previous dev branch.
+
+Proposed KYC branch DevOps-923-kyc-production-deploy from current origin/master after approval. Reuse the Nomad Selectel and v3 production CI patterns with an explicitly reviewed manual first rollout, one version for all four images, and blocking Pre EF migrations. The migrations helper exports CON_STR and invokes /app/entrypoint.sh. Image entrypoint and Pre-only behavior require verification. Validate effective production variables, DB and RabbitMQ access, Vault policy and per-process NeuroVision/KEK configuration, HCL and CI rules. Route the public nginx name to Traefik Host youdo-kyc-api-ext.proxy.youdo.local. Keep internal API and Worker private, validate nginx syntax on the target and smoke test health and the webhook route after approved rollout. Start with the B2B flag disabled. A first Nomad deployment has no previous job version to revert to.
+
+Live production dependencies, rollout and routing remain pending. The existing DevOps-923 TODO entry retains these actions. Cancelled dev lifecycle and source-key cleanup remain closed. No repository edits or external writes.
+
+## Production AUTO configuration prepared 2026-11-18
+
+The user directed implementation of production HCL and the existing B2B AUTO CI flow, correcting the manual-mode proposal, and asked to follow nearby service HCL. Created the previously proposed DevOps-923-kyc-production-deploy branch from refreshed origin/master 454d393b. Added devops/production.hcl based on DocValidation web/svc layout and B2B PostgreSQL settings, and connected v3/.deploy-prod-full-auto.yml with auto, PostgreSQL youdo_kyc, and worker count one. The selected production secret path is the existing secret/dotnet/business, fields KycNeuroVisionApiToken, KycNeuroVisionScenarioId, KycNeuroVisionScenarioSecret, and KycEncryptionKekV1. Nomad also uses secret/resources/databases/postgres managed_host and youdo_password, and secret/resources/rabbitmq youdo_conn_string. Values and policy access were not verified in production.
+
+GitLab CI Lint simulation on master passed with automatic deploy production and release jobs. The existing child runs blocking EF Pre and invokes the same idempotent EF runner at Post. Offline Nomad validation passed with the svc count zero warning common to the template's stop/start layout. Local JSON checks verified the task, image, Vault key, health check, database name and nginx/Traefik host wiring. Production DB_ADDR and the HCL host must resolve to the same database. Prod driver, Vault access, DB presence/permissions, and actual rollout/routing remain unverified. No staging, commit, push, MR or production change. Existing TODO remains open for publication, readiness checks and rollout.
+
+## Production Vault path selected 2026-11-18
+
+The user reported creating the production secrets at dotnet/kyc. Updated all three Nomad task templates to secret/dotnet/kyc, superseding secret/dotnet/business in the preceding local configuration. Offline Nomad validation passed with the same svc count warning. The rendered job confirms the new path for api, api-ext and worker. The production Nomad token policy and secret values remain unverified. No Vault or GitLab writes.
+
+## Production HCL conventions and internal API name 2026-11-18
+
+The user pointed out that B2B HCL does not use toJSON and requested naming the internal API api-int. Replaced toJSON in all Vault env templates with the quoted interpolation used in the neighboring DocValidation and Business Tickets jobs. Renamed the internal task, service, port label and generated Traefik route to youdo-kyc-api-int and api_int_port. Retained the api image expected by existing CI and dev/test deploys. Offline Nomad validation passed with the existing svc count warning. Rendered job checks verified both API names, routes and health checks, the internal image, and the Vault interpolation. No publication or runtime changes. Existing DevOps-923 TODO remains open for the production rollout.
+
+## Production MR proposal 2026-11-18
+
+Prepared Draft: DevOps-923 Add KYC production deployment, commit add kyc production deployment, branch DevOps-923-kyc-production-deploy to master, base 454d393b, assignee a.solonenko, squash off and source removal on merge. GitLab GET found no existing MR and ls-remote confirmed current master and no source branch. Current task patch has only .gitlab-ci.yml and devops/production.hcl. Exact body, patch, proposal and snapshot saved under ai-data/gitlab-workflow/DevOps-923/kyc/production. Offline Nomad validation passed with the svc count warning, rendered configuration checks passed, GitLab CI Lint master dry run passed with automatic prod and release. MR builds and pushes four MR images and runs dotnet tests. Merge triggers production and release. Draft status proposed while production Vault policy, database alignment and routing remain unverified. Second approval pending. No stage, commit, push, MR or deployment.
+
+## Approved production Draft MR publication 2026-11-18
+
+The user confirmed the reviewed publication proposal with `Да`. The snapshot matched and the entire staged and committed diffs matched review.patch byte for byte. Commit 67d4fc45bdc0a13189e19c1f86b29ba885b5c538 `add kyc production deployment` contains two files and 339 insertions. Pushed the source branch and created [KYC Draft MR !5](https://gitlab.youdo.sg/youdo/microservices/kyc/-/merge_requests/5). GitLab readback verified SHA, exact title and body, source to master, Draft, assignee a.solonenko, squash off, and source deletion on merge. MR pipeline 143534 initially created. No merge or production deployment. The central DevOps-923 item remains open for checking production Vault and DB alignment, rollout, and verifying nginx/Traefik.
+
+## User correction about Draft MRs 2026-11-18
+
+The user rejected the use of Draft for MR !5 and set a durable preference to create MRs without Draft. The previous proposal chose Draft because production prerequisites remained unverified. The company gitlab-workflow conventions now require new MRs to be Ready and pending checks to be reported separately. Existing MR !5 readiness remains pending explicit approval to update it. This does not authorize merge or deployment.
+
+## Approved production MR Ready status 2026-11-18
+
+The user confirmed removing Draft with `Да`. GitLab GET verified MR !5 was open at 67d4fc4 and auto-merge was disabled. One PUT changed the title to DevOps-923 Add KYC production deployment. GET readback verified Ready, the same SHA, description, branches, assignee and settings. MR pipeline 143534 was running. No merge or production deployment. Production prerequisites remain tracked in the existing TODO.
+
+## Production prerequisites accepted 2026-11-18
+
+The user confirmed that Nomad can read the KYC Vault path under the established production policy and that the CI/runtime PostgreSQL target was checked, citing the existing shared deployment pattern. Accept both prerequisites for this task on user confirmation. The agent did not perform an independent production read or connection test. GitLab readback confirmed Ready MR !5 at 67d4fc4 and running pipeline 143534. Separate merge approval and post-rollout migration, health and routing checks remain.
+
+## Production PostgreSQL Terraform proposal 2026-11-18
+
+The user requested recent activity and a description of the Terraform changes needed for the KYC production database. GitLab showed KYC MR !5 Ready and open at 67d4fc4 with pipeline 143534 running. Selectel Terraform master 680d69d includes DevOps-925 MR !96. Its MR grants apply succeeded, its DBaaS apply remained manual, and both master applies in pipeline 143530 remained manual. Live state was not inspected.
+
+Proposed selectel-tf branch DevOps-923-kyc-prod-db from origin/master 680d69d. Append youdo_kyc to the B2B database list in prod-dbaas/terraform.tfvars and the B2B baseline grants list in prod-dbaas-grants/terraform.tfvars. Appending preserves existing count indexes. The service and Pre EF migrations use youdo. Review a plan with no unrelated changes. Apply DBaaS before grants and verify that CI DB_ADDR and Nomad managed_host point to the same cluster before merging the automatic KYC rollout. First-stage approval remains pending. No code or production changes. No background task commands remain.
+
+## Production hardware balancer single-vhost procedure 2026-11-18
+
+The user asked how to apply the new KYC vhost only. Prepared a local standalone playbook selecting a single present youdo-kyc-api-ext.youdo.com entry from production nginx_vhost, including the existing nginx vhost_configs tasks, then running nginx -t before the notified reload. Inventory and list-hosts confirmed balancers_hardware selects only msk3-balancer02 and msk3-balancer03. Serial one and fatal errors stop the rollout on a failing host. Syntax check and offline check-mode render passed using the inventory and role template with a substituted local test handler. No connection to production hosts or deployment. The existing DevOps-923 item retains the rollout verification.
+
+## Production PostgreSQL Terraform MR prepared 2026-11-18
+
+The user followed the first-gate branch proposal with `Подготовь МР`. Created DevOps-923-kyc-prod-db from origin/master 680d69d in the clean selectel-tf checkout. Added youdo_kyc at the end of the B2B lists in both Terraform stacks. Git diff check, Terraform console comparisons, and offline Terraform validate for both stacks passed. Existing prod-dbaas tfvars formatting was preserved. No live plans or apply.
+
+Prepared Ready MR DevOps-923 Add KYC production database, commit add kyc production database, source DevOps-923-kyc-prod-db to master, assignee a.solonenko, squash off, remove source on merge. Exact body, patch and snapshot saved under ai-data/gitlab-workflow/DevOps-923/selectel-tf. CI runs validation and plan for both stacks on MR. Apply jobs are manual and DB creation precedes grants. Publication approval remains pending. No stage, commit, push or MR creation. No background operations remain.
+
+## Production hardware vhost applied 2026-11-18
+
+The user reported applying the production hardware vhost. Agent HTTPS requests with verified TLS to both hardware balancers and the public DNS name returned identical HTTP 404 bodies. The direct HTTP Traefik backend returned the same body. This supports edge forwarding with the upstream KYC route still absent. MR !5 pipeline 143534 succeeded and remote master remains 454d393b, before the KYC production commit. No agent remote apply or nginx -t. Merge and post-rollout health and route confirmation remain pending.
+
+## Production PostgreSQL Terraform MR published 2026-11-18
+
+The user approved the exact second-stage proposal with `Да`. Snapshot comparison passed. The full staged and commit diffs matched the approved patch. Pushed d01f0adeefd342f82890a5306e3f622a7f471ef3 to DevOps-923-kyc-prod-db and opened [Ready MR !97](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/merge_requests/97). Readback verified source and target branches, title, body, commit, assignee a.solonenko, squash off and source removal on merge. [Pipeline 143539](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/pipelines/143539) started. Publication is complete. No merge, manual apply or KYC prod rollout was performed. The existing TODO tracks DB plans, creation and grants, then the KYC production rollout and routing checks.
+
+## Production DBaaS plan includes earlier cluster changes 2026-11-18
+
+The user flagged extra changes in [DBaaS plan 3308206](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/jobs/3308206). This plan on d01f0ad creates only youdo_kyc and its CONNECT grant and also adds log_min_duration_statement=30000 to the config maps of both prod PostgreSQL clusters in place. [Earlier DevOps-925 plan 3307743](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/jobs/3307743) shows the identical two cluster updates and zero resource adds. The setting entered master through 88dc8ea before KYC. The MR !97 diff only adds the KYC database to the two lists. [Grants plan 3308207](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/jobs/3308207) adds 21 KYC grants and changes or destroys zero resources. Apply jobs in both pipelines are still manual.
+
+Separate the existing cluster configuration difference from the KYC change. Check the actual threshold and agree on the cluster configuration before any apply. A KYC-only plan must show two resource additions, zero changes and zero deletions. The current TODO already tracks plan review before production apply. No changes to GitLab or production were made. No background operations remain.
+
+## Selectel PostgreSQL primary and logging threshold check 2026-11-18
+
+The user reported a possible PostgreSQL primary switch when reapplying log_min_duration_statement. Job 3308206 installed Selectel provider v6.8.0. The provider source sends config updates through the configuration path and resizes only for node_count, flavor or flavor_id changes. PostgreSQL 16 declares the parameter PGC_SUSET and supports applying it without a restart. Selectel documents a per-parameter is_restart_required field and documents primary switches during cluster scaling or loss of the primary. Public references do not provide the live flag for this parameter on the project.
+
+The regional API returned HTTP 401 without the required project-scoped IAM token. The C2C primary name did not resolve for the read-only PostgreSQL check even outside the sandbox. GitLab jobs 3308121, 3308208 and 3307745 remained manual with no start timestamp. No observed application or primary switch can be attributed to these jobs. The existing plan-review TODO remains open. Read-only closure requires the Selectel parameter metadata for the actual cluster type or the corresponding restart marker in the control panel. No production changes or background operations.
+
+## PostgreSQL restart observed during Terraform apply 2026-11-18
+
+User asked whether [apply job 3308208](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/jobs/3308208) was restarting PostgreSQL. Job started 18:27:41 MSK and planned KYC database and CONNECT plus log_min_duration_statement=30000 on both clusters. Authenticated read-only TLS SQL on both C2C nodes returned pg_postmaster_start_time on the current primary at 18:30:54 and on the current replica at 18:31:10 MSK. Both returned 30s and pending_restart=false. The restart during apply is confirmed for both C2C nodes. This supersedes the earlier inference from the supplied control panel screenshot. A primary switch and outage duration are unverified. The B2B endpoints answered TCP 5432. No read-only B2B SQL credential was available for postmaster timing.
+
+Terraform reported B2B modification complete in 2m19s, C2C in 3m21s, and KYC database creation complete in 1m09s. The run was still creating the CONNECT grant at the last recorded check. No agent-triggered apply, retry, or cancellation.
+
+## Selectel restart support question 2026-11-18
+
+GitLab job 3308208 finished successfully at 18:34:04 MSK. KYC grants job 3308209 was still manual when checked. Source review of [Selectel provider v6.8.0](https://github.com/selectel/terraform-provider-selectel/blob/v6.8.0/selectel/dbaas.go#L275-L306) found that a config change submits the full desired config map. Keys present remotely but absent from the desired map are sent as null. The provider waits for ACTIVE. Selectel API documents null as reset to default and exposes is_restart_required on parameter metadata. Public docs found no statement that this parameter requires restart. The provider has no explicit restart in this path. Prepared support question asking which operation or parameter caused the observed C2C restarts, whether unchanged restart-sensitive fields in the full configuration can cause them, whether B2B restarted or either primary changed, and which method can apply only the logging threshold. No support ticket was submitted.
+
+## Production Pre migrations target diagnosis 2026-11-18
+
+KYC MR !5 merged at 97a84a1c. Child job 3308276 failed in NpgsqlDatabaseCreator.CreateAsync with PostgreSQL 42501 on the administrative postgres connection. Selectel job 3308208 succeeded before this failure and created the B2B youdo_kyc database and CONNECT. Job 3308209 also succeeded. The Terraform MR !97 was still open. GitLab GET showed no KYC project or subgroup DB_ADDR. Inherited DB_ADDR expands to POSTGRES_ADDR_C2C, which matches the Terraform C2C primary. Business Tickets and Business Auth each have project DB_ADDR=$POSTGRES_ADDR_B2B, scope wildcard, env_var, raw false, unprotected and unmasked. The source B2B variable matches the B2B Terraform primary. User requested the same project-level mapping. Awaiting the explicit approval for the GitLab create operation. No GitLab updates or deploy retry performed.
+
+## KYC B2B CI database override applied 2026-11-18
+
+The user explicitly approved the KYC project variable creation. GET confirmed no prior project DB_ADDR. One GitLab POST created DB_ADDR=$POSTGRES_ADDR_B2B, wildcard scope, env_var, raw false, unprotected, unmasked. A fresh GET verified every setting including hidden false, matching Business Tickets and Business Auth. Parent pipeline 143542 on master 97a84a1c and its prod bridge 3308269 had failed. Child 143543 failed Pre migrations and release job 3308271 was skipped. No retry or new pipeline requested or performed. Restart requires separate approval.
+
+## Production rollout verified and monitoring failure isolated 2026-11-18
+
+Pipeline 143542 failed solely in deploy-monitoring job 3308272. The deployment bridge and child 143543 succeeded after the external retry of Pre job 3308285, which applied InitialKyc and OutboxRetrySchedule. Post migrations, Nomad API rollout, svc start and release job succeeded. The svc trace records one healthy Worker. Release master-46 points at 97a84a1c. Internal and external readiness returned 200. Public DNS and both hardware IPs with the production SNI returned HTTP 200 and the expected live body. Selectel TF MR !97 was verified merged at 737cb10f.
+
+Monitoring deploy runs after release and failed with cat unable to open *.yml. KYC includes the shared monitoring template without a Pyrra SLO rules file, so there was no generated YAML to apply. No retry, monitoring changes, independent nginx -t, or business canary.
+
+## Monitoring template removal proposed 2026-11-18
+
+The user requested removal of the shared monitoring include after the monitoring job failed without KYC Pyrra rules. Proposed KYC branch DevOps-923-remove-kyc-monitoring-template from current origin/master 97a84a1c. Scope is one .gitlab-ci.yml include line. Merge would trigger the existing automatic production deployment again. First approval pending. No branch or repo edits.
+
+## Monitoring template removal prepared 2026-11-18
+
+The user approved the proposed branch and requested an MR. Fetched origin/master 97a84a1c, created DevOps-923-remove-kyc-monitoring-template, and removed exactly v3/.monitoring.yml from .gitlab-ci.yml. Diff checks and CI Lint master dry run passed. Both monitoring jobs are absent, build/test and auto prod deploy/release remain. Proposed Ready MR DevOps-923 Remove KYC monitoring template, commit remove kyc monitoring template, source to master, assignee a.solonenko, squash off, source delete on merge. Exact patch, body and proposal saved under ai-data/gitlab-workflow/DevOps-923/kyc/remove-monitoring. Second approval pending. No stage, commit, push or deployment.
+
+## Monitoring template removal MR published 2026-11-18
+
+The user explicitly approved the reviewed Ready MR. Snapshot matched and the entire staged and committed diffs matched the saved one-line removal. Pushed d4908d29d09884965ca4f2cf2c0371c9f5d6447d and opened [Ready MR !6](https://gitlab.youdo.sg/youdo/microservices/kyc/-/merge_requests/6). GitLab verified draft false, exact title/body, source to master, SHA, assignee a.solonenko, squash false, and source deletion on merge. Pipeline 143551 created. No merge or production deploy. Merge into master will trigger the existing automatic deployment and release.
+
+## Final production rollout and YouTrack addendum draft 2026-11-18
+
+The user reported closing DevOps-923. GET confirmed YouTrack Fixed. GitLab verified KYC MR !6 merged at 44cd55cc, successful master pipeline 143552 and child 143553 with both migration jobs and service start successful, the release master-49 pointing to the same commit, and no monitoring jobs. Public liveness returned status ok and internal readiness 200. Terraform MR !97 also merged.
+
+Prepared the following exact Markdown addendum to existing YouTrack comment 74-125619, whose dev text is preserved in the full local draft. No YouTrack update made.
+
+```markdown
+### Продакшен
+
+- Настроен автоматический деплой KYC в Nomad Selectel для внутреннего API, внешнего API и Worker. EF-миграции запускаются перед выкатыванием сервиса. [KYC MR !5](https://gitlab.youdo.sg/youdo/microservices/kyc/-/merge_requests/5)
+- В B2B-кластере PostgreSQL создана база `youdo_kyc` и выданы права. В GitLab CI проекта задано `DB_ADDR=$POSTGRES_ADDR_B2B`. [Terraform MR !97](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/merge_requests/97)
+- На hardware balancers применён nginx-vhost для `youdo-kyc-api-ext.youdo.com`. Публичный `/health/live` возвращает HTTP 200. [nginx MR !1399](https://gitlab.youdo.sg/sysadmins/automation-services/-/merge_requests/1399)
+- Из GitLab CI убран шаблон мониторинга Pyrra, для которого в KYC нет SLO-правил. [KYC MR !6](https://gitlab.youdo.sg/youdo/microservices/kyc/-/merge_requests/6)
+
+Прод-деплой завершился успешно, опубликован релиз `master-49`. [Пайплайн #143552](https://gitlab.youdo.sg/youdo/microservices/kyc/-/pipelines/143552)
+```

@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-14
+checked: 2026-11-18
 tags: [agents, learning]
 ---
 # Agent learning: verify-expected-results
@@ -113,6 +113,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "personal/knowledge/log/2026-11-14-agents-p14-transfer-protocol.md#expected-result-and-verification: exact one-hunk arms, six input/oracle fixtures, 16 verified hashes, full frozen rule view and budget/limits; preparation only, behavioral pilot remains pending",
       "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-18T20:52:12.866510+00:00",
+      "cause": "",
+      "event_id": "P2.2-2026-11-18-retention",
+      "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "current/knowledge/log/2026-11-18-agents-ai-data-retention.md, candidate checks, archive extraction comparison, and measured final allocation",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
   "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
@@ -137,7 +148,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-14T00:34:36.086499+00:00",
+  "updated": "2026-11-18T20:52:12.866510+00:00",
   "version": 1
 }
 ```

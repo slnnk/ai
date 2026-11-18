@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-11-15
+checked: 2026-11-18
 tags: [agents, learning]
 ---
 # Agent learning: todo-heading-ancestry
@@ -36,6 +36,28 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "current/knowledge/log/2026-11-15-knowledge-base-todo-relevance-audit.md: Nomad heading corrected in place, home item retained under Personal/Home network, both affected sections rendered successfully.",
       "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-18T19:15:58.914020+00:00",
+      "cause": "",
+      "event_id": "2026-11-18-graphyfi-todo",
+      "expected": "Choose TODO section by task subject and source; inspect full Markdown heading ancestry before adding or moving; verify affected rendered heading path using todo.py, or source ancestry for closed entries.",
+      "outcome": "pass",
+      "revision": 2,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-18-knowledge-base-graphyfi.md",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-18T19:22:37.573065+00:00",
+      "cause": "",
+      "event_id": "2026-11-18-codex-config-review-todo",
+      "expected": "Choose TODO section by task subject and source; inspect full Markdown heading ancestry before adding or moving; verify affected rendered heading path using todo.py, or source ancestry for closed entries.",
+      "outcome": "pass",
+      "revision": 2,
+      "rule_loaded": "yes",
+      "source": "TODO.md#knowledge-base, verified by todo.py --layer knowledge base --query Review supported Codex",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
   "expected": "Choose TODO section by task subject and source; inspect full Markdown heading ancestry before adding or moving; verify affected rendered heading path using todo.py, or source ancestry for closed entries.",
@@ -60,7 +82,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "knowledge-base",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-14T23:26:04.879207+00:00",
+  "updated": "2026-11-18T19:22:37.573065+00:00",
   "version": 1
 }
 ```

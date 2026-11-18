@@ -1,6 +1,6 @@
 sandbox_mode = "workspace-write"
 
-model = "gpt-6.1-sol"
+model = "gpt-6.2-sol"
 model_auto_compact_token_limit = 800000
 model_context_window = 872000
 model_reasoning_effort = "medium"
@@ -124,6 +124,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/slnnk/git/buildapi"]
+trust_level = "trusted"
+
+[projects."/home/slnnk/git/kyc"]
 trust_level = "trusted"
 
 [notice.model_migrations]

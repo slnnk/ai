@@ -126,3 +126,7 @@ Historical follow-ups were tracked in `~/ai/TODO.md`; DevOps-887 was closed by t
 ## Portable lesson reference
 
 [Terraform PostgreSQL provider: `tuple concurrently updated (XX000)` on parallel grants](../../../../general/knowledge/terraform/postgresql-grant-tuple-concurrently-updated.md)
+
+## Serial apply confirmed during DevOps-923 preparation 2026-11-18
+
+Verified that both Selectel Terraform master 680d69d and DevOps-923 MR !97 at d01f0ad contain the DevOps-887 fix. The trace of [DevOps-925 job 3307746](https://gitlab.youdo.sg/sysadmins/selectel/selectel-tf/-/jobs/3307746) confirms `terraform apply -parallelism=1` and 4 added, 0 changed, 0 destroyed. This is later runtime evidence for the shared CI job. The KYC grants apply remains manual. No additional CI edits or apply were needed for this follow-up.

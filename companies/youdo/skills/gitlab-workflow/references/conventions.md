@@ -33,9 +33,10 @@ limited to the targeting/configuration needed for the requested run.
 - Assign the user; do not invent reviewers or labels. Inspect actual project defaults.
   Observed infra defaults were target master, squash off and source deletion on merge
   on; YouDoApp uses develop and squash on. These are observations, not universal defaults.
-- Draft when work/checks/dependencies remain incomplete; ready when agreed checks pass.
-  Present that state for approval. Preserve an existing MR's readiness unless the user
-  explicitly approves a change. A skipped pipeline or successful merge is not runtime proof.
+- Propose and create new MRs as Ready. Present pending checks and deployment
+  dependencies separately with the publication proposal. Change an existing MR's
+  readiness only with explicit user approval. A skipped pipeline or successful
+  merge is not runtime proof.
 
 ## CI and releases
 

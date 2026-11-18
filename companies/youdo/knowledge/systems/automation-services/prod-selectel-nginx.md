@@ -37,6 +37,8 @@ Client -> nginx edge (`server_name`) -> one of:
   `proxy.service.consul`), e.g. `mcp.youdo.com` (overrides `Host` to the backend name and adds
   `X-Forwarded-Host`/`X-Forwarded-Proto` for the OAuth issuer).
 
+- Both `/apple-app-site-association` and `/.well-known/apple-app-site-association` serve `roles/nginx/files/sync/.well-known/apple-app-site-association`. The nginx role copies the directory via `nginx_sync_static_content` and the `nginx-static` tag. [DevOps-926](../../log/2026-11-18-automation-services-devops-926-nginx-aasa.md).
+
 ## Control points
 
 - Which Host the Traefik router of the Nomad job matches (public name vs `.proxy.youdo.local`)

@@ -320,3 +320,13 @@ Patch application, generated-log behavior, skill syntax, local dependencies and
 instruction lint passed; active instructions were not changed. P1.4/P1.5 retain
 selection, behavioral trials and adoption. This supersedes the earlier open P1.3
 preparation status only; no measured transfer benefit is claimed.
+
+## P1.5 adoption decision on November 18
+
+[Adoption decision](2026-11-18-agents-p15-adoption-decision.md) closes P1.5 for the selected pilot.
+Retain the current workflow and decline the tested paragraph. The four replay pairs tied
+on the primary criterion and human steering. The treatment used more input tokens.
+P2.1 and P3.1 remain conditional, with no qualifying bottleneck established by this pilot.
+
+Later on November 18 the user closed P2.1 without a trial. See the
+[P2.1 closure](2026-11-18-agents-p15-adoption-decision.md#p21-closure).

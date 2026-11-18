@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-11-15
+checked: 2026-11-18
 tags: [agents, learning]
 ---
 # Agent learning: final-note-todo-reconciliation
@@ -47,6 +47,28 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "current/knowledge/log/2026-11-15-knowledge-base-todo-relevance-audit.md: audit findings linked to existing TODO owners; preserved 114 open entries and deferred/cancelled scope; no duplicate backlog.",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T19:30:41.194992+00:00",
+      "cause": "",
+      "event_id": "kb-setup-guide-refresh-2026-11-18-final-reconciliation",
+      "expected": "Before the final response after substantial work, review only notes created or changed for the current task against TODO: track remaining actions with source links, reconcile completed/cancelled/deferred statuses and supersede stale directions preserving history. Optional improvements remain proposals, not execution permission.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-18-knowledge-base-setup-guide-audit.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T20:14:53.885422+00:00",
+      "cause": "",
+      "event_id": "kb-p15-20261118-reconciliation",
+      "expected": "Before the final response after substantial work, review only notes created or changed for the current task against TODO: track remaining actions with source links, reconcile completed/cancelled/deferred statuses and supersede stale directions preserving history. Optional improvements remain proposals, not execution permission.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-18-agents-p15-adoption-decision.md#changes-and-status: TODO closure, P1.4 and research cross-links read back; conditional P2.1/P3.1 entries preserved.",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Before the final response after substantial work, review only notes created or changed for the current task against TODO: track remaining actions with source links, reconcile completed/cancelled/deferred statuses and supersede stale directions preserving history. Optional improvements remain proposals, not execution permission.",
@@ -71,7 +93,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "knowledge-base",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-14T23:26:05.010429+00:00",
+  "updated": "2026-11-18T20:14:53.885422+00:00",
   "version": 1
 }
 ```

@@ -1,7 +1,7 @@
 ---
 system: git
 status: verified
-checked: 2026-11-15
+checked: 2026-11-18
 tags: [agents, learning]
 ---
 # Agent learning: preserve-unrelated-checkout-changes
@@ -80,6 +80,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "personal/knowledge/log/2026-11-15-home-network-mediamanager.md#task-and-approvals",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T16:41:34.155211+00:00",
+      "cause": "",
+      "event_id": "DevOps-926-checkout",
+      "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/current/knowledge/log/2026-11-18-automation-services-devops-926-nginx-aasa.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Work in the existing repository; create a worktree only on explicit request and never discard unrelated changes.",
@@ -104,7 +115,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "git",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-15T17:06:36.327900+00:00",
+  "updated": "2026-11-18T16:41:34.155211+00:00",
   "version": 1
 }
 ```

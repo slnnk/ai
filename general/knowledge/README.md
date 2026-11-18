@@ -25,6 +25,32 @@ One recipe per file, `<topic>-<slug>.md`, no date in the name; the date lives in
     ~/ai-data/        generated data of skills and scripts, one subdirectory per tool (e.g. rp/); outside git, may hold private data
     knowledge/ = INDEX.md, systems/ (maps), log/ (dated entries), repos.md
 
+### Generated data retention
+
+Use private temporary directories under `/tmp` for scratch work that can be
+discarded when the task ends. Use `~/ai-data` for generated files needed across
+sessions, such as active tool state, work needed to resume a task, or data with
+a concrete operational, audit, or recovery use.
+
+Before closing a task that wrote to `~/ai-data`, review the paths it created or
+grew and check their allocated size. Keep the smallest set that serves a named
+future use. For example, keep a sanitized log excerpt or a verified package
+when it serves the purpose of a full trace or build tree. Apply the same
+retention test to archives. Once the required result is verified, remove
+disposable task-generated files within the authorized scope. Record the path,
+size and reason for substantial retained data, plus the condition for removing
+it if the need is temporary.
+
+### Dependency sources for repeated builds
+
+For repeated local builds using work under `~/ai-data`, start with fresh
+dependency state and obtain packages from the configured registries. Honor
+source manifests, pinned versions and lockfiles. A missing package is evidence
+of a registry or dependency problem; record it and stop that build instead of
+falling back to a saved cache. Keep temporary package-manager caches and installed
+build dependencies only for the current build. Retain required runtime tools
+and unique recovery artifacts separately.
+
 ## Frontmatter
 
     ---
@@ -194,6 +220,9 @@ Read Material assumptions and Economical tool use at task entry; run the require
 daily sync helper. Load the agent-learning skill and retrieve applicable rules for
 substantive discussions as required by AGENTS.md.
 
+Keep the [other-PC setup guide](knowledge-base/setup-another-pc.md) current.
+Update it in the same change when adding tools or changing setup requirements.
+
 Select further reading by the task and the next action. Read the company CONTEXT.md
 for company work, including when a personal task expands into company work. Read only
 the affected TODO section. Repository discovery, code edits, reviews, publication,
@@ -329,6 +358,9 @@ Prompts for recurring jobs live in `general/prompts/` (`normalize-notes.md`,
   for this task. Explicitly state whether task work has finished and whether background
   operations remain. If any remain, identify them and explain how to check or stop them.
   If status cannot be verified, say so; never infer completion from silence or UI exit.
+- When further work depends on the user, say explicitly that the task is waiting for
+  them. State the specific input, decision or action needed, and what resumes after
+  they provide it.
 
 ## Task resumption
 

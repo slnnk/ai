@@ -25,9 +25,9 @@ Read and follow triggered sections of `~/ai/general/knowledge/README.md` (README
 - Company work: `~/ai/current/` (use this symlink); own work: `personal/`; portable recipes:
   `general/`, free of company identifiers per README "Layers". Before creating/moving
   material read that section and template; link portable recipes from company logs.
-- Access values only in the layer's `.env` as `KEY=value`; elsewhere only secret locations,
-  variable names and access routes. Minimize personal data;
-  generated data goes in `~/ai-data/`.
+- Minimize personal data. Store secrets as `KEY=value` only in layer `.env`.
+  Elsewhere give only locations, variable names and access routes.
+- Follow README "Generated data retention" for `~/ai-data`.
 
 ## Local code and Git
 

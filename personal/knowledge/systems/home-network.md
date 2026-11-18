@@ -210,6 +210,8 @@ Cudy: TrustTunnel is managed by netifd interface `tun0`; runtime TOML under
 
 ## Operations
 
+For new reviewed Podkop domain lists, use [cudy_add_domains.py](../../scripts/cudy_add_domains.py) with the source file and `--label`. The default validates the local file. `--apply` changes the router and requires separate approval for the reviewed domain list. Keep source lists and run receipts under `~/ai-data/cudy/`.
+
 LinkedIn routing added2026-11-15: all12 literal names from the user-specified v2fly
 list appended to main manual suffix rules, including the three full-prefixed names
 as suffixes with explicit user approval. All12 FakeIP checks, preserved prior domains,

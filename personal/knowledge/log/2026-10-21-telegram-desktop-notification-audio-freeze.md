@@ -33,3 +33,9 @@ The user confirmed normal operation after the PulseAudio restart and requested p
 
 ## Portable lesson
 None.
+
+## Follow-up 2026-11-18
+
+Telegram froze again. The same pinned GNOME launcher had reverted to the plain command `/home/slnnk/Telegram/Telegram -- %U` and `DBusActivatable=true`. Neither `ALSOFT_DRIVERS` nor `DESKTOPINTEGRATION` was present in PID 93547. This confirms the previous launcher workaround was absent, while the cause of this freeze and the launcher reversion were not investigated. Sent SIGTERM and confirmed no Telegram Desktop process remained. The user requested termination and a settings check.
+
+Later that day, at the user’s request, restored `ALSOFT_DRIVERS=pulse`, `DESKTOPINTEGRATION=1` and `DBusActivatable=false` in the same pinned launcher. GIO resolved that desktop ID to the expected command and confirmed URI support and the quit action. The next panel launch and persistence after launch remain unverified.

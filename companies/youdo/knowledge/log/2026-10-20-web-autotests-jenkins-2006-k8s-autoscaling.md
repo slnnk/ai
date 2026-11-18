@@ -42,3 +42,9 @@ none
 ## Duration investigation
 
 A later same-day [duration analysis](2026-10-20-web-autotests-jenkins-2006-duration-api-latency.md) identifies slow client-observed stand API calls as the dominant sampled delay; browser-start median0.828s and effective test concurrency approximately11.45. Underlying API latency cause remains unisolated.
+
+## Console retention update
+
+The full private `console.txt` was archived on 2026-11-18. The other job
+evidence remains in the original directory. See the
+[restore procedure](2026-11-18-agents-ai-data-retention.md#restore).
