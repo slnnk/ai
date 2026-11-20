@@ -78,6 +78,9 @@ if [ "$FORCE" -eq 0 ] && [ "$(cat "$STATE" 2>/dev/null)" = "$TODAY" ]; then
   exit 0
 fi
 
+[ "$(git symbolic-ref -q HEAD)" = refs/heads/main ] || fail "switch to main before syncing $AI_ROOT"
+git remote get-url origin >/dev/null 2>&1 || fail "origin is not configured in $AI_ROOT"
+
 # 1. indexes
 python3 general/scripts/build_index.py >/dev/null || fail "build_index.py"
 
@@ -142,65 +145,86 @@ for line in open("TODO.md", encoding="utf-8"):
         print(f"{m.group(1)} {text[:110]}{'...' if len(text) > 110 else ''}")
 EOF
 
-# 2. stage and inspect
-git add -A || fail "git add"
-if git diff --cached --name-only | grep -qE '(^|/)\.env$'; then
-  git reset -q; fail "a .env file is staged; check .gitignore"
-fi
-# Lint must complete before publication; ordinary nonsecret findings remain report-only.
-LINT=$(mktemp "${TMPDIR:-/tmp}/ai-sync-lint.XXXXXX") || fail "create lint report"
-python3 general/scripts/kb_lint.py --staged > "$LINT" 2>&1
-LINT_STATUS=$?
-LINT_SUMMARY=$(tail -n 1 "$LINT")
-# Exit 1 also means normal lint findings, so require its final completion summary.
-LINT_EXPECTED=-1
-if [[ "$LINT_SUMMARY" =~ ^kb-lint:\ ([0-9]+)\ errors,\ ([0-9]+)\ warnings\ \(staged\ files\ only\)$ ]]; then
-  LINT_EXPECTED=0
-  [ "${BASH_REMATCH[1]}" != "0" ] && LINT_EXPECTED=1
-fi
-if [ "$LINT_STATUS" -ne "$LINT_EXPECTED" ]; then
-  cat "$LINT" >&2
-  rm -f "$LINT"
-  fail "kb_lint.py did not complete (exit $LINT_STATUS); commit/pull/push skipped; staged changes preserved"
-fi
-if grep -q '^E secret' "$LINT"; then
-  grep '^E secret' "$LINT" >&2; rm -f "$LINT"; git reset -q
-  fail "a staged note looks like it contains a credential; remove it and rerun"
-fi
-if grep -q '^[EW] ' "$LINT"; then
-  log "lint findings to fix (commit proceeds):"; grep '^[EW] ' "$LINT" | sed 's/^/  /'
-fi
-rm -f "$LINT"
-
-# 3. commit with a message built from agent notes and changed-note metadata
-if ! git diff --cached --quiet; then
-  MSG=/tmp/ai-sync-msg.$$
-  git diff --cached --name-status | python3 general/scripts/ai_sync_message.py "$TODAY" "$NOTES" > "$MSG" \
-    || fail "compose commit message"
-  git commit -q -F "$MSG" || fail "git commit"
-  log "$(head -1 "$MSG")"
-  rm -f "$MSG"
-  [ -f "$NOTES" ] && : > "$NOTES"
-else
-  log "nothing to commit"
-fi
+# Stage, check and commit with a private index. Hold the normal Git index lock
+# so another writer cannot change staging before the checked index is installed.
+commit_changes() (
+  INDEX=$(git rev-parse --git-path index) || fail "locate Git index"
+  [ -n "$INDEX" ] || fail "locate Git index"
+  case "$INDEX" in /*) ;; *) INDEX="$PWD/$INDEX" ;; esac
+  TEMP=$(mktemp -d "${INDEX%/*}/ai-sync.XXXXXX") || fail "create private staging directory"
+  LOCK="$INDEX.lock"
+  LOCK_HELD=0
+  trap 'if [ "$LOCK_HELD" -eq 1 ]; then rm -f -- "$LOCK"; fi; rm -rf -- "$TEMP"' EXIT
+  trap 'exit 1' HUP INT TERM
+  (set -o noclobber; : > "$LOCK") 2>/dev/null || fail "Git index is locked"
+  LOCK_HELD=1
+  export GIT_INDEX_FILE="$TEMP/index"
+  if [ -f "$INDEX" ]; then
+    cp -p -- "$INDEX" "$GIT_INDEX_FILE" || fail "copy Git index"
+  fi
+  git add -A || fail "git add to private index"
+  # Lint must complete before publication; ordinary nonsecret findings remain report-only.
+  LINT="$TEMP/lint"
+  python3 general/scripts/kb_lint.py --staged > "$LINT" 2>&1
+  LINT_STATUS=$?
+  LINT_SUMMARY=$(tail -n 1 "$LINT")
+  # Exit 1 also means normal lint findings, so require its final completion summary.
+  LINT_EXPECTED=-1
+  if [[ "$LINT_SUMMARY" =~ ^kb-lint:\ ([0-9]+)\ errors,\ ([0-9]+)\ warnings\ \(staged\ files\ only\)$ ]]; then
+    LINT_EXPECTED=0
+    [ "${BASH_REMATCH[1]}" != "0" ] && LINT_EXPECTED=1
+  fi
+  if [ "$LINT_STATUS" -ne "$LINT_EXPECTED" ]; then
+    cat "$LINT" >&2
+    fail "kb_lint.py did not complete (exit $LINT_STATUS); commit/pull/push skipped; staged changes preserved"
+  fi
+  if grep -q '^E secret' "$LINT"; then
+    grep '^E secret' "$LINT" >&2
+    fail "a staged file contains a possible credential or is a .env file; fix the reported path and rerun"
+  fi
+  if grep -q '^[EW] ' "$LINT"; then
+    log "lint findings to fix (commit proceeds):"; grep '^[EW] ' "$LINT" | sed 's/^/  /'
+  fi
+  # Commit the checked index and install it only after commit succeeds.
+  git diff --cached --quiet
+  case $? in
+  0) log "nothing to commit" ;;
+  1)
+    MSG="$TEMP/message"
+    set -o pipefail
+    git diff --cached --name-status | python3 general/scripts/ai_sync_message.py "$TODAY" "$NOTES" > "$MSG" \
+      || fail "compose commit message"
+    python3 general/scripts/kb_lint.py --commit-message "$MSG" || fail "commit message check; see .sync-notes and changed-note titles"
+    [ "$(git symbolic-ref -q HEAD)" = refs/heads/main ] || fail "current branch changed during sync"
+    git commit -q --cleanup=verbatim -F "$MSG" || fail "git commit"
+    mv -f -- "$GIT_INDEX_FILE" "$INDEX" || fail "install committed Git index"
+    log "$(head -1 "$MSG")"
+    if [ -f "$NOTES" ]; then : > "$NOTES" || fail "clear recorded sync notes"; fi
+    ;;
+  *) fail "inspect staged changes" ;;
+  esac
+)
+commit_changes || exit 1
 
 # 4. pull --rebase, then push to every remote URL of origin
 export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=8"
-if git remote get-url origin >/dev/null 2>&1; then
+if [ "$(git symbolic-ref -q HEAD)" = refs/heads/main ]; then
   if ! git pull --rebase -q origin main 2>/tmp/ai-sync-pull.$$; then
     git rebase --abort 2>/dev/null
     cat /tmp/ai-sync-pull.$$ >&2; rm -f /tmp/ai-sync-pull.$$
     fail "pull --rebase; resolve manually in $AI_ROOT"
   fi
   rm -f /tmp/ai-sync-pull.$$
-  if ! git push -q origin main 2>/tmp/ai-sync-push.$$; then
+  SYNC_COMMIT=$(git rev-parse --verify refs/heads/main) || fail "resolve main for push"
+  if ! git push -q origin "$SYNC_COMMIT:refs/heads/main" 2>/tmp/ai-sync-push.$$; then
     cat /tmp/ai-sync-push.$$ >&2; rm -f /tmp/ai-sync-push.$$
     fail "push (commit is saved locally; will retry next run)"
   fi
   rm -f /tmp/ai-sync-push.$$
   log "pushed to all remotes"
+else
+  fail "current branch changed before pull"
 fi
 
-echo "$TODAY" > "$STATE"
+echo "$TODAY" > "$STATE" || fail "record successful sync date"
 exit 0

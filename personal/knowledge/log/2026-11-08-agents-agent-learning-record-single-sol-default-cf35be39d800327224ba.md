@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-14
+checked: 2026-11-19
 tags: [agents, learning]
 ---
 # Agent learning: single-sol-default
@@ -13,7 +13,16 @@ Correction evidence and scoped application history. Canonical instructions remai
 ```agent-learning-json
 {
   "created": "2026-11-08T22:20:10.589717+00:00",
-  "decisions": [],
+  "decisions": [
+    {
+      "at": "2026-11-18T21:41:05.975494+00:00",
+      "decision": "adopted",
+      "expected": "Use one Sol agent by default. Add helpers only with explicit authorization for the current task or when Review evidence calls for one independent design reviewer. File count and log length alone do not authorize delegation.",
+      "revision": 2,
+      "source": "personal/knowledge/log/2026-11-19-agents-memory-and-design-review-tools.md#standing-review-trigger",
+      "target": "/home/slnnk/ai/general/knowledge/README.md#economical-tool-use"
+    }
+  ],
   "evaluations": [
     {
       "at": "2026-11-12T08:18:56.293951+00:00",
@@ -71,7 +80,7 @@ Correction evidence and scoped application history. Canonical instructions remai
       "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
-  "expected": "Use one Sol agent by default; add same-model or cheaper helpers only with explicit authorization for the current task. File count and log length alone do not authorize delegation.",
+  "expected": "Use one Sol agent by default. Add helpers only with explicit authorization for the current task or when Review evidence calls for one independent design reviewer. File count and log length alone do not authorize delegation.",
   "key": "single-sol-default",
   "kind": "explicit",
   "layer": "personal",
@@ -87,13 +96,13 @@ Correction evidence and scoped application history. Canonical instructions remai
     }
   ],
   "repo": "",
-  "revision": 1,
+  "revision": 2,
   "scope": "global",
   "summary": "User selected one Sol agent after reviewing the delegation comparison.",
   "system": "agents",
-  "target": "/home/slnnk/ai/general/knowledge/README.md",
+  "target": "/home/slnnk/ai/general/knowledge/README.md#economical-tool-use",
   "task_id": "",
-  "updated": "2026-11-13T22:53:49.533326+00:00",
+  "updated": "2026-11-18T21:41:05.975494+00:00",
   "version": 1
 }
 ```

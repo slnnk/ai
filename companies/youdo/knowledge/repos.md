@@ -72,6 +72,7 @@ Current branch is not a property of the repository; do not record it.
 | `/home/slnnk/git/moderation-monitoring` | `git@gitlab.youdo.sg:youdo/moderation-monitoring.git` | Moderation monitoring requirements and Nomad deployments | moderation-monitoring | 2026-11-09 |
 | `/home/slnnk/git/ai-qa` | `git@gitlab.youdo.sg:youdo/ai/ai-qa.git` | AI QA test-environment orchestration service; DevOps-918 deployment assessment | ai-qa | 2026-11-12 |
 | `/home/slnnk/git/kyc` | `git@gitlab.youdo.sg:youdo/microservices/kyc.git` | KYC service; DevOps-923 dev Kubernetes onboarding investigation | dev-deployment | 2026-11-17 |
+| `/home/slnnk/git/moderation-bert` | `git@gitlab.youdo.sg:data/moderation-bert.git` | Moderation BERT scoring service, release image and model-fetch deployment contract for DevOps-884 | dev-deployment | 2026-11-19 |
 
 ## Relationships
 

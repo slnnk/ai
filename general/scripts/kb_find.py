@@ -14,8 +14,9 @@ import shlex
 import sys
 from pathlib import Path
 
+from kb_paths import DEFAULT_LAYERS, knowledge_dirs, markdown_files
+
 AI_ROOT = Path(os.environ.get("AI_ROOT", Path.home() / "ai"))
-DEFAULT_LAYERS = ["general", "personal", "current"]
 SKIP = {"INDEX.md", "README.md"}
 LINE_WIDTH = 240
 DECISION_FIELDS = ("decision_state", "decision_scope", "decision_summary", "decision_date", "decision_source")
@@ -35,15 +36,16 @@ def parse_frontmatter(lines):
     return {}, 0
 
 
-def notes(layers):
+def notes(layers=None):
     seen = set()
-    for layer in layers:
-        root = (AI_ROOT / layer / "knowledge").resolve()
-        if root.is_dir():
-            for f in sorted(root.rglob("*.md")):
-                if f.name not in SKIP and f not in seen:
-                    seen.add(f)
-                    yield f
+    for root in knowledge_dirs(AI_ROOT, layers or DEFAULT_LAYERS, explicit=layers is not None):
+        paths = sorted(markdown_files(root))
+        canonical_root = root.resolve()
+        for path in paths:
+            f = canonical_root / path.relative_to(root)
+            if f.name not in SKIP and f not in seen:
+                seen.add(f)
+                yield f
 
 
 def display(f):
@@ -211,7 +213,7 @@ def main():
     match = any if args.any else all
     results = []
     try:
-        for f in notes(args.layer or DEFAULT_LAYERS):
+        for f in notes(args.layer):
             text = f.read_text(errors="replace")
             if not match(p.search(text) for p in pats):
                 continue
@@ -252,7 +254,7 @@ def main():
                 "status": meta.get("status", "?"), "checked": meta.get("checked", "?"),
                 "title": title, "size_bytes": size, "has_summary": any(l.startswith("## Summary") for l in lines),
                 "decision": decision(meta, f), "section": section, "snippets": snippets})
-    except (OSError, ValueError) as e:
+    except (OSError, RuntimeError, ValueError) as e:
         print("kb-find: error: " + str(e), file=sys.stderr)
         return 2
     end = args.offset + len(rendered)

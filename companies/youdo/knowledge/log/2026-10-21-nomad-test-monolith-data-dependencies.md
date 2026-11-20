@@ -49,3 +49,7 @@ none
 
 ## Subsequent restoration status
 By the later2026-10-21 snapshot, daily-compilations and recommendations-mock restored/accepted; subcategory-predictor VK healthy and retrycontract3242527/load3242528 SUCCESS in pipeline141391. Full isolatedKafka job deployed successfully via pipeline141395. Remaining three configured missing targets from the original audit: price-predictor, customer-task-recommendations and taskqualitycontrol (sysadmins/taskqualitycontrolfortest). These have not been re-probed in this status-answer turn. Taskqualitycontrol is directly demonstrated by8Jenkins2020failures; other two are configuration dependencies without direct error evidence in that build.
+
+## VK Nomad deployment status (2026-11-19)
+
+At 01:58 MSK, authenticated read-only Nomad API requests returned 329 jobs in the visible `default` namespace. No job ID or name matched price-predictor or customer-task-recommendations. The `taskqualitycontrol` job is running with one desired and one running allocation, no task restarts, and the configured image is from `sysadmins/taskqualitycontrolfortest`. This supersedes the October missing-job observation for the test mock. Application endpoint checks and autotests were outside this check. On 2026-11-19 the user closed the combined restoration proposal in the central TODO after reviewing these statuses. No deployment of the two Data services or further work was requested.

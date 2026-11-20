@@ -53,3 +53,8 @@ Correction evidence and scoped application history. Canonical instructions remai
   "version": 1
 }
 ```
+
+## Decision example
+
+For tool choices where inherited capabilities might already satisfy the task, see
+[C01: inspect supplied capabilities](2026-11-14-agents-p01-decision-cases-metrics.md#c01-inspect-supplied-capabilities-before-adding-acquisition-machinery).

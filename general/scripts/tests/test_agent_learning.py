@@ -100,8 +100,24 @@ class LearningTests(unittest.TestCase):
         self.run_cli('verify', '--key', 'discussion', '--scope', 'global', '--event-id', 'e1',
                      '--source', 'test:case', '--outcome', 'fail', ok=False)
 
+    def test_record_updates_preserve_decision_example(self):
+        self.record()
+        path = m.records(self.root)[0][0]
+        example = '\n## Decision example\n\n[Original case](example.md#decision).\n'
+        path.write_text(path.read_text() + example)
+        self.run_cli('verify', '--key', 'discussion', '--scope', 'global',
+                     '--event-id', 'e1', '--source', 'test:case', '--outcome', 'pass')
+        self.assertTrue(path.read_text().endswith(example))
+        self.record('event-2')
+        self.assertTrue(path.read_text().endswith(example))
+        data = m.records(self.root)[0][1]
+        self.assertEqual(len(data['evaluations']), 1)
+        self.assertEqual(len(data['occurrences']), 2)
+
     def test_secret_and_target_rejection(self):
-        for secret in ['Bearer abcdefghijklmnop', 'password=abc123456789', '-----BEGIN PRIVATE KEY-----']:
+        # Build the synthetic header at runtime so staged-file lint accepts this test.
+        private_key_header = '-----BEGIN ' + 'PRIVATE KEY-----'
+        for secret in ['Bearer abcdefghijklmnop', 'password=abc123456789', private_key_header]:
             self.run_cli('record', '--key', 'bad', '--event-id', 'bad', '--scope', 'global', '--system', 'agents',
                          '--kind', 'explicit', '--summary', secret, '--expected', 'safe', '--source', 'test', '--dry-run', ok=False)
         self.assertFalse(self.root.exists())

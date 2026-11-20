@@ -14,6 +14,7 @@ DEFAULT_DISPLAY = Path.home() / "ai-data" / "todo" / "display-ru.json"
 MAX_DESCRIPTION_LENGTH = 120
 HEADING = re.compile(r"^(#{2,6})\s+(.+?)\s*#*\s*$")
 CHECKBOX = re.compile(r"^([ \t]*)[-*+] \[([ xX])\] (.*)$")
+DUE_DATE = re.compile(r"^[ \t]*[-*+] \[ \] due ([0-9]{4}-[0-9]{2}-[0-9]{2}):")
 
 
 def entries(markdown):
@@ -103,7 +104,11 @@ def render(selected, display):
             titles = [display["headings"][h] for h in headings] or ["Без раздела"]
             output.extend(["", "### " + " → ".join(titles), ""])
             previous = headings
-        output.append("- " + display["tasks"][task_key(item)])
+        title = display["tasks"][task_key(item)]
+        due = DUE_DATE.match(item)
+        if due:
+            title = f"{due[1]} — {title}"
+        output.append("- " + title)
     return "\n".join(output) + "\n"
 
 

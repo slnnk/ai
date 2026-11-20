@@ -23,7 +23,8 @@ class SyncPreviewTests(unittest.TestCase):
         self.git('init', '-q')
         scripts = self.root / 'general/scripts'
         scripts.mkdir(parents=True)
-        for name in ('ai_sync_preview.py', 'build_index.py'):
+        (self.root / 'general/knowledge').mkdir()
+        for name in ('ai_sync_preview.py', 'build_index.py', 'kb_paths.py'):
             shutil.copyfile(str(SCRIPTS / name), str(scripts / name))
         self.notes = self.root / 'personal/knowledge'
         self.notes.mkdir(parents=True)
@@ -104,6 +105,23 @@ class SyncPreviewTests(unittest.TestCase):
         self.assertIn('split Git indexes are not supported', result.stderr)
         after = self.snapshot()
         self.assertEqual([], [key for key in before.keys() | after.keys() if before.get(key) != after.get(key)])
+
+    def test_log_links_include_titles_when_dates_repeat(self):
+        log = self.notes / 'log'
+        log.mkdir()
+        for day, name, title in (
+            ('2026-10-19', 'first', 'First note'),
+            ('2026-10-19', 'second', 'Second note'),
+            ('2026-10-18', 'earlier', 'Earlier note'),
+        ):
+            (log / f'{day}-example-{name}.md').write_text(
+                f'---\nsystem: example\nstatus: verified\nchecked: {day}\n---\n# {title}\n')
+        subprocess.run(['python3', str(self.root / 'general/scripts/build_index.py')],
+                       cwd=self.root, env=self.env, check=True, capture_output=True)
+        by_system = (self.notes / 'INDEX.md').read_text().split('### Log by system', 1)[1]
+        self.assertIn('[2026-10-19 First note](log/2026-10-19-example-first.md)', by_system)
+        self.assertIn('[2026-10-19 Second note](log/2026-10-19-example-second.md)', by_system)
+        self.assertIn('[2026-10-18](log/2026-10-18-example-earlier.md)', by_system)
 
     def test_failure_preserves_existing_staging_and_files(self):
         # A malformed tracked Git index must cause a safe failure, never reset.

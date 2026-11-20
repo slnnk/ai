@@ -293,7 +293,11 @@ def mutate(root, a):
     d['updated'] = stamp
     validate(d)
     if not a.dry_run:
-        atomic_write(path, render(d))
+        notes = ''
+        if path.exists():
+            payload_and_notes = path.read_text(encoding='utf-8').partition(MARKER)[2]
+            notes = payload_and_notes.partition('\n```\n')[2]
+        atomic_write(path, render(d) + notes)
     print(('planned: ' if a.dry_run else 'saved: ') + str(path))
 
 

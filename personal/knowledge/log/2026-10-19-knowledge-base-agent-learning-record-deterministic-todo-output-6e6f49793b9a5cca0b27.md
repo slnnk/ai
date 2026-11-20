@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-10-19
+checked: 2026-11-19
 tags: [agents, learning]
 ---
 # Agent learning: deterministic-todo-output
@@ -29,10 +29,18 @@ Correction evidence and scoped application history. Canonical instructions remai
       "revision": 3,
       "source": "Current Codex correction with screenshot: descriptions still too long, output slow, large spaces between tasks.",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T22:36:02.389362+00:00",
+      "decision": "adopted",
+      "expected": "For todo or задачи, render open tasks in source order as concise Russian titles with tight bullet spacing and source-keyed cached descriptions. Prefix titles with the explicit due date from the task source. Omit other dates, source links and checkboxes; preserve useful IDs and deferral or proposal labels. Listing grants no execution permission.",
+      "revision": 4,
+      "source": "Codex user follow-up after the 105-item TODO listing on 2026-11-19 requested that todo show the date for scheduled tasks.",
+      "target": "/home/slnnk/ai/general/knowledge/README.md#todo-output"
     }
   ],
   "evaluations": [],
-  "expected": "For todo or задачи, return all open tasks in order as short Russian action titles, typically 6-12 words and no more than 120 characters, with no blank lines between items in a group. Omit dates, source links and checkboxes; preserve useful IDs and deferral/proposal labels. Use source-keyed cached titles; keep full details and permission conditions in source TODO.",
+  "expected": "For todo or задачи, render open tasks in source order as concise Russian titles with tight bullet spacing and source-keyed cached descriptions. Prefix titles with the explicit due date from the task source. Omit other dates, source links and checkboxes; preserve useful IDs and deferral or proposal labels. Listing grants no execution permission.",
   "key": "deterministic-todo-output",
   "kind": "explicit",
   "layer": "personal",
@@ -66,13 +74,13 @@ Correction evidence and scoped application history. Canonical instructions remai
     }
   ],
   "repo": "",
-  "revision": 3,
+  "revision": 4,
   "scope": "global",
   "summary": "User requested compact Russian TODO titles and tight bullet spacing.",
   "system": "knowledge-base",
-  "target": "/home/slnnk/ai/AGENTS.md",
+  "target": "/home/slnnk/ai/general/knowledge/README.md#todo-output",
   "task_id": "",
-  "updated": "2026-10-19T20:52:32.763088+00:00",
+  "updated": "2026-11-18T22:36:02.389362+00:00",
   "version": 1
 }
 ```

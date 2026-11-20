@@ -45,6 +45,25 @@ class TodoTests(unittest.TestCase):
     def test_empty(self):
         self.assertEqual(todo.render([], {}), "Открытых задач нет.\n")
 
+    def test_explicit_due_date_prefixes_the_cached_title(self):
+        source = (
+            "## Test\n"
+            "- [ ] due 2099-11-20: Scheduled (2026-11-19)\n"
+            "  Context.\n"
+            "  * [ ] due 2026-11-18: Earlier deadline\n"
+            "- [ ] Mention due 2026-11-21: in the description\n"
+            "- [x] due 2026-11-22: Closed\n"
+        )
+        cache = display_for(source)
+        output = todo.render(todo.select(source, cache), cache)
+        self.assertEqual(
+            output,
+            "Открытые задачи: 3\n\n### Раздел Test\n\n"
+            "- 2099-11-20 — Проверить задачу 0\n"
+            "- 2026-11-18 — Проверить задачу 1\n"
+            "- Проверить задачу 2\n",
+        )
+
     def test_no_blank_lines_between_items(self):
         source = "## Test\n- [ ] One\n- [ ] Two\n## Next\n- [ ] Three\n"
         cache = display_for(source)

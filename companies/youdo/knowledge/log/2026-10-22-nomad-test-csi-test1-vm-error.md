@@ -28,7 +28,7 @@ Read Jenkins5895–5899 logs and parameters, Nomad nodes/plugins/volume details,
 KB evidence/system map/backlog only. No restart, reset-state, force-detach, disk deletion, deployment or Jenkins retry.
 
 ## Status and risks
-2026-10-22 diagnosis complete, recovery pending. Restore cloud VM control-plane state with provider assistance or a separately reviewed approved action; then observe automatic CSI detach and verify ordinary deployment. No destructive recovery proposed. Remaining action is tracked in [central TODO](../../../../TODO.md), section nomad-test / Consul.
+2026-10-22: diagnosis complete and recovery was pending. On 2026-10-23 the user confirmed a successful test1 redeploy after provider fixes. On 2026-11-19 the user confirmed everything is working and requested closure. The [central TODO](../../../../TODO.md) entry is closed on that basis. No fresh per-VM cloud verification or infrastructure changes were performed during closure.
 
 ## Portable lesson
 none
@@ -44,4 +44,4 @@ User requested checking all VK Cloud machines. Paginated Compute servers/detail 
 | vk-ms1-nomad-agent-test-05 | 198e36be-c539-4375-b2ca-111fa383b620 | 2026-10-22T11:41:16Z |
 | vk-ms1-pg-b2b-test | 7d38b527-d082-4dc7-8711-ce2dbf8a69a3 | 2026-10-22T11:41:57Z |
 
-Correlated faults within3minutes18seconds suggest a shared cloud control-plane incident; this is an inference, not verified provider root cause. Existing Nomad snapshot showed both affected clients ready. Provider investigation/recovery should cover all4VMs; no reset/reboot or external support message performed. Sanitized snapshot: ~/ai-data/nomad-csi-5895/all-servers.json. Remaining recovery tracked in the existing central TODO entry.
+Correlated faults within3minutes18seconds suggest a shared cloud control-plane incident; this is an inference, not verified provider root cause. Existing Nomad snapshot showed both affected clients ready. At the time, the proposed provider investigation covered all four VMs. No reset, reboot or external support message was performed during the diagnosis. Sanitized snapshot: ~/ai-data/nomad-csi-5895/all-servers.json. See the dated closure under Status and risks.

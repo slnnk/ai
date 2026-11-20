@@ -25,6 +25,29 @@ design evidence.
 
 The user later authorized the [second E01 stage](../../../current/knowledge/log/2026-11-09-knowledge-base-e01-stage2-comparison.md), completed on 2026-11-09 with 36 historical-task attempts and 114 invocations. Raw cost fell with Luna helpers, but equal quality was not demonstrated; no model-default change was adopted. Method/rubric limits are recorded with that outcome. The user subsequently retained one Sol agent and closed E01 follow-ups without further runs; E02–E14 remain proposals.
 
+## E03 selection November 19
+
+The user selected E03 for the next bounded experiment. Use mocked empty results,
+unavailable sources, and truncated output to check whether the agent distinguishes
+a completed search from an incomplete check and reports the verified state correctly.
+The user then asked to run the pilot. It completed on 2026-11-19 with six
+fresh sessions across three paired cases. Both arms passed all three cases.
+See the [result and limits](2026-11-19-agents-e03-partial-tool-failures.md)
+and the [central TODO](../../../TODO.md#knowledge-base) for closure.
+
+## When to add an experiment to TODO
+
+When work on agent behavior or tooling reveals a concrete problem and a bounded
+comparison could inform a decision, record the experiment as a proposal in the
+[central TODO](../../../TODO.md#knowledge-base). Include the observed problem,
+a source example, the comparison, and the result that would justify a change.
+If an open item already covers the comparison, use that item. E11 is covered by
+the existing F2/F4 proposal.
+
+Keep the other candidates here until such a problem appears. For a verified
+defect with a known fix, track the fix. A proposal records work for a decision
+and requires separate authorization to run.
+
 ## Current scope reconciliation November 14
 
 The [personalized-learning backlog reconciliation](2026-11-14-agents-personalized-learning-backlog.md#reconciliation-decisions)
@@ -174,8 +197,8 @@ subsequently selected E01. Its [bounded pilot](2026-11-09-knowledge-base-e01-mod
 finished on 2026-11-09: 42 calls, full participant usage and verification, no permanent
 model-routing changes. Luna helpers reduced delegated cost but did not beat solo on
 the tested short tasks; one strict next-action mismatch has a documented rubric
-ambiguity. E02–E14 remain proposals referenced from central TODO. No background
-research or experiment remains running.
+ambiguity. E03 completed on November 19. See the current selection criteria above
+for the remaining candidates. No experiment remains running.
 
 ## Portable lesson
 

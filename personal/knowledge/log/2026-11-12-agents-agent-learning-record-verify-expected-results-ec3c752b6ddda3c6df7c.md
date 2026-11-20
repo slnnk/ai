@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-18
+checked: 2026-11-19
 tags: [agents, learning]
 ---
 # Agent learning: verify-expected-results
@@ -124,6 +124,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "current/knowledge/log/2026-11-18-agents-ai-data-retention.md, candidate checks, archive extraction comparison, and measured final allocation",
       "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-19T13:55:05.484842+00:00",
+      "cause": "",
+      "event_id": "devops-927-local-image",
+      "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "DevOps-927 work log: local image built, final linkage verified, and HEIC/AVIF smoke-tested before delivery.",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
   "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
@@ -148,7 +159,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-18T20:52:12.866510+00:00",
+  "updated": "2026-11-19T13:55:05.484842+00:00",
   "version": 1
 }
 ```

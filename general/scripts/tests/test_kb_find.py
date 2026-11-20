@@ -10,6 +10,7 @@ import unittest
 SCRIPT = Path(__file__).resolve().parents[1] / "kb_find.py"
 if not SCRIPT.exists():
     SCRIPT = Path(__file__).with_name("kb_find.py")
+sys.path.insert(0, str(SCRIPT.parent))
 spec = importlib.util.spec_from_file_location("kb_find", SCRIPT)
 kb = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(kb)
@@ -146,6 +147,7 @@ class RetrievalTests(unittest.TestCase):
         self.write("\n## Cause\nalpha [beta]\n")
         p = self.run_cli("--files", "-l", "general", "-s", "SERVICE", "[beta]")
         self.assertEqual(p.stdout, "~/ai/general/knowledge/service/note.md\n")
+        (self.root / "personal/knowledge").mkdir(parents=True)
         self.assertEqual(self.run_cli("-l", "personal", "alpha").stdout, "kb-find: 0 notes\n")
         self.assertEqual(self.run_cli("alpha", "missing").returncode, 1)
         self.assertEqual(self.run_cli("--any", "alpha", "missing").returncode, 0)

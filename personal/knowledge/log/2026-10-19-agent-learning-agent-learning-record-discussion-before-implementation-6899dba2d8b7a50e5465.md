@@ -1,7 +1,7 @@
 ---
 system: agent-learning
 status: verified
-checked: 2026-11-18
+checked: 2026-11-19
 tags: [agents, learning]
 ---
 # Agent learning: discussion-before-implementation
@@ -256,6 +256,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "personal/knowledge/log/2026-11-18-codex-config-performance-review.md",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-18T21:34:17.786028+00:00",
+      "cause": "",
+      "event_id": "agents-memory-design-review-tools-20261119-discussion-scope",
+      "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-19-agents-memory-and-design-review-tools.md#changes-and-status",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Investigate and prepare the requested plan; start implementation after the user requests it.",
@@ -280,7 +291,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agent-learning",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-18T20:20:44.634800+00:00",
+  "updated": "2026-11-18T21:34:17.786028+00:00",
   "version": 1
 }
 ```

@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-13
+checked: 2026-11-19
 tags: [agents, learning]
 ---
 # Agent learning: clarify-material-assumptions
@@ -13,7 +13,16 @@ Correction evidence and scoped application history. Canonical instructions remai
 ```agent-learning-json
 {
   "created": "2026-11-12T15:41:35.792309+00:00",
-  "decisions": [],
+  "decisions": [
+    {
+      "at": "2026-11-18T21:37:36.185443+00:00",
+      "decision": "adopted",
+      "expected": "Check available context first. Clarify consequential interpretations before dependent work and handle routine reversible choices independently. When clarification is needed, ask about the decision that others depend on first, offer concrete options and consequences when useful, and stop when remaining choices are covered or reversible.",
+      "revision": 2,
+      "source": "personal/knowledge/log/2026-11-19-agents-memory-and-design-review-tools.md#local-adoption",
+      "target": "/home/slnnk/ai/general/knowledge/README.md#material-assumptions"
+    }
+  ],
   "evaluations": [
     {
       "at": "2026-11-13T19:40:17.226242+00:00",
@@ -27,7 +36,7 @@ Correction evidence and scoped application history. Canonical instructions remai
       "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
-  "expected": "Check material assumptions against available context; explicitly surface interpretations affecting result, scope or permissions and clarify before acting on that choice; make routine reversible decisions independently.",
+  "expected": "Check available context first. Clarify consequential interpretations before dependent work and handle routine reversible choices independently. When clarification is needed, ask about the decision that others depend on first, offer concrete options and consequences when useful, and stop when remaining choices are covered or reversible.",
   "key": "clarify-material-assumptions",
   "kind": "explicit",
   "layer": "personal",
@@ -43,13 +52,13 @@ Correction evidence and scoped application history. Canonical instructions remai
     }
   ],
   "repo": "",
-  "revision": 1,
+  "revision": 2,
   "scope": "global",
   "summary": "User approved material-assumption clarification after reviewing its explanation and proposed wording.",
   "system": "agents",
-  "target": "/home/slnnk/ai/general/knowledge/README.md",
+  "target": "/home/slnnk/ai/general/knowledge/README.md#material-assumptions",
   "task_id": "",
-  "updated": "2026-11-13T19:40:17.226242+00:00",
+  "updated": "2026-11-18T21:37:36.185443+00:00",
   "version": 1
 }
 ```

@@ -8,7 +8,7 @@ tags: [b2b, ephemeral-dev, jenkins, gitlab-ci, helm, kubernetes, yandex-dev, roa
 
 ## Summary
 
-DevOps-884 target clarified2026-11-17:19shared applications, all in permanent namespace dev-single (latest user selection, superseding dev). First ten repository assessment complete: existing chart handles most component/PG/migration shapes; user subsequently selected existing CI modes unchanged (MR plus semver-tag release for manual mode, master for auto), user expects namespace bootstrap once by any first service, followed by app-only upgrades (current template needs adjustment); selected dev-single matches the live Vault role pattern dev-*. ai-qa current dev-ai-qa was not migrated. Analysis only; no implementation or deployment. [Assessment](../../log/2026-11-17-dev-deployment-devops-884-first-ten-assessment.md).
+DevOps-884: permanent namespace `dev-single` for 18 shared applications. Seven have prepared MRs and verified dev deployments. The user confirmed ai-qa stays in `dev-ai-qa`, with separate work to move its image publication to Nexus. [Current assessment](../../log/2026-11-19-dev-deployment-devops-884-all-services-plan.md).
 
 - What: B2B ephemeral dev deployment. A service MR pipeline deploys the service plus its catalog dependencies into a task-named namespace (`dev-devops-689` style) in the Yandex dev cluster, then can run post-deploy autotests. YouTrack article DevOps-A-50. This is the authoritative note; component notes (`gitlab-ci-deploy-dev.md`, `jenkins-deploy-dev-b2b.md`, `helm-charts.md`) are history.
 - Flow: service pipeline builds images (Nexus) -> manual `1 deploy dev` -> `gitlab-ci-templates` `v3/.deploy-dev.yml` -> Jenkins job `test` (`jenkins-pipelines`, `deploy-dev-b2b.Jenkinsfile`, pinned to `node('AutoTest')`) -> `helm-charts` (`ephemeral-namespace`, `microservice`) with each service's `devops/dev.yml` and a generated routing overlay -> `generated/deploy-dev.env` back to GitLab -> `2 extend dev` / `3 delete dev`.
@@ -131,6 +131,15 @@ Current explicit routing targets in the two verified service files are:
 | `docvalidation` | `youdo-business` | Stable fallback until `youdo-business` is enabled in the set. |
 | `docvalidation` | `cerberus2` | Stable fallback; `cerberus2` is intentionally outside the current Jenkins catalog. |
 
+### ASP.NET Core container listener
+
+Use port `8080` for non-root ASP.NET Core services in dev Kubernetes (user decision,
+2026-11-19). Set the actual listener via `ASPNETCORE_URLS` and match the chart
+component port and probes. The Kubernetes Service can still expose port `80`.
+The same Kestrel bind failure was observed in
+[youdo.business dev-107](../../log/2026-06-26-dev-deployment-youdo-business-dev-yml.md#2026-06-26-dev-107-deployment-monitoring)
+and [geocoder](../../log/2026-11-19-dev-deployment-devops-884-all-services-plan.md#geocoder-exit-134-root-cause-verified).
+
 ## Kubernetes and shared infrastructure
 
 Last live check: 2026-08-27, kubeconfig `/home/slnnk/.kube/config-yandex-dev`.
@@ -152,6 +161,11 @@ Last live check: 2026-08-27, kubeconfig `/home/slnnk/.kube/config-yandex-dev`.
 - Limits: no per-user audit (all actions as the ServiceAccount), revocation only by rotation; `edit` exposes namespace secrets including the registry pull secret. SSO alternative (Pinniped + Keycloak `auth-tech.youdo.com/realms/youdo`) in the DevOps-883 log entry.
 
 The namespace chart creates RabbitMQ and Redis without persistence. The microservice chart can create PostgreSQL as a StatefulSet with a PVC. The PVC persists across Helm upgrades inside the namespace and is deleted with the namespace. `PGDATA` points to a subdirectory to avoid `lost+found` initialization failures.
+
+Leave CPU requests and limits at the chart defaults for dev service components
+(user decision, 2026-11-19). Omit both `services[].cpu` and
+`services[].cpuLimit` from service values. The current chart defaults for
+both are null.
 
 Ephemeral service and PostgreSQL memory requests/limits should normally remain at or below `256Mi`. Current prepared service values do not exceed this cap. (superseded 2026-09-04: the `256Mi` cap caused OOMs; Billing webapp, TKB `mock-api`/`worker-mock`, doc-generator API, automation-web and the `youdo.business` worker now run 512Mi request / 1Gi limit, see `Current status`.)
 

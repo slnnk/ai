@@ -22,12 +22,13 @@ import argparse
 import os
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+from kb_paths import DEFAULT_LAYERS, knowledge_dirs, markdown_files
+
 AI_ROOT = Path(os.environ.get("AI_ROOT", Path.home() / "ai"))
-DEFAULT_LAYERS = ["general", "personal", "current"]
 SKIP = {"INDEX.md", "README.md"}
 DATE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
 DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -59,7 +60,7 @@ def first_heading(body):
 
 def collect(knowledge):
     notes, missing = [], []
-    for path in sorted(knowledge.rglob("*.md")):
+    for path in sorted(markdown_files(knowledge)):
         if path.name in SKIP or any(p.startswith(".") for p in path.parts):
             continue
         rel = path.relative_to(knowledge)
@@ -122,8 +123,11 @@ def render(layer_name, notes, missing):
         out += ["### Log by system", ""]
         for system in sorted(by_system):
             entries = sorted(by_system[system], key=lambda n: n["date"], reverse=True)
+            visible = entries[:8]
+            date_counts = Counter(n["date"] for n in visible)
             out.append(f"- **{system}** ({len(entries)}): " + ", ".join(
-                f"[{n['date']}]({n['rel'].as_posix()})" for n in entries[:8])
+                link(n["rel"], f"{n['date']} {n['title']}" if date_counts[n["date"]] > 1 else n["date"])
+                for n in visible)
                 + (" ..." if len(entries) > 8 else ""))
         out.append("")
 
@@ -141,15 +145,11 @@ def render(layer_name, notes, missing):
     return "\n".join(out)
 
 
-def stale_report(roots, days, recipe_days, count_only=False):
+def stale_report(directories, days, recipe_days, count_only=False):
     cutoffs = {True: (date.today() - timedelta(days=days)).isoformat(),
                False: (date.today() - timedelta(days=recipe_days)).isoformat()}
     rows = []
-    for root in roots:
-        knowledge = root / "knowledge"
-        if not knowledge.is_dir():
-            continue
-        notes, _ = collect(knowledge)
+    for knowledge, notes, _ in directories:
         for n in notes:
             if n["rel"].parts[0] == "log" or n["status"] == "outdated":
                 continue
@@ -182,17 +182,15 @@ def main():
     ap.add_argument("--count", action="store_true", help="with --stale: print only the number due")
     args = ap.parse_args()
 
-    roots = [Path(p).expanduser() for p in args.layers] or [AI_ROOT / l for l in DEFAULT_LAYERS]
+    layers = [Path(p).expanduser().absolute() for p in args.layers] or DEFAULT_LAYERS
+    # Read every selected layer before touching any index.
+    directories = [(knowledge, *collect(knowledge))
+                   for knowledge in knowledge_dirs(AI_ROOT, layers, explicit=bool(args.layers))]
     if args.stale is not None:
-        return stale_report(roots, args.stale, args.recipe_days, args.count)
+        return stale_report(directories, args.stale, args.recipe_days, args.count)
     stale = 0
-    for root in roots:
-        knowledge = root / "knowledge"
-        if not knowledge.is_dir():
-            print(f"skip {root}: no knowledge/ directory", file=sys.stderr)
-            continue
-        notes, missing = collect(knowledge)
-        text = render(root.resolve().name, notes, missing)
+    for knowledge, notes, missing in directories:
+        text = render(knowledge.parent.resolve().name, notes, missing)
         target = knowledge / "INDEX.md"
         current = target.read_text(encoding="utf-8") if target.exists() else None
         if current == text:
@@ -208,4 +206,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except (OSError, RuntimeError) as error:
+        print(f"build-index: error: {error}", file=sys.stderr)
+        sys.exit(2)

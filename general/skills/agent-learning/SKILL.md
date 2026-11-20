@@ -25,6 +25,8 @@ Agents own detecting recurring problems and useful generalizations; do not requi
 
 Identify common intent and contextual differences, including problems visible in the artifacts even without a new user complaint. If the evidence suggests a reusable improvement, proactively present a concise proposed rule, its intended scope and the supporting examples for user confirmation. Record agent-derived generalizations as inferred, not active instructions, until confirmed. Repetition alone is insufficient to promote a rule, and absence of complaints is not approval. Explicit durable user directions already authorize their scoped canonical update without asking again. Reuse or revise existing rules instead of adding one for every edit; do not collect complete transcripts or claim access to unavailable discussions.
 
+When you find a concrete problem in agent behavior or tooling that may warrant an experiment, consult the [experiment selection criteria](../../../personal/knowledge/log/2026-11-06-knowledge-base-merged-agent-experiments.md#when-to-add-an-experiment-to-todo) before creating or updating a TODO proposal.
+
 ## Before related work
 
 At the start of a task, and before a consequential action of a new type, retrieve applicable rules:
@@ -36,6 +38,8 @@ python3 ~/ai/general/scripts/agent_learning.py query --system <system> <keywords
 Add `--scope current` for company work, `--scope personal` for personal work, and `--repo <absolute-checkout>` for repository-specific rules. Supply the same `--task-id` when consulting task-specific records. Global rules are included with narrower scope. Topic/action keywords work in either language; a shared key and explicit system tags work across languages.
 
 Read each relevant canonical target before acting; a title, match, or startup scan is not proof its rule was loaded. Also read existing system context and applicable instructions: this index is not a replacement. A record without a linked canonical rule is evidence, not an active instruction. Treat inferred records as proposals. If retrieval reports corruption, missing targets, or a read error, report it and consult known canonical instructions; do not interpret failure as no rules.
+
+When an applicable learning record links a decision example, read the relevant section before choosing the approach it covers. Compare its rationale and applicability with the current facts, scope, and permissions.
 
 ## When corrected
 
@@ -55,7 +59,9 @@ Read [references/operations.md](references/operations.md) for capture, linking, 
 
 Find the existing key and add the new occurrence once. Diagnose from evidence: rule absent, not found, not loaded, ambiguous, conflicting, out of scope, or violated despite being loaded. Use observable reads/actions; mark hidden or unsupported causes unknown.
 
-Update the existing rule instead of appending a duplicate. Repeated failure of a loaded rule calls for the smallest effective enforcement: an existing script check, validation, supported hook, or checkpoint before the action. Implement it only within authorized scope; external changes retain their approval requirements. Put further work in `~/ai/TODO.md` with an evidence link. Records are evidence, not another backlog.
+For a recurring judgment error despite reading the rule, add a short Decision example section after the learning record's data block and link the source note. The linked example should show the rejected choice, corrected choice, rationale, and a condition where it would not apply. If a procedure proves reusable across tasks, put it in the relevant existing skill within the approved scope.
+
+Update the existing rule when it needs correction. For a repeat failure that can be checked mechanically, use the smallest effective check before the action. Implement it only within authorized scope; external changes retain their approval requirements. Put further work in `~/ai/TODO.md` with an evidence link. Records are evidence, not another backlog.
 
 ## Daily metrics
 

@@ -18,6 +18,7 @@ import tempfile
 # Prevent imports from writing __pycache__ in the knowledge repository.
 sys.dont_write_bytecode = True
 import build_index
+from kb_paths import DEFAULT_LAYERS, knowledge_dirs
 
 
 def git(root, *args, env=None, data=None):
@@ -56,13 +57,9 @@ def preview(root):
                    GIT_OBJECT_DIRECTORY=str(private_objects), GIT_OPTIONAL_LOCKS='0')
         env.pop('GIT_ALTERNATE_OBJECT_DIRECTORIES', None)
         git(root, 'add', '-A', env=env)
-        for layer_name in build_index.DEFAULT_LAYERS:
-            layer = root / layer_name
-            knowledge = layer / 'knowledge'
-            if not knowledge.is_dir():
-                continue
+        for knowledge in knowledge_dirs(root, DEFAULT_LAYERS):
             notes, missing = build_index.collect(knowledge)
-            content = build_index.render(layer.resolve().name, notes, missing).encode('utf-8')
+            content = build_index.render(knowledge.parent.resolve().name, notes, missing).encode('utf-8')
             target = (knowledge / 'INDEX.md').resolve()
             # Match normal generation, including current -> companies/<name>.
             relative = target.relative_to(root).as_posix()

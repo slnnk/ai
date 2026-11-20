@@ -211,6 +211,11 @@ interpretations remain that affect the result, scope of work or permissions, sta
 them explicitly and clarify what is needed before acting on that choice. Do not
 silently choose such an interpretation. Make routine reversible decisions independently.
 
+When clarification is needed, ask first about the unresolved decision that other
+choices depend on. Offer concrete options and their consequences when useful.
+Revisit dependent questions after the answer and stop asking once the remaining
+choices are covered by known requirements or can be made reversibly.
+
 Before nontrivial changes, also read "Verifiable results" below.
 
 ## Task context selection
@@ -268,6 +273,25 @@ Support each defect finding with a source location, a concrete reachable scenari
 and the resulting incorrect behavior or impact. Read the relevant connected code to
 check the scenario. Separate confirmed defects from hypotheses and style preferences;
 do not present speculative risks as established bugs.
+
+Before presenting a design or plan draft for approval, independently review it
+when it covers any of these cases:
+
+- A production migration or cutover with a risk of downtime, data loss or a
+  difficult rollback.
+- An access change that could grant broader access than intended or lock out
+  administrators.
+- A change to a contract between systems where a compatibility or rollout-order
+  mistake could affect multiple services or teams.
+
+For these cases, spawn one read-only reviewer subagent without a separate user
+request. For other consequential designs or plans, use this review when explicitly
+requested. Give the reviewer a fresh context with the draft, its goal, relevant
+source references, and applicable scope, constraints and permissions. Omit the prior
+discussion and the author's conclusions. Ask for material ambiguities, missing
+assumptions and contradictions with the sources, using the evidence format above.
+If fresh context is unavailable, report that limitation. Existing approvals for
+implementation and external changes still apply.
 
 #### Simplicity
 
@@ -383,7 +407,8 @@ permission evidence before the dependent action.
 - Check `<layer>/scripts/` before improvising. A sequence of three or more commands run
   twice becomes a script (CLI args or env, `--help`, compact summary output).
 - Use one Sol agent by default. Add helpers only when explicitly authorized for the
-  current task; do not automatically route ordinary work to same-model or cheaper helpers.
+  current task or when [Review evidence](#review-evidence) calls for one independent
+  design reviewer.
 - For multiple files or long logs, read relevant sections and bounded output locally;
   file count or log length alone does not authorize delegation.
 - Never print a whole file or raw output when a line will do: `head`, `grep -c`, `wc -l`,
@@ -399,9 +424,9 @@ permission evidence before the dependent action.
   over ssh, and API calls that create, update or delete (POST/PUT/PATCH/DELETE to GitLab,
   YouTrack, Zabbix, cloud providers, ...).
 - Say what the command changes and where, then wait for an explicit yes. A yes covers only
-  that action; ask again for the next one. Exception: the second training-stage approval
-  above covers commit + branch push + MR creation/update for the reviewed task together;
-  it does not authorize other external changes.
+  that action. [Daily sync](#daily-sync) has standing approval for its own knowledge-base
+  Git operations. The second training-stage approval above covers commit + branch push +
+  MR creation/update for the reviewed task together.
 - No permission is needed for editing local files (including files in a repository
   checkout), or for read-only commands: `terraform plan`, `--check`/`--diff`, `kubectl get`,
   GET requests, reading logs.
@@ -423,7 +448,7 @@ case-insensitive matching and does not translate or interpret natural language.
    Repeat `-l` when both a system record and portable guidance are relevant, for
    example `-l current -l general`. If the layer is uncertain, omit the filter
    rather than guessing. Use `-s` only for a known metadata system name.
-3. Use default AND matching first. A normal empty result is exit1 with
+3. Use default AND matching first. A normal empty result is exit 1 with
    `kb-find: 0 notes` and no stderr; an exception, stderr or usage failure is a
    tool failure, not evidence that the knowledge is absent. Handle the failure
    before drawing a retrieval conclusion.
@@ -452,6 +477,11 @@ within the same question; this procedure does not authorize installing a search
 service or changing the search implementation.
 
 ### Search results and scoped decisions
+
+Search, index generation and local KB lint report unavailable directories as
+an incomplete check with exit 2. Absent default layers are optional when other
+layers are configured. An explicitly selected layer or an existing layer entry
+whose `knowledge/` directory cannot be read is an error.
 
 `kb_find.py` keeps literal AND/ANY matching. Ranking uses title/path/system term
 coverage, a one-term tie preference for living system maps and portable recipes,
@@ -571,9 +601,10 @@ The output begins with `Открытые задачи: N`, followed by Russian h
 ordinary `- description` bullet lists in file order. Use short Russian action titles,
 typically 6–12 words and at most 120 characters. No blank lines between items in a group;
 keep a blank line before each heading and before its list. Preserve useful task IDs and
-explicit deferral/proposal labels. Implementation details and full permission conditions
-remain in source TODO; listing grants no execution permission. Omit dates, checkboxes,
-source references and completed historical detail. Do not
+explicit deferral/proposal labels. Prefix titles of tasks marked `due YYYY-MM-DD:`
+with `YYYY-MM-DD — `, including future and overdue tasks. Implementation details and
+full permission conditions remain in source TODO; listing grants no execution permission.
+Omit other dates, checkboxes, source references and completed historical detail. Do not
 omit tasks, reorder or prioritize. Markdown headings define groups; free-standing prose
 is not a task. Fenced examples are ignored. Source TODO entries remain unchanged.
 With no matches, return `Открытых задач нет.`; a read error is an error, not zero tasks.
@@ -669,13 +700,21 @@ Normal invocations then run `agent_lint.py` when watched agent inputs changed si
 successful check. Later calls the same day therefore catch new instruction edits while
 skipping Git work. Identical successfully checked inputs produce no lint output.
 
+Git synchronization requires a checkout of `main` and a configured `origin`. The
+sync date is written after a successful push of the synchronized `main` commit.
 Before publication, staged KB lint must finish with its final summary and the matching
 exit status (0 without errors, 1 with findings). A checker crash, incomplete output or
 inconsistent status stops sync before commit/pull/push, shows the checker diagnostics,
 and preserves staged changes, `.sync-notes` and the prior sync date. Completed nonsecret
 findings remain report-only; detected credentials still block publication.
+Sync stages and checks changes in a private Git index and installs it after commit.
+Rejected files or messages leave the original staging and sync notes intact.
+The credential check reads whole changed blobs regardless of extension and checks
+the generated commit message, including the text from `.sync-notes`. It reports
+findings without credential values, blocks staged `.env` files, and examines plain
+content without unpacking archives.
 
-The commit subject lists the touched areas (`Sync 2026-09-24: youdo, general/linux`).
+The commit subject lists the touched areas (`Sync 2026-09-24: personal, general/linux`).
 After each completed task, append one concise final summary to `~/ai/.sync-notes`:
 `- <system>: <final result and why>; <key check>; <material remaining risk if any>`.
 Keep intermediate steps, commands and approval evidence in the task log rather than adding

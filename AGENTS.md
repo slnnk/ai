@@ -56,10 +56,9 @@ Read and follow triggered sections of `~/ai/general/knowledge/README.md` (README
 
 ## External changes
 
-Before EACH command changing state outside local files, describe changes/location and
-wait for explicit yes; publication is the sole batch exception. Read-only/local edits need
-no permission subject to repo gates. Before external operations read README "External
-changes"; TODO grants no permission.
+Before external operations read README "External changes". Describe each change/location
+and wait for explicit yes, with the daily sync and publication exceptions defined there.
+Read-only/local edits remain subject to repo gates. TODO grants no permission.
 
 ## Progress and execution status
 

@@ -199,6 +199,7 @@ raise SystemExit(1 if mode=='error' else 0)
         scripts=self.root/'general/scripts'; scripts.mkdir(parents=True)
         for name in ['agent_lint.py','ai-sync.sh']:
             shutil.copyfile(SCRIPTS/name,scripts/name)
+        (scripts/'agent_metrics.py').write_text('raise SystemExit(0)\n')
         update_marker = self.base / 'update-calls'
         (scripts/'agnix_update.py').write_text(
             'from pathlib import Path\np=Path(' + repr(str(update_marker)) + ')\n'

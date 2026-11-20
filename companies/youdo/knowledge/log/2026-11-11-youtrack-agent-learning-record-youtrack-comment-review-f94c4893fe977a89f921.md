@@ -1,7 +1,7 @@
 ---
 system: youtrack
 status: verified
-checked: 2026-11-17
+checked: 2026-11-19
 tags: [agents, learning]
 ---
 # Agent learning: youtrack-comment-review
@@ -58,6 +58,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "current/knowledge/log/2026-11-17-dev-deployment-devops-923-kyc-plan.md#approved-youtrack-comment-publication-2026-11-17",
       "target": "/home/slnnk/ai/companies/youdo/CONTEXT.md"
+    },
+    {
+      "at": "2026-11-19T14:39:41.942603+00:00",
+      "cause": "",
+      "event_id": "devops-927-comment-74-125679",
+      "expected": "Read issue context and applicable preferences, prepare the exact concise Markdown draft, check facts and relevant MR URLs, obtain explicit posting/update confirmation, verify readback and record original/final wording plus applicable outcomes.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "DevOps-927 work log: checked issue and existing comments, posted user-provided wording with MR link after explicit request, verified exact text by GET.",
+      "target": "/home/slnnk/ai/companies/youdo/CONTEXT.md"
     }
   ],
   "expected": "Read issue context and applicable preferences, prepare the exact concise Markdown draft, check facts and relevant MR URLs, obtain explicit posting/update confirmation, verify readback and record original/final wording plus applicable outcomes.",
@@ -82,7 +93,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "youtrack",
   "target": "/home/slnnk/ai/companies/youdo/CONTEXT.md",
   "task_id": "",
-  "updated": "2026-11-17T18:44:44.318473+00:00",
+  "updated": "2026-11-19T14:39:41.942603+00:00",
   "version": 1
 }
 ```
