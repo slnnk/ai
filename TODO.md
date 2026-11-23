@@ -143,7 +143,7 @@ Published work and superseded proposals are recorded in the source note. The fol
 - [x] Verify stand pause/stop and temporary environment cleanup never scale down/delete the permanent ai-qa controller/namespace. (2026-11-12) — [src](current/knowledge/log/2026-11-12-ai-qa-devops-918-vk-helm-deployment-plan.md) Closed by user on2026-11-13: developer-owned lifecycle verification, duplicating the previously closed developer QA follow-up; not verified by DevOps.
 ### dev-deployment (B2B ephemeral dev, DevOps-832, DevOps-A-50)
 
-- [ ] DevOps-884: continue staged rollout of 18 shared services in dev-single, including legacy CI and model dependencies, and migrate ai-qa image publication to Nexus in dev-ai-qa (proposal 2026-11-19) — [src](current/knowledge/log/2026-11-19-dev-deployment-devops-884-all-services-plan.md)
+- [ ] DevOps-884: continue staged rollout of 17 shared services in dev-single, including legacy CI and model dependencies, and migrate ai-qa image publication to Nexus in dev-ai-qa (scope updated 2026-11-23) — [src](current/knowledge/log/2026-11-19-dev-deployment-devops-884-all-services-plan.md)
 
 - [x] DevOps-923: KYC production deployed and monitoring template removed. MR !6 merged; master 143552 and child 143553 succeeded, master-49 released, public and internal health HTTP 200. User closed DevOps-923 and YouTrack GET confirmed Fixed. Production comment addendum drafted at user request. Independent nginx -t and business canary were not run. (2026-11-18) — [src](current/knowledge/log/2026-11-17-dev-deployment-devops-923-kyc-plan.md#final-production-rollout-and-youtrack-addendum-draft-2026-11-18)
 
@@ -365,6 +365,9 @@ QA-owned, not DevOps: `ignoreFailures=true`; smoke/regress tag separation; Billi
 - [ ] M-K0056: monitor Selenium Grid on `4444` in Zabbix; check active-checks timeout to `172.24.0.107:10051` (2026-08-13) — [src](companies/youdo/knowledge/log/2026-08-13-android-farm-selenium-hub-zabbix.md) — Reviewed2026-11-12: fresh Zabbix has84OSitems/noGrid4444check/0active-checkitems. Remaining gap is application-level Grid monitoring; standalone old active-check timeout diagnosis is superseded as unproven current need. [audit](current/knowledge/log/2026-11-12-android-farm-backlog-relevance-audit.md)
 
 ### Jenkins recovery (DevOps-892)
+
+- [x] Restore Lenochka version lookups for Jenkins and BuildsInfo (2026-11-23) — [src](current/knowledge/log/2026-11-23-lenochka-versions-incident.md) User edited !10149 and confirmed all reported functions work. Authenticated Lenochka and BuildsInfo reads returned 200.
+- [x] Proposal: restrict Lenochka release search to titles, validate version matches, and complete HTTP responses on errors (2026-11-23) — [src](current/knowledge/log/2026-11-23-lenochka-versions-incident.md) Cancelled at the user’s request on 2026-11-23.
 
 - [ ] Fix failed-test post-build trigger in `youdo_web_testing_one/two/three`: replace stale Jenkins API host, move hard-coded auth to Credentials and rotate, verify enqueue (2026-10-16) — [src](companies/youdo/knowledge/log/2026-10-16-jenkins-selenium-vk-grid-session-eof.md)
 

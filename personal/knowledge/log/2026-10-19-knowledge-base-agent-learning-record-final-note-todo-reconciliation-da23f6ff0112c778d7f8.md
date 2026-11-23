@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-11-18
+checked: 2026-11-23
 tags: [agents, learning]
 ---
 # Agent learning: final-note-todo-reconciliation
@@ -69,6 +69,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "personal/knowledge/log/2026-11-18-agents-p15-adoption-decision.md#changes-and-status: TODO closure, P1.4 and research cross-links read back; conditional P2.1/P3.1 entries preserved.",
       "target": "/home/slnnk/ai/AGENTS.md"
+    },
+    {
+      "at": "2026-11-23T15:48:34.637965+00:00",
+      "cause": "",
+      "event_id": "lenochka-incident-2026-11-23-recovery-closeout",
+      "expected": "Before the final response after substantial work, review only notes created or changed for the current task against TODO: track remaining actions with source links, reconcile completed/cancelled/deferred statuses and supersede stale directions preserving history. Optional improvements remain proposals, not execution permission.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "/home/slnnk/ai/current/knowledge/log/2026-11-23-lenochka-versions-incident.md",
+      "target": "/home/slnnk/ai/AGENTS.md"
     }
   ],
   "expected": "Before the final response after substantial work, review only notes created or changed for the current task against TODO: track remaining actions with source links, reconcile completed/cancelled/deferred statuses and supersede stale directions preserving history. Optional improvements remain proposals, not execution permission.",
@@ -93,7 +104,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "knowledge-base",
   "target": "/home/slnnk/ai/AGENTS.md",
   "task_id": "",
-  "updated": "2026-11-18T20:14:53.885422+00:00",
+  "updated": "2026-11-23T15:48:34.637965+00:00",
   "version": 1
 }
 ```

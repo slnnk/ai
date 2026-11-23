@@ -9,6 +9,8 @@ tags: [jenkins, recovery, vkcloud]
 
 ## Summary
 
+2026-11-23 incident: Lenochka release search included monolith !10149 based on its description, and the version parser threw without completing the HTTP response. This stalled `dynamic_deploy` version selection and broke the BuildsInfo home page. The user corrected the MR description and confirmed recovery. Authenticated Lenochka and BuildsInfo GET requests returned HTTP 200. See the [incident log](../log/2026-11-23-lenochka-versions-incident.md) for verified evidence and current recovery status.
+
 Current user acceptance 2026-11-16: Jenkins workflows, backups and settings already work; the overall DevOps-892 recovery backlog item is closed. Earlier pending statements below are historical verification limits, not current recovery blockers. No new independent runtime or backup check was performed for this closure. Monitoring remains separately deferred. [Acceptance](../log/2026-10-13-jenkins-devops-892-vk-recovery-plan.md#user-acceptance-november-16).
 
 2026-10-21 network incident: user confirmed full recovery of UI, dynamic_deploy monolith/static versions and youdo_web_testing_one branches. Public login/assets GET200; container DNS and unauthenticated GitLab/version API probes reachable. No agent changes/restarts/builds; transient data-loading cause unproven. Host80 maps to container8080. [Recovery evidence](../log/2026-10-21-vk-cloud-inter-subnet-access-outage.md).
