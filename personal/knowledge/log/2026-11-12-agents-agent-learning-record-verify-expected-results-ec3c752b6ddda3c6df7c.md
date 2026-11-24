@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-19
+checked: 2026-11-24
 tags: [agents, learning]
 ---
 # Agent learning: verify-expected-results
@@ -135,6 +135,17 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "DevOps-927 work log: local image built, final linkage verified, and HEIC/AVIF smoke-tested before delivery.",
       "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-23T23:14:30.102456+00:00",
+      "cause": "CI baseline comparison, chart render and isolated exact-image startup fixtures verified the preview. Kubernetes cold start remains unverified.",
+      "event_id": "devops-884-subcategory-downloader-preflight-2026-11-24",
+      "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "current/knowledge/log/2026-11-19-dev-deployment-devops-884-all-services-plan.md#subcategory-predictor-downloader-mr-preflight-2026-11-24",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
   "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
@@ -159,7 +170,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-19T13:55:05.484842+00:00",
+  "updated": "2026-11-23T23:14:30.102456+00:00",
   "version": 1
 }
 ```

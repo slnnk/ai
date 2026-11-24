@@ -8,7 +8,7 @@ tags: [b2b, ephemeral-dev, jenkins, gitlab-ci, helm, kubernetes, yandex-dev, roa
 
 ## Summary
 
-DevOps-884 targets 17 shared applications in permanent namespace `dev-single` after the user excluded `youdo-business-doc-generator` on 2026-11-23. The generator deploys with ephemeral B2B environments. Thirteen shared releases were Ready on 2026-11-23 after mailer joined textvalidation and youdo-call-service with per-service PostgreSQL instances. The user confirmed `ai-qa` stays in `dev-ai-qa`, with separate work to move its image publication to Nexus. [Current assessment](../../log/2026-11-19-dev-deployment-devops-884-all-services-plan.md).
+DevOps-884 targets 17 shared applications in permanent namespace `dev-single` after the user excluded `youdo-business-doc-generator` on 2026-11-23. The generator deploys with ephemeral B2B environments. Fifteen shared releases were Ready on 2026-11-24 after daily-compilations became the first Data rollout. The user confirmed `ai-qa` stays in `dev-ai-qa`, with separate work to move its image publication to Nexus. [Current assessment](../../log/2026-11-19-dev-deployment-devops-884-all-services-plan.md).
 
 DevOps-884 shared Helm deployments currently target VK through group `KUBECONFIG_DEV`. The first TaskQualityControl install failed when the Nexus pull host was absent. The `sysadmins` group now supplies it, and the fresh pipeline 143937 deployed successfully. [Verified failure and access](../../log/2026-11-19-dev-deployment-devops-884-all-services-plan.md#taskqualitycontrol-dev-image-failure-confirmed-in-vk-2026-11-23).
 
