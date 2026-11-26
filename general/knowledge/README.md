@@ -242,6 +242,12 @@ load newly applicable rules when scope changes. A path, summary or previous clai
 that a rule was loaded is not the rule text. This avoids duplicate reads, not required
 sync calls, scoped rule queries or checks of mutable operational state.
 
+For example, when the user asks you to explain the previous answer within the
+same task, use the current instructions and source excerpts already in context.
+Before reopening a source, identify which excerpt you need and why the context is
+insufficient. Reopen it if the excerpt is missing, its contents may have changed,
+or the follow-up raises a new point that requires checking that source.
+
 ## Verifiable results
 
 Before nontrivial changes, define the expected result and a proportionate way to
@@ -411,6 +417,14 @@ permission evidence before the dependent action.
   design reviewer.
 - For multiple files or long logs, read relevant sections and bounded output locally;
   file count or log length alone does not authorize delegation.
+- For code navigation by symbol or responsibility, use `agentgrep outline`, `find`
+  or `trace` when installed. Use `rg` for exact matches and verify candidate
+  definitions in the source.
+- For complex call chains with two known endpoints in a checkout under `~/git`,
+  use `graphify path` on demand and verify its edges in the source. Build or
+  update the selected repository's local graph as needed, without background
+  watchers or hooks. Store it outside the checkout under `~/ai-data/graphify/`.
+  See [Graphify setup](knowledge-base/setup-another-pc.md#on-demand-graphify).
 - Never print a whole file or raw output when a line will do: `head`, `grep -c`, `wc -l`,
   `--quiet`.
 - Reusable prompts go to `<layer>/prompts/<name>.md` with a `model:` tier line.
@@ -507,6 +521,13 @@ read the indicated source section and other matching sections when needed. A com
 excerpt does not establish a complete or correct answer. Do not equate a page or excerpt
 with full inspection; follow continuation or read the source before drawing a conclusion
 that depends on omitted content.
+
+When the source file is known, use `kb_find.py --outline NOTE` to see its heading
+hierarchy with source line numbers and anchors. Then use `kb_find.py --section NOTE ANCHOR`
+to read the selected heading and its subsections. Both accept a Markdown path relative
+to the knowledge base or an absolute path inside it. The section command prints source
+Markdown, including any fenced examples in the selected text. Choose the needed
+section using the search result and its scoped decision when present.
 
 When a user cancels or supersedes an instruction, keep historical evidence and add
 these optional scalar frontmatter fields to the affected note. All five are required

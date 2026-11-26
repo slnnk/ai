@@ -4,6 +4,7 @@
 AND is the default; use --any for alternatives, -l for layers, -s for a system.
 -n limits displayed context lines (default 5). --files keeps path-only output;
 --json provides structured results for repeatable retrieval checks.
+Use --outline NOTE or --section NOTE ANCHOR to navigate a known Markdown file.
 """
 import argparse
 import datetime
@@ -190,9 +191,35 @@ def context(lines, body_start, pats, budget):
     return selected, [{"line": i + 1, "text": clip(lines[i], pats)} for i in range(start, start + width)]
 
 
+def navigate_note(note, anchor=None):
+    root = AI_ROOT.resolve()
+    path = (root / Path(note).expanduser()).resolve()
+    if root not in path.parents or path.suffix != ".md":
+        raise ValueError("expected a Markdown file inside the knowledge base")
+
+    lines = path.read_text().splitlines(keepends=True)
+    _, body_start = parse_frontmatter(lines)
+    headings = list(markdown_headings(lines, body_start))
+    if anchor is None:
+        for index, level, title, heading_anchor in headings:
+            print(f"{index + 1}: {'#' * level} {title} [#{heading_anchor}]")
+        if not headings:
+            print("kb-find: no headings")
+        return
+
+    if anchor.startswith("#"):
+        anchor = anchor[1:]
+    for offset, (start, level, _, heading_anchor) in enumerate(headings):
+        if heading_anchor == anchor:
+            end = next((index for index, depth, _, _ in headings[offset + 1:] if depth <= level), len(lines))
+            sys.stdout.write("".join(lines[start:end]))
+            return
+    raise ValueError(f"heading anchor not found: #{anchor}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("keywords", nargs="+")
+    ap.add_argument("keywords", nargs="*")
     ap.add_argument("-l", "--layer", action="append")
     ap.add_argument("-s", "--system")
     ap.add_argument("-n", "--lines", type=int, default=5, help="context line budget per note (default 5)")
@@ -203,7 +230,23 @@ def main():
     output = ap.add_mutually_exclusive_group()
     output.add_argument("--files", action="store_true")
     output.add_argument("--json", action="store_true")
+    output.add_argument("--outline", metavar="NOTE", help="show headings in a known Markdown file")
+    output.add_argument("--section", nargs=2, metavar=("NOTE", "ANCHOR"), help="print one section and its subsections")
     args = ap.parse_args()
+    if args.outline is not None or args.section:
+        if args.keywords or args.layer or args.system or args.any or args.regex or args.offset:
+            ap.error("note navigation cannot be combined with search arguments")
+        try:
+            if args.outline is not None:
+                navigate_note(args.outline)
+            else:
+                navigate_note(*args.section)
+        except (OSError, RuntimeError, ValueError) as e:
+            print("kb-find: error: " + str(e), file=sys.stderr)
+            return 2
+        return 0
+    if not args.keywords:
+        ap.error("provide search keywords, --outline or --section")
     if args.lines < 0 or args.max_notes < 0 or args.offset < 0:
         ap.error("line and note limits must be nonnegative")
     try:

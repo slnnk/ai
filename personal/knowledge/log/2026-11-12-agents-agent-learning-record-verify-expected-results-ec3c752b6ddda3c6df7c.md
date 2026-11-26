@@ -1,7 +1,7 @@
 ---
 system: agents
 status: verified
-checked: 2026-11-24
+checked: 2026-11-25
 tags: [agents, learning]
 ---
 # Agent learning: verify-expected-results
@@ -146,6 +146,50 @@ Correction evidence and scoped application history. Canonical instructions remai
       "rule_loaded": "yes",
       "source": "current/knowledge/log/2026-11-19-dev-deployment-devops-884-all-services-plan.md#subcategory-predictor-downloader-mr-preflight-2026-11-24",
       "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-24T21:53:55.399995+00:00",
+      "cause": "",
+      "event_id": "jcode-codex-cli-benchmark-2026-11-25-verified",
+      "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-25-jcode-codex-cli-benchmark.md#results",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-24T22:09:06.018483+00:00",
+      "cause": "",
+      "event_id": "jcode-kb-section-navigation-2026-11-25-verification",
+      "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-25-knowledge-base-jcode-section-navigation.md#verification",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-24T22:22:39.689550+00:00",
+      "cause": "",
+      "event_id": "jcode-navigation-feedback-2026-11-25-native-hook",
+      "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "personal/knowledge/log/2026-11-25-knowledge-base-jcode-navigation-feedback.md#codex-activation",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
+    },
+    {
+      "at": "2026-11-24T22:35:55.462539+00:00",
+      "cause": "",
+      "event_id": "youdo-graphify-code-pilot-2026-11-25-verification",
+      "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
+      "outcome": "pass",
+      "revision": 1,
+      "rule_loaded": "yes",
+      "source": "current/knowledge/log/2026-11-25-youdo-graphify-code-pilot.md",
+      "target": "/home/slnnk/ai/general/knowledge/README.md"
     }
   ],
   "expected": "Before nontrivial changes define the expected result and proportionate verification; before completion verify against those criteria and report confirmed facts and limitations; changed files or unrelated checks do not prove required behavior, and verification does not expand permissions.",
@@ -170,7 +214,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "agents",
   "target": "/home/slnnk/ai/general/knowledge/README.md",
   "task_id": "",
-  "updated": "2026-11-23T23:14:30.102456+00:00",
+  "updated": "2026-11-24T22:35:55.462539+00:00",
   "version": 1
 }
 ```

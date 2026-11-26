@@ -1,7 +1,7 @@
 ---
 system: knowledge-base
 status: verified
-checked: 2026-11-18
+checked: 2026-11-25
 tags: [agents, learning]
 ---
 # Agent learning: keep-other-pc-setup-guide-current
@@ -14,7 +14,19 @@ Correction evidence and scoped application history. Canonical instructions remai
 {
   "created": "2026-11-18T19:20:39.682708+00:00",
   "decisions": [],
-  "evaluations": [],
+  "evaluations": [
+    {
+      "at": "2026-11-24T21:51:10.905511+00:00",
+      "cause": "",
+      "event_id": "jcode-codex-benchmark-2026-11-25-setup-guide",
+      "expected": "Update the other-PC setup guide in the same change when adding tools or changing setup requirements.",
+      "outcome": "pass",
+      "revision": 2,
+      "rule_loaded": "yes",
+      "source": "general/knowledge/knowledge-base/setup-another-pc.md#3-connect-instruction-and-skill-entry-points",
+      "target": "/home/slnnk/ai/general/knowledge/README.md#task-context-selection"
+    }
+  ],
   "expected": "Update the other-PC setup guide in the same change when adding tools or changing setup requirements.",
   "key": "keep-other-pc-setup-guide-current",
   "kind": "explicit",
@@ -37,7 +49,7 @@ Correction evidence and scoped application history. Canonical instructions remai
   "system": "knowledge-base",
   "target": "/home/slnnk/ai/general/knowledge/README.md#task-context-selection",
   "task_id": "",
-  "updated": "2026-11-18T19:21:23.265319+00:00",
+  "updated": "2026-11-24T21:51:10.905511+00:00",
   "version": 1
 }
 ```

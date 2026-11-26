@@ -4,6 +4,7 @@
 Default scope: shared KB instructions/skills and this machine's Claude/Codex settings.
 Additional files/directories may be supplied for repository-local agent instructions.
 No installation, model calls, fixes or Git operations. Reports omit source/message text.
+Use --check-links CLIENT to verify a full shared KB setup without running agnix.
 """
 import argparse
 import fcntl
@@ -242,6 +243,50 @@ def check(args):
     return 0
 
 
+def check_kb_links(root, home, client):
+    runtime = home / ('.' + client)
+    instruction = 'AGENTS.md' if client == 'codex' else 'prompt-overlay.md'
+    links = {runtime / instruction: root / 'AGENTS.md'}
+    current = root / 'current'
+    if current.is_symlink() and not current.is_dir():
+        print(f'FAIL {current}: broken company layer link')
+        return 1
+    for layer in ('general', 'current'):
+        skills = root / layer / 'skills'
+        if not skills.exists() and not skills.is_symlink():
+            continue
+        for skill in sorted(skills.iterdir()):
+            if skill.name.startswith('.') or not (skill / 'SKILL.md').is_file():
+                continue
+            destination = runtime / 'skills' / skill.name / 'SKILL.md'
+            if destination in links:
+                print('agent-links: ambiguous shared skill: ' + skill.name)
+                return 1
+            links[destination] = skill / 'SKILL.md'
+
+    failures = 0
+    for destination, source in links.items():
+        link = destination.parent if destination.name == 'SKILL.md' else destination
+        if not source.is_file():
+            status = 'source missing'
+        elif link.is_symlink() and not destination.is_file():
+            status = 'broken link'
+        elif not link.exists():
+            status = 'missing link'
+        elif not link.is_symlink():
+            status = 'local copy, expected symlink'
+        elif destination.resolve() != source.resolve():
+            status = 'wrong target'
+        else:
+            print(f'OK {link}')
+            continue
+        failures += 1
+        expected = source.parent if source.name == 'SKILL.md' else source
+        print(f'FAIL {link}: {status} (expected {expected})')
+    print(f'agent-links: {len(links) - failures}/{len(links)} valid for {client}')
+    return int(bool(failures))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('paths', nargs='*', help='additional repository files or instruction/skill directories')
@@ -249,12 +294,21 @@ def main():
     parser.add_argument('--runtime-home', type=Path, default=Path.home(), help='override only for isolated tests/other profiles')
     parser.add_argument('--state-dir', type=Path, default=Path(os.environ.get('AI_LINT_STATE_DIR', str(Path.home() / 'ai-data/agnix'))))
     parser.add_argument('--agnix', help='executable override, otherwise managed install, legacy pin, then PATH')
+    parser.add_argument('--check-links', choices=('codex', 'jcode'), help='check shared instructions and skill links only')
     parser.add_argument('--force', action='store_true', help='check even if successful input hashes are unchanged')
     parser.add_argument('--timeout', type=float, default=30)
     args = parser.parse_args()
     args.root = args.root.expanduser().absolute()
     args.runtime_home = args.runtime_home.expanduser().absolute()
     args.state_dir = args.state_dir.expanduser().absolute()
+    if args.check_links:
+        if args.paths:
+            parser.error('--check-links does not accept additional paths')
+        try:
+            return check_kb_links(args.root, args.runtime_home, args.check_links)
+        except (OSError, RuntimeError):
+            print('agent-links: NOT CHECKED: source or runtime path unreadable')
+            return 1
     try:
         args.state_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
         with (args.state_dir / 'check.lock').open('a') as lock:

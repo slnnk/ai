@@ -47,6 +47,16 @@ For each repository task, keep original/final scope, branch/base, commit subject
 
 For each YouTrack comment, read the issue and relevant existing comments, retrieve task-scoped preferences, and prepare concise Russian Markdown with the requested content, factual outcomes and clickable MR links where relevant. Follow the latest user-approved format for that task; do not impose another task's format. Check task identity, omissions, links and unverified claims before showing the exact draft for approval. Update an existing matching summary instead of duplicating it; preserve prior performed-work evidence. Post/update only after explicit confirmation, read back the exact text and URLs, and record original/final wording, user edits and applicable rule outcomes in the task log. Drafting is not publication or issue closure.
 
+### Five-task first-delivery check
+
+For the next five distinct company tasks where the agent shows a diff, a merge
+request proposal, or a YouTrack comment draft, keep a stable pointer to the first
+version shown in the existing task log before feedback. Count each task once using
+its first qualifying artifact. Use the existing daily task metrics to record
+whether substantive corrections were needed. Required approval, useful clarification,
+and changed requirements are separate from corrections. Keep unsupported outcomes
+unknown. Add each task log to the [five-task review](knowledge/log/2026-11-20-gitlab-ci-continuous-learning-review.md#five-task-follow-up-november-25).
+
 ## Conventions
 
 - automation-services secrets (user decision, 2026-11-11): all real service/runner/cache credentials belong in HashiCorp Vault; repository configuration references them through the existing inventory fetch mechanism, without literals or application-secret environment fallback. Migrate legacy values within agreed scope; this grants no Vault writes, rotation, publication or deployment. [Policy](knowledge/systems/automation-services/local-vault-ansible-access.md#repository-secret-policy-user-decision-november-11).

@@ -4,6 +4,7 @@
 Usage:
     kb_lint.py              check all layers, print findings, exit 1 on errors
     kb_lint.py --staged     check only files staged in git (used by ai-sync.sh)
+    kb_lint.py --paths FILE [FILE ...]  check selected working-tree Markdown files
     kb_lint.py --commit-message FILE  check a generated Git commit message for credentials
     kb_lint.py --quiet      print only the summary line
 
@@ -176,9 +177,9 @@ def decode_blob(blob):
     return blob.decode("utf-8-sig", errors="replace")
 
 
-def lint_inputs(staged, report_secret):
+def lint_inputs(staged, report_secret, paths=None):
     if not staged:
-        for path in sorted(set(working_notes())):
+        for path in sorted(set(working_notes() if paths is None else paths)):
             text = path.read_text(errors="replace")
             if find_cause(text, SECRET_RES):
                 report_secret(path, "looks like a credential")
@@ -201,7 +202,9 @@ def main():
     inputs = ap.add_mutually_exclusive_group()
     inputs.add_argument("--staged", action="store_true")
     inputs.add_argument("--commit-message", type=pathlib.Path)
+    inputs.add_argument("--paths", nargs="+", type=pathlib.Path)
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--codes-only", action="store_true", help="omit diagnostic details that quote source text")
     args = ap.parse_args()
 
     if args.commit_message is not None:
@@ -215,20 +218,39 @@ def main():
             return 1
         return 0
 
+    paths = None
+    if args.paths is not None:
+        root = AI_ROOT.resolve()
+        paths = []
+        for path in args.paths:
+            path = (root / path.expanduser()).resolve()
+            if root not in path.parents or path.suffix != ".md":
+                ap.error("--paths requires Markdown files inside the knowledge base")
+            paths.append(AI_ROOT / path.relative_to(root))
+
     leak_res = load_leak_patterns()
     errors, warnings = [], []
 
     def err(f, code, msg):
-        errors.append(f"E {code:<11} {f.relative_to(AI_ROOT)}: {msg}")
+        if args.codes_only:
+            errors.append(f"E {code:<11} {str(f.relative_to(AI_ROOT))!r}")
+        else:
+            errors.append(f"E {code:<11} {f.relative_to(AI_ROOT)}: {msg}")
 
     def warn(f, code, msg):
-        warnings.append(f"W {code:<11} {f.relative_to(AI_ROOT)}: {msg}")
+        if args.codes_only:
+            warnings.append(f"W {code:<11} {str(f.relative_to(AI_ROOT))!r}")
+        else:
+            warnings.append(f"W {code:<11} {f.relative_to(AI_ROOT)}: {msg}")
 
     def report_secret(path, message):
         # Escape newlines/control characters and never show credential bytes.
-        errors.append(f"E secret      {str(path.relative_to(AI_ROOT))!r}: {message}")
+        if args.codes_only:
+            errors.append(f"E secret      {str(path.relative_to(AI_ROOT))!r}")
+        else:
+            errors.append(f"E secret      {str(path.relative_to(AI_ROOT))!r}: {message}")
 
-    for f, text in lint_inputs(args.staged, report_secret):
+    for f, text in lint_inputs(args.staged, report_secret, paths):
         rel = f.relative_to(AI_ROOT)
         is_note = f.name not in SKIP_NAMES and "knowledge" in rel.parts and f.parent != AI_ROOT
 

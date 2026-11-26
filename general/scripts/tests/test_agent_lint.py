@@ -178,6 +178,57 @@ raise SystemExit(1 if mode=='error' else 0)
         (replacement/'references/stage.md').write_text('Changed runtime reference')
         self.run_lint(); self.assertEqual(self.calls(),3)
 
+    def test_check_links_detects_copies_broken_links_and_old_company(self):
+        current = self.root / 'current'
+        company_a = self.root / 'companies/a'
+        company_b = self.root / 'companies/b'
+        for company in (company_a, company_b):
+            skill = company / 'skills/company-skill'
+            skill.mkdir(parents=True)
+            (skill / 'SKILL.md').write_text('# Company skill\n')
+        current.symlink_to(company_a)
+        runtime = self.runtime / '.jcode'
+        runtime_skills = runtime / 'skills'
+        runtime_skills.mkdir(parents=True)
+        overlay = runtime / 'prompt-overlay.md'
+        overlay.symlink_to(self.instructions)
+        shared_link = runtime_skills / 'example'
+        shared_link.symlink_to(self.skill)
+        company_link = runtime_skills / 'company-skill'
+        company_link.symlink_to(company_a / 'skills/company-skill')
+        result = self.run_lint('--check-links', 'jcode')
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn('3/3 valid', result.stdout)
+
+        current.unlink()
+        current.symlink_to(company_b)
+        self.assertIn('company-skill: wrong target', self.run_lint('--check-links', 'jcode').stdout)
+
+        shared_link.unlink()
+        shared_link.symlink_to(self.base / 'missing')
+        overlay.unlink()
+        overlay.write_text(self.instructions.read_text())
+        result = self.run_lint('--check-links', 'jcode')
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn('example: broken link', result.stdout)
+        self.assertIn('prompt-overlay.md: local copy', result.stdout)
+        current.unlink()
+        current.symlink_to(self.base / 'missing')
+        result = self.run_lint('--check-links', 'jcode')
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn('current: broken company layer link', result.stdout)
+        self.assertEqual(self.calls(), 0)
+        self.assertFalse(self.state.exists())
+
+    def test_check_links_selects_codex_instruction_entry_point(self):
+        runtime = self.runtime / '.codex'
+        (runtime / 'skills').mkdir(parents=True)
+        (runtime / 'AGENTS.md').symlink_to(self.instructions)
+        result = self.run_lint('--check-links', 'codex')
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn(f'OK {runtime / "AGENTS.md"}', result.stdout)
+        self.assertIn('example: missing link', result.stdout)
+
     def test_instruction_aliases_keep_tool_specific_filenames(self):
         for directory,name in [('.codex','AGENTS.md'),('.claude','CLAUDE.md')]:
             folder=self.runtime/directory; folder.mkdir()

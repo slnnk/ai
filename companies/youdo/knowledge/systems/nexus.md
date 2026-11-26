@@ -18,6 +18,24 @@ Fresh Nexus3.96.4 deployed on `10.18.24.233` after explicit approval using exist
 
 User clarification2026-11-05: old Docker image cleanup is performed by the separate `nexus-cleaner` service; Nexus compaction physically removes soft-deleted blobs afterward. Distinguish these roles in incident/task summaries; do not imply built-in Cleanup service is the sole producer of deleted Docker data. Cleaner recovery log confirms a successful run and108acceptedDELETEs; exact per-blob origin was not measured. Built-in unused-asset cleanup and repository cleanup tasks coexist. [Evidence](../log/2026-10-20-nexus-cleaner-recovery-assessment.md), [DevOps-910 clarification](../log/2026-11-05-nexus-devops-910-disk-diagnosis.md#cleaner-attribution-correction).
 
+## Data disk exhaustion on November 25
+
+Nexus logged ENOSPC at 15:51–16:06 MSK, with 47 HTTP 500 responses recorded in the request log during those minute buckets. At 17:44 MSK, `/data` was 98% used with 4.56 GiB free and `docker-hosted` accounted for about 164.9 GiB of content. Status and writable endpoints returned 200, and successful Docker writes were observed. All 12 compactions last reported OK, including `docker-hosted` at 17:18. Reclaimed bytes were unverified. [Read-only diagnosis](../log/2026-11-25-nexus-data-disk-capacity.md).
+
+Cleaner follow-up: Nexus accepted cleaner manifest DELETEs daily from November 11 through 25, including 32 at the November 25 scheduled 04:00 MSK run and 12 at 17:17. The user-triggered 17:44 run finished with exit 0, 43 successful search requests and no DELETEs. Scheduled Docker compaction ran at 03:00 MSK, before cleaner. Available space remained 4.6 GiB at 17:47. [Cleaner evidence](../log/2026-11-25-nexus-data-disk-capacity.md#cleaner-follow-up).
+
+After the user reduced the age threshold, the 17:57 run entered a restart loop. Nexus logged 265 accepted DELETEs and 20 subsequent 404s. Each failed request repeated a path and digest already accepted. The allocation had 21 restarts at the last check. [Restart-loop evidence](../log/2026-11-25-nexus-data-disk-capacity.md#cleaner-restart-loop-after-retention-change).
+
+The 18:03 Docker compaction completed OK with zero-day age and six empty directories removed in its log. Afterward only 161 MiB of soft-deleted payload remained, while about 165 GiB of layer payload was not marked deleted. The task list contains no `repository.docker.gc`. Potential reclaimable layer bytes are unknown. [Compaction evidence](../log/2026-11-25-nexus-data-disk-capacity.md#compaction-after-the-reduced-retention-run).
+
+The user subsequently created Docker GC for `docker-hosted`, daily at 00:45 MSK with a 24-hour deployment offset. The initial 18:11 run was in progress when checked at 18:12. [Task verification](../log/2026-11-25-nexus-data-disk-capacity.md#user-created-docker-gc-task).
+
+The initial GC completed at 18:12:39 and reported 18,352 layer removals. The following compaction completed at 18:13:35. At 18:15 `/data` still had 4.08 GiB free and the filesystem scan found only 108 MiB soft-deleted. The next Docker asset cleanup was scheduled at 18:30, and its outcome was not observed. [First-run evidence](../log/2026-11-25-nexus-data-disk-capacity.md#first-docker-gc-and-compaction-result).
+
+Storage recovered after the administrator ran Docker asset blob cleanup at 18:16:19, followed by compaction at 18:16:44. Both finished OK. Available space increased by 123.50 GiB to 127.58 GiB at 18:22, with `/data` 32% used and Nexus status/writable HTTP 200. This supersedes the narrow capacity margin reported earlier. [Recovery verification](../log/2026-11-25-nexus-data-disk-capacity.md#storage-recovery-verified).
+
+The 18:22 cleaner child still restarted on duplicate manifest DELETEs after recovery, then was stopped. The periodic parent remains enabled at 04:00 MSK. [Cleaner follow-up](../log/2026-11-25-nexus-data-disk-capacity.md#cleaner-errors-after-storage-recovery).
+
 ## Active storage outage (2026-11-05)
 
 [Android publish job3273026](../log/2026-11-05-nexus-android-publish-job3273026-disk-full.md) got two upstream HTTP500s at18:55:07 Moscow but appeared successful because curl lacks HTTP-error checks. At19:05 the Nexus `/data` disk is100%used/0available and Docker output confirms ENOSPC plus non-writable blob stores. File request logging stopped18:52:58; later request totals may be incomplete. No cleanup/resize/retry performed. This supersedes earlier availability statements for current write health; restoration remains an open proposal.
@@ -45,6 +63,10 @@ DevOps-910 closure accepted on user report2026-11-05. Incident remediation and12
 Product Android MR2922 uses image19 with preinstalled SDK36 and shared dependency key `gradle-cache`. Same-SHA/same-runner cold feature3279317 and warm retry3279322 both succeed; cache restore verified in7s. Nexus Gradle8.13 requests in exact script windows fall2,596to0 (all cold maven-public,319JAR downloads); warm has no Gradle requests of any version. Logs cover both intervals with records every minute/parser failures0; bounded product/autotest job overlap check supports attribution. Job durations16m40s versus15m49s, full compilation remains. Cross-runner reuse, sustained load and rolling-limit effect unverified. Pipeline notify failure is the existing AND-only task-ID handling on the DevOps branch. [Detailed verification and limits](../log/2026-11-05-nexus-devops-904-android-product-cache-proposal.md).
 
 User merge confirmation: AndroidMR2922 merged into develop asc1ea7823 on2026-11-05; BusinessMR3918 merged into master as7efa6508 (squash e2d91aae). Both independently GET-verified; post-merge pipeline status unavailable after API timeout. Cross-runner and sustained rolling-limit verification remain open; no new execution permission inferred. [Android evidence](../log/2026-11-05-nexus-devops-904-android-product-cache-proposal.md), [Business evidence](../log/2026-11-05-nexus-business-gates-recent-cache-check.md). This supersedes open/unmerged statements in the historical follow-ups below.
+
+## Request-limit check (2026-11-25)
+
+DevOps-904: November 16–24 Moscow gives nine complete calendar days below both the 100,000 rolling 24-hour limit and the provisional 80,000 target. Maximum 65,109 on November 20 at 12:41:56, leaving 34,891 of headroom. Total through November 25 02:00:30: 339,802. NuGet accounts for 174,026 including 102,065 background workload checks. Docker accounts for 111,739. Nine monolith build windows cover 8,316 legacy npm and 15,411 legacy NuGet requests in the peak, with cache extraction verified for all nine. API reports 14,802 current components and a November high water of 15,078 against 40,000. No HTTP 402/429/5xx in the observed logs. Observed-period limit check complete; existing remediation and source-specific verification remain open. [Table, attribution and limits](../log/2026-11-25-nexus-nov16-25-devops-904-requests.md).
 
 ## Request-limit check (2026-11-10)
 

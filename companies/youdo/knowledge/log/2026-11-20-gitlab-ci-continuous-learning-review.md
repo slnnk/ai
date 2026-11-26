@@ -70,6 +70,21 @@ Keep the two repository approvals and exact-comment confirmation active. The obs
 
 Saved this report, linked it from the November 11 decision and existing Git workflow map, and closed the dated item in central TODO. Completed the bounded review using existing local evidence. No live GitLab/YouTrack audit, project publication or deployment was performed. No task commands or agents remain in the background.
 
+## Five-task follow-up November 25
+
+The user approved collecting evidence from the next five distinct qualifying tasks
+in normal work. The [company context](../../CONTEXT.md#five-task-first-delivery-check)
+defines eligibility and capture. For each case, add the task ID and a link to its
+first-delivery evidence. After five cases, report evidence coverage, first-delivery
+outcomes and substantive corrections, and identify any repeated issue supported by
+the artifacts. This small sample tests whether the evidence can be collected in
+ordinary work. After the fifth case, close the corresponding TODO item and mark
+the temporary collection instruction in company context complete.
+
+Cases collected at setup: 0 of 5. Existing approval rules apply.
+
+- `nexus-cleaner-20261125-shared-digest-diff` — [first diff and checks](2026-11-25-nexus-data-disk-capacity.md#first-delivery-of-the-cleaner-diff).
+
 ## Portable lesson
 
 [Correction learning](../../../../general/knowledge/agents/correction-learning.md).

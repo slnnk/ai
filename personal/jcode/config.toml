@@ -1,0 +1,8 @@
+[provider]
+default_provider = "openai"
+openai_reasoning_effort = "medium"
+openai_service_tier = "off"
+
+[hooks]
+post_tool_feedback = 'python3 "$HOME/ai/general/scripts/kb_post_edit.py"'
+post_tool_feedback_timeout_ms = 6000

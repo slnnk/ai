@@ -129,6 +129,9 @@ trust_level = "trusted"
 [projects."/home/slnnk/git/kyc"]
 trust_level = "trusted"
 
+[projects."/home/slnnk/ai"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
 
@@ -158,3 +161,16 @@ url = "https://developers.openai.com/mcp"
 
 [sandbox_workspace_write]
 network_access = true
+
+[[hooks.PostToolUse]]
+matcher = "^apply_patch$"
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = 'python3 "$HOME/ai/general/scripts/kb_post_edit.py"'
+timeout = 6
+
+[hooks.state]
+
+[hooks.state."/home/slnnk/.codex/config.toml:post_tool_use:0:0"]
+trusted_hash = "sha256:56f60805f7fb855a4d503e38d97be1ece2f31d0e8b5708ded147b67d41f05700"

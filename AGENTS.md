@@ -62,9 +62,9 @@ Read-only/local edits remain subject to repo gates. TODO grants no permission.
 
 ## Progress and execution status
 
-- Update progress every 30 seconds during long work; before final verify and report task
-  background status per README "Progress and execution status". Disclose unknown status;
-  give check/stop instructions for remaining operations. Read "Task resumption" for checkpoints.
+- Follow README "Progress and execution status" and "Task resumption".
+- For each reported next step, name the owner and action. Tell the user exactly what to do
+  or decide. For agent-owned steps, say when they run and if the user has nothing to do.
 
 ## Backlog and completion
 

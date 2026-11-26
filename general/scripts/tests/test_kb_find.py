@@ -46,6 +46,35 @@ class RetrievalTests(unittest.TestCase):
         p = self.run_cli("--json", "alpha", "beta")
         self.assertEqual(json.loads(p.stdout)["results"][0]["section"]["heading"], "Cause")
 
+    def test_outline_and_section_share_anchors_and_skip_fenced_headings(self):
+        self.write("\n## Recovery\nRead this.\n~~~markdown\n## Fake\n~~~\n"
+                   "### Check\nKeep the child.\n## Recovery\nSecond recovery.")
+        outline = self.run_cli("--outline", str(self.path.relative_to(self.root)))
+        self.assertEqual(outline.returncode, 0, outline.stderr)
+        self.assertEqual(outline.stdout.splitlines(), [
+            "6: # Service [#service]", "8: ## Recovery [#recovery]",
+            "13: ### Check [#check]", "15: ## Recovery [#recovery-1]",
+        ])
+        parent = self.run_cli("--section", str(self.path), "#recovery")
+        self.assertEqual(parent.returncode, 0, parent.stderr)
+        self.assertEqual(parent.stdout, "## Recovery\nRead this.\n~~~markdown\n## Fake\n~~~\n"
+                         "### Check\nKeep the child.\n")
+        last = self.run_cli("--section", str(self.path), "recovery-1")
+        self.assertEqual(last.returncode, 0, last.stderr)
+        self.assertEqual(last.stdout, "## Recovery\nSecond recovery.")
+
+    def test_navigation_rejects_unknown_anchor_and_escaped_path(self):
+        self.write("## Recovery\nRead this.\n")
+        outside = Path(__file__).resolve()
+        alias = self.root / "outside.md"
+        alias.symlink_to(outside)
+        for args in (("--outline", str(alias)),
+                     ("--section", str(self.path), "unknown"),
+                     ("--outline", str(self.path), "recovery")):
+            result = self.run_cli(*args)
+            self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertEqual(result.stdout, "")
+
     def test_cause_can_use_one_fewer_symptom_term_without_selecting_title(self):
         self.write("\n## Symptom\nalpha beta occurs.\n\n## Cause\nalpha parser is broken.\n")
         r = json.loads(self.run_cli("--json", "alpha", "beta").stdout)["results"][0]

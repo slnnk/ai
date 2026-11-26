@@ -134,6 +134,81 @@ After changing `current`, review company skill links and remove stale employer l
 only after inspecting them. Gemini reads the explicitly referenced shared skill files;
 do not assume that Codex/Claude discovery behavior applies to it.
 
+For jcode, use its global prompt overlay and link the same custom skills individually
+into `~/.jcode/skills/`. Jcode can import copies on first run. Compare each existing
+copy with its canonical source and preserve it before replacing it with a link.
+
+```bash
+mkdir -p "$HOME/.jcode/skills"
+ln -s "$HOME/ai/AGENTS.md" "$HOME/.jcode/prompt-overlay.md"
+ln -s "$HOME/ai/general/skills/agent-learning" "$HOME/.jcode/skills/agent-learning"
+```
+
+For the optional [tracked jcode configuration](../../../personal/jcode/config.toml),
+review the provider settings and link it to `~/.jcode/config.toml` if the destination
+is absent. Keep provider credentials in jcode's local authentication store.
+Start a new session after changing the overlay or skill links.
+[Jcode prompt layers](https://github.com/1jehuang/jcode/blob/v1.1.2/docs/SYSTEM_PROMPT_CONFIG.md)
+
+After wiring a full Codex or jcode setup, check its global instructions and shared
+skills before opening a session. The check expects each skill in `general/skills`
+and the active `current/skills` to point at its source. It reports copies, broken
+links and wrong targets, including links to a previous company layer.
+
+```bash
+python3 ~/ai/general/scripts/agent_lint.py --check-links codex
+python3 ~/ai/general/scripts/agent_lint.py --check-links jcode
+```
+
+For optional code navigation, install agentgrep v0.2.0 from its pinned upstream
+revision with a Rust toolchain that supports edition 2024. Ensure the install
+directory is on PATH and run `agentgrep --version`.
+
+```bash
+cargo install --git https://github.com/1jehuang/agentgrep \
+  --rev a2c52bbfea9fbcf1d7e89d74ef607c6d1fb4ba14
+agentgrep outline --max-items 5 "$HOME/ai/general/scripts/kb_lint.py"
+```
+
+#### On-demand Graphify
+
+Install the Graphify CLI in a Python 3.12 virtual environment. Install the
+symlink when the destination is absent. Agents can invoke the CLI through their
+existing shell access.
+
+```bash
+graphify_venv="$HOME/.local/share/graphify/0.9.119"
+python3.12 -m venv "$graphify_venv"
+"$graphify_venv/bin/python" -m pip install 'graphifyy==0.9.119'
+ln -s "$graphify_venv/bin/graphify" "$HOME/.local/bin/graphify"
+"$HOME/.local/bin/graphify" --version
+```
+
+Use one private output directory per checkout, mirroring its path relative to
+`~/git`. From the checkout root, substitute its relative path for `repo-name`.
+Run `update` on the first use or after relevant source changes. Reuse the graph
+for additional queries against the same source. Confirm the returned edges in
+the source before relying on them.
+
+```bash
+install -d -m 700 "$HOME/ai-data/graphify"
+install -d -m 700 "$HOME/ai-data/graphify/repo-name"
+(
+  export GRAPHIFY_OUT="$HOME/ai-data/graphify/repo-name"
+  export GRAPHIFY_QUERY_LOG_DISABLE=1 GRAPHIFY_VIZ_NODE_LIMIT=0
+  "$HOME/.local/bin/graphify" update . &&
+    "$HOME/.local/bin/graphify" path 'Start.Method()' 'End.Method()' \
+      --graph "$GRAPHIFY_OUT/graph.json"
+)
+```
+
+Keep the graph and extraction cache locally while they serve follow-up
+traces. Remove a checkout's output directory when its graph is no longer
+used. The [Graphify CLI reference](https://github.com/Graphify-Labs/graphify#full-command-reference)
+describes available commands.
+
+#### Codex configuration
+
 If using the tracked [global Codex configuration](../../../personal/codex/config.toml),
 review the absolute paths in `[projects]` and the MCP helper paths for this
 workstation. After inspecting any existing `~/.codex/config.toml`, create the link
@@ -146,6 +221,16 @@ readlink -f "$HOME/.codex/config.toml"
 
 If machine-specific paths need to differ, use a reviewed local copy of the config.
 Changes to a linked config also change the tracked file that sync can publish.
+
+The tracked Codex and jcode configurations call `general/scripts/kb_post_edit.py`
+after supported Markdown edits. Codex registers it as `PostToolUse` for
+`apply_patch`. Review and trust that exact hook through `/hooks` in a new Codex
+CLI session. Jcode uses `post_tool_feedback` with its named edit tools after a
+fresh launch. Clean edits are silent. Findings contain lint codes and file
+paths. The hook checks explicit edit paths, while the end-of-task KB lint covers
+shell writes and all other notes.
+[Codex hook review](https://learn.chatgpt.com/docs/hooks#review-and-trust-hooks) ·
+[Jcode feedback hook](https://github.com/1jehuang/jcode/blob/v1.1.2/docs/HOOKS.md#feedback-hook-post_tool_feedback)
 
 ### 4. Restore secrets and local generated data
 
